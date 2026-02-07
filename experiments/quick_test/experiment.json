@@ -1,0 +1,24 @@
+{
+    "name": "quick_test",
+    "template": "distributed_base.txt",
+    "description": "Quick sanity check with small shot count",
+
+    "defaults": {
+        "physical_error": 0.001,
+        "measurement_error": 0.001,
+        "reset_error": 0.001,
+        "total_shots": "10K",
+        "mode": "monte_carlo",
+        "T1": "125e-6",
+        "T2": "200e-6",
+        "measurement_delay": "660e-9",
+        "raw_epr_fidelity": 0.99,
+        "distillation_rounds": 1
+    },
+
+    "sweep": [
+        {"var": "code_distance", "values": [5, 7]},
+        {"var": "entanglement_rate", "values": ["100e6", "350e6"]},
+        {"var": "distillation_protocol", "values": ["none", "pumping_2to1", "recurrence_3to1"]}
+    ]
+}

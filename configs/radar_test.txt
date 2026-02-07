@@ -1,0 +1,30 @@
+# RADar test configuration (paper parameters from Section III.B and VI)
+code_distance 15
+rounds 15
+code_type rotated_memory_x
+physical_error 0.001
+measurement_error 0.001
+reset_error 0.001
+total_shots 100K
+
+# Simulation mode
+mode monte_carlo
+
+# Distributed QEC
+distributed true
+interconnect_error 0.0
+
+# Entanglement parameters (paper Section VI: 150-500 MHz)
+entanglement_rate 350e6
+
+# Coherence times (paper Section III.B)
+T1 125e-6
+T2 200e-6
+
+# Timing (paper Section III.B: 660ns measurement delay)
+measurement_delay 660e-9
+
+# Distillation (paper: 0.99 raw fidelity, 3→1 Recurrence at 350MHz)
+raw_epr_fidelity 0.99
+distillation_protocol recurrence_3to1
+distillation_rounds 1

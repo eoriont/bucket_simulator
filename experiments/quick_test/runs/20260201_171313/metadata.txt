@@ -1,0 +1,9 @@
+Experiment: quick_test
+Run ID: 20260201_171313
+Started: Sun Feb  1 17:13:13 EST 2026
+MPI Processes: 1
+Parallel Jobs: 1
+Total Configs: 12
+Host: Elijahs-MacBook-Pro-3.local
+User: eli
+Simulator: /Users/eli/dev/bucket_simulator/build/bucket_simulator

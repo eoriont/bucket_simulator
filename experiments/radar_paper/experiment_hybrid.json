@@ -1,0 +1,44 @@
+{
+    "name": "radar_paper_hybrid",
+    "template": "distributed_base.txt",
+    "description": "Hybrid: MC for d=13, Bucket for d=15,17 (where LER is lower)",
+
+    "_strategy": "Use Monte Carlo for higher LER cases, bucket for low LER",
+
+    "defaults": {
+        "physical_error": 0.001,
+        "measurement_error": 0.001,
+        "reset_error": 0.001,
+        "T1": "125e-6",
+        "T2": "200e-6",
+        "measurement_delay": "660e-9",
+        "raw_epr_fidelity": 0.99,
+        "distillation_rounds": 1,
+        "max_bias_bound": "1e-10"
+    },
+
+    "_comment": "Reduced sweep for faster execution - expand as needed",
+
+    "sweep": [
+        {
+            "var": "code_distance",
+            "values": [13, 15, 17]
+        },
+        {
+            "var": "entanglement_rate",
+            "values": ["200e6", "350e6", "500e6"]
+        },
+        {
+            "var": "distillation_protocol",
+            "values": ["none", "pumping_2to1", "recurrence_3to1"]
+        },
+        {
+            "var": "mode",
+            "values": ["monte_carlo"]
+        },
+        {
+            "var": "total_shots",
+            "values": ["10M"]
+        }
+    ]
+}

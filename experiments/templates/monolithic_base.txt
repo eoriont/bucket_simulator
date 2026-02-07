@@ -1,0 +1,15 @@
+# Base template for monolithic (non-distributed) QEC experiments
+# Used as baseline comparison for distributed QEC
+
+code_distance {{CODE_DISTANCE}}
+rounds {{ROUNDS}}
+code_type rotated_memory_x
+physical_error {{PHYSICAL_ERROR}}
+measurement_error {{MEASUREMENT_ERROR}}
+reset_error {{RESET_ERROR}}
+total_shots {{TOTAL_SHOTS}}
+
+mode {{MODE}}
+
+# Monolithic: no distribution
+distributed false

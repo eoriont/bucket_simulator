@@ -1,0 +1,23 @@
+============================================
+Experiment Summary
+============================================
+Experiment: quick_test
+Run ID: 20260201_171313
+Completed: Sun Feb  1 17:13:16 EST 2026
+Total Runtime: 3s
+Configs Run: 12
+Failed: 0
+
+Results:
+  d5_rate100M_distnone: LER = 0.000800
+  d5_rate100M_distpumping21: LER = 0.000400
+  d5_rate100M_distrecurrence31: LER = 0.000500
+  d5_rate350M_distnone: LER = 0.001000
+  d5_rate350M_distpumping21: LER = 0.000800
+  d5_rate350M_distrecurrence31: LER = 0.001500
+  d7_rate100M_distnone: LER = 0.000100
+  d7_rate100M_distpumping21: LER = 0.000100
+  d7_rate100M_distrecurrence31: LER = 0.000300
+  d7_rate350M_distnone: LER = 0.000200
+  d7_rate350M_distpumping21: LER = 0.000100
+  d7_rate350M_distrecurrence31: LER = 0.000200

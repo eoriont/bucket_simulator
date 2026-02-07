@@ -1,0 +1,28 @@
+Configuration:
+  Code Distance: 5
+  Rounds: 5
+  Physical Error Rate: 0.001
+  Measurement Error Rate: 0.001
+  Reset Error Rate: 0.001
+  Total Shots: 10000
+  Code Type: rotated_memory_x
+  Simulation Mode: Monte Carlo
+  Distributed QEC: Yes
+  Distillation Protocol: 2→1 Pumping
+  Distillation Rounds: 1
+  Raw EPR Fidelity: 0.99
+  Interconnect Error Rate: 0
+  Entanglement Rate: 350 MHz
+  T1 Coherence Time: 125 μs
+  T2 Coherence Time: 200 μs
+  Measurement Delay: 660 ns
+
+Results:
+  Logical Error Rate: 0.000800 (8/10000)
+
+Runtime Statistics:
+  Total Runtime: 0 hours, 0 minutes, 0 seconds
+  Shots per Second: 312500
+
+Per-Rank Statistics:
+  Rank 0: 10000 shots, 0.0s, 312500 shots/s

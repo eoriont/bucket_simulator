@@ -1,0 +1,13 @@
+config_name,code_distance,entanglement_rate,distillation_protocol,distillation_rounds,raw_epr_fidelity,logical_error_rate,total_shots,runtime
+d5_rate100M_distnone,5,100.0,,,,0.0008,10000,0
+d5_rate100M_distpumping21,5,100.0,2→1 Pumping,1,0.99,0.0004,10000,0
+d5_rate100M_distrecurrence31,5,100.0,3→1 Recurrence,1,0.99,0.0005,10000,0
+d5_rate350M_distnone,5,350.0,,,,0.001,10000,0
+d5_rate350M_distpumping21,5,350.0,2→1 Pumping,1,0.99,0.0008,10000,0
+d5_rate350M_distrecurrence31,5,350.0,3→1 Recurrence,1,0.99,0.0015,10000,0
+d7_rate100M_distnone,7,100.0,,,,0.0001,10000,0
+d7_rate100M_distpumping21,7,100.0,2→1 Pumping,1,0.99,0.0001,10000,0
+d7_rate100M_distrecurrence31,7,100.0,3→1 Recurrence,1,0.99,0.0003,10000,0
+d7_rate350M_distnone,7,350.0,,,,0.0002,10000,0
+d7_rate350M_distpumping21,7,350.0,2→1 Pumping,1,0.99,0.0001,10000,0
+d7_rate350M_distrecurrence31,7,350.0,3→1 Recurrence,1,0.99,0.0002,10000,0

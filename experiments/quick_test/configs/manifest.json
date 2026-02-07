@@ -1,0 +1,55 @@
+{
+  "experiment": "quick_test",
+  "template": "distributed_base.txt",
+  "num_configs": 12,
+  "configs": [
+    {
+      "name": "d5_rate100M_distnone",
+      "file": "d5_rate100M_distnone.txt"
+    },
+    {
+      "name": "d5_rate100M_distpumping21",
+      "file": "d5_rate100M_distpumping21.txt"
+    },
+    {
+      "name": "d5_rate100M_distrecurrence31",
+      "file": "d5_rate100M_distrecurrence31.txt"
+    },
+    {
+      "name": "d5_rate350M_distnone",
+      "file": "d5_rate350M_distnone.txt"
+    },
+    {
+      "name": "d5_rate350M_distpumping21",
+      "file": "d5_rate350M_distpumping21.txt"
+    },
+    {
+      "name": "d5_rate350M_distrecurrence31",
+      "file": "d5_rate350M_distrecurrence31.txt"
+    },
+    {
+      "name": "d7_rate100M_distnone",
+      "file": "d7_rate100M_distnone.txt"
+    },
+    {
+      "name": "d7_rate100M_distpumping21",
+      "file": "d7_rate100M_distpumping21.txt"
+    },
+    {
+      "name": "d7_rate100M_distrecurrence31",
+      "file": "d7_rate100M_distrecurrence31.txt"
+    },
+    {
+      "name": "d7_rate350M_distnone",
+      "file": "d7_rate350M_distnone.txt"
+    },
+    {
+      "name": "d7_rate350M_distpumping21",
+      "file": "d7_rate350M_distpumping21.txt"
+    },
+    {
+      "name": "d7_rate350M_distrecurrence31",
+      "file": "d7_rate350M_distrecurrence31.txt"
+    }
+  ]
+}

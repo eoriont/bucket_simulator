@@ -1,0 +1,40 @@
+Initializing simulator with configuration:
+  Code distance: 5
+  Rounds: 5
+  Physical error: 0.001
+  Measurement error: 0.001
+  Reset error: 0.001
+  Total shots: 10000
+  Code type: rotated_memory_x
+  MPI ranks: 1
+Entanglement distillation:
+  Protocol: None
+  Distillation rounds: 1
+  Raw EPR fidelity: 0.99
+  Distilled EPR fidelity: 0.99
+  Distillation success prob: 1
+  Raw pairs per distilled: 1
+  Remote CNOT error (Eq.1): 0.011979
+Entanglement-limited idling (Eq. 2):
+  Remote CNOTs per cycle: 9
+  Raw pairs per distilled: 1
+  Distillation time: 90 ns
+  Measurement delay: 660 ns
+  Idling time (max): 0.66 μs
+  Timing constraint satisfied: YES
+  Idling errors (pX, pY, pZ): (0.00131652, 0.00131652, 0.000330759)
+  Total idling error: 0.0029638
+Circuit generated:
+  Qubits: 64
+  Detectors: 120
+  Observables: 1
+  Mode: Distributed QEC
+  Interconnect Error: 0
+MWPM decoder initialized
+
+===============================================
+Simulation Complete
+===============================================
+Logical Error Rate: 0.000800
+(8/10000)
+Results written to: /Users/eli/dev/bucket_simulator/experiments/quick_test/runs/20260201_171313/results/results_20260201_171314.txt

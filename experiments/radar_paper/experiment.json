@@ -1,0 +1,26 @@
+{
+    "name": "radar_paper_reproduction",
+    "template": "distributed_base.txt",
+    "description": "Reproduce key results from RADar paper (ISCA 2026): Tables I, II and baseline comparisons",
+
+    "defaults": {
+        "physical_error": 0.001,
+        "measurement_error": 0.001,
+        "reset_error": 0.001,
+        "total_shots": "10M",
+        "mode": "monte_carlo",
+        "T1": "125e-6",
+        "T2": "200e-6",
+        "measurement_delay": "660e-9",
+        "raw_epr_fidelity": 0.99,
+        "distillation_rounds": 1
+    },
+
+    "_comment_table2": "Table II: High-RGEN regime (150-500 MHz) for d=13,15,17 with all protocols",
+
+    "sweep": [
+        {"var": "code_distance", "values": [13, 15, 17]},
+        {"var": "entanglement_rate", "values": ["150e6", "250e6", "300e6", "350e6", "400e6", "450e6", "500e6"]},
+        {"var": "distillation_protocol", "values": ["none", "pumping_2to1", "pumping_3to1", "recurrence_2to1", "recurrence_3to1"]}
+    ]
+}

@@ -1,0 +1,27 @@
+{
+    "name": "radar_paper_bucket",
+    "template": "distributed_base.txt",
+    "description": "Table II using bucket sampling for faster/more accurate low-LER estimation",
+
+    "defaults": {
+        "physical_error": 0.001,
+        "measurement_error": 0.001,
+        "reset_error": 0.001,
+        "total_shots": "1M",
+        "mode": "bucket",
+        "max_bias_bound": "1e-10",
+        "T1": "125e-6",
+        "T2": "200e-6",
+        "measurement_delay": "660e-9",
+        "raw_epr_fidelity": 0.99,
+        "distillation_rounds": 1
+    },
+
+    "_comment": "Bucket mode with 1M effective shots should give better LER estimates than MC with 10M for low-LER configs",
+
+    "sweep": [
+        {"var": "code_distance", "values": [13, 15, 17]},
+        {"var": "entanglement_rate", "values": ["150e6", "300e6", "500e6"]},
+        {"var": "distillation_protocol", "values": ["none", "pumping_2to1", "recurrence_3to1"]}
+    ]
+}

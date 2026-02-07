@@ -1,0 +1,11 @@
+# Distance 19 with automatic bias bound control
+code_distance 19
+rounds 19
+code_type rotated_memory_x
+physical_error 0.01
+measurement_error 0.01
+reset_error 0.01
+total_shots 10000
+mode bucket
+max_bucket 0
+max_bias_bound 0.01

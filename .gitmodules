@@ -1,0 +1,6 @@
+[submodule "Stim"]
+	path = Stim
+	url = https://github.com/quantumlib/Stim.git
+[submodule "Pymatching"]
+	path = Pymatching
+	url = https://github.com/oscarhiggott/PyMatching.git

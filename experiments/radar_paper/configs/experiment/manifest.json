@@ -1,0 +1,427 @@
+{
+  "experiment": "radar_paper_reproduction",
+  "template": "distributed_base.txt",
+  "num_configs": 105,
+  "configs": [
+    {
+      "name": "d13_rate150M_distnone",
+      "file": "d13_rate150M_distnone.txt"
+    },
+    {
+      "name": "d13_rate150M_distpumping21",
+      "file": "d13_rate150M_distpumping21.txt"
+    },
+    {
+      "name": "d13_rate150M_distpumping31",
+      "file": "d13_rate150M_distpumping31.txt"
+    },
+    {
+      "name": "d13_rate150M_distrecurrence21",
+      "file": "d13_rate150M_distrecurrence21.txt"
+    },
+    {
+      "name": "d13_rate150M_distrecurrence31",
+      "file": "d13_rate150M_distrecurrence31.txt"
+    },
+    {
+      "name": "d13_rate250M_distnone",
+      "file": "d13_rate250M_distnone.txt"
+    },
+    {
+      "name": "d13_rate250M_distpumping21",
+      "file": "d13_rate250M_distpumping21.txt"
+    },
+    {
+      "name": "d13_rate250M_distpumping31",
+      "file": "d13_rate250M_distpumping31.txt"
+    },
+    {
+      "name": "d13_rate250M_distrecurrence21",
+      "file": "d13_rate250M_distrecurrence21.txt"
+    },
+    {
+      "name": "d13_rate250M_distrecurrence31",
+      "file": "d13_rate250M_distrecurrence31.txt"
+    },
+    {
+      "name": "d13_rate300M_distnone",
+      "file": "d13_rate300M_distnone.txt"
+    },
+    {
+      "name": "d13_rate300M_distpumping21",
+      "file": "d13_rate300M_distpumping21.txt"
+    },
+    {
+      "name": "d13_rate300M_distpumping31",
+      "file": "d13_rate300M_distpumping31.txt"
+    },
+    {
+      "name": "d13_rate300M_distrecurrence21",
+      "file": "d13_rate300M_distrecurrence21.txt"
+    },
+    {
+      "name": "d13_rate300M_distrecurrence31",
+      "file": "d13_rate300M_distrecurrence31.txt"
+    },
+    {
+      "name": "d13_rate350M_distnone",
+      "file": "d13_rate350M_distnone.txt"
+    },
+    {
+      "name": "d13_rate350M_distpumping21",
+      "file": "d13_rate350M_distpumping21.txt"
+    },
+    {
+      "name": "d13_rate350M_distpumping31",
+      "file": "d13_rate350M_distpumping31.txt"
+    },
+    {
+      "name": "d13_rate350M_distrecurrence21",
+      "file": "d13_rate350M_distrecurrence21.txt"
+    },
+    {
+      "name": "d13_rate350M_distrecurrence31",
+      "file": "d13_rate350M_distrecurrence31.txt"
+    },
+    {
+      "name": "d13_rate400M_distnone",
+      "file": "d13_rate400M_distnone.txt"
+    },
+    {
+      "name": "d13_rate400M_distpumping21",
+      "file": "d13_rate400M_distpumping21.txt"
+    },
+    {
+      "name": "d13_rate400M_distpumping31",
+      "file": "d13_rate400M_distpumping31.txt"
+    },
+    {
+      "name": "d13_rate400M_distrecurrence21",
+      "file": "d13_rate400M_distrecurrence21.txt"
+    },
+    {
+      "name": "d13_rate400M_distrecurrence31",
+      "file": "d13_rate400M_distrecurrence31.txt"
+    },
+    {
+      "name": "d13_rate450M_distnone",
+      "file": "d13_rate450M_distnone.txt"
+    },
+    {
+      "name": "d13_rate450M_distpumping21",
+      "file": "d13_rate450M_distpumping21.txt"
+    },
+    {
+      "name": "d13_rate450M_distpumping31",
+      "file": "d13_rate450M_distpumping31.txt"
+    },
+    {
+      "name": "d13_rate450M_distrecurrence21",
+      "file": "d13_rate450M_distrecurrence21.txt"
+    },
+    {
+      "name": "d13_rate450M_distrecurrence31",
+      "file": "d13_rate450M_distrecurrence31.txt"
+    },
+    {
+      "name": "d13_rate500M_distnone",
+      "file": "d13_rate500M_distnone.txt"
+    },
+    {
+      "name": "d13_rate500M_distpumping21",
+      "file": "d13_rate500M_distpumping21.txt"
+    },
+    {
+      "name": "d13_rate500M_distpumping31",
+      "file": "d13_rate500M_distpumping31.txt"
+    },
+    {
+      "name": "d13_rate500M_distrecurrence21",
+      "file": "d13_rate500M_distrecurrence21.txt"
+    },
+    {
+      "name": "d13_rate500M_distrecurrence31",
+      "file": "d13_rate500M_distrecurrence31.txt"
+    },
+    {
+      "name": "d15_rate150M_distnone",
+      "file": "d15_rate150M_distnone.txt"
+    },
+    {
+      "name": "d15_rate150M_distpumping21",
+      "file": "d15_rate150M_distpumping21.txt"
+    },
+    {
+      "name": "d15_rate150M_distpumping31",
+      "file": "d15_rate150M_distpumping31.txt"
+    },
+    {
+      "name": "d15_rate150M_distrecurrence21",
+      "file": "d15_rate150M_distrecurrence21.txt"
+    },
+    {
+      "name": "d15_rate150M_distrecurrence31",
+      "file": "d15_rate150M_distrecurrence31.txt"
+    },
+    {
+      "name": "d15_rate250M_distnone",
+      "file": "d15_rate250M_distnone.txt"
+    },
+    {
+      "name": "d15_rate250M_distpumping21",
+      "file": "d15_rate250M_distpumping21.txt"
+    },
+    {
+      "name": "d15_rate250M_distpumping31",
+      "file": "d15_rate250M_distpumping31.txt"
+    },
+    {
+      "name": "d15_rate250M_distrecurrence21",
+      "file": "d15_rate250M_distrecurrence21.txt"
+    },
+    {
+      "name": "d15_rate250M_distrecurrence31",
+      "file": "d15_rate250M_distrecurrence31.txt"
+    },
+    {
+      "name": "d15_rate300M_distnone",
+      "file": "d15_rate300M_distnone.txt"
+    },
+    {
+      "name": "d15_rate300M_distpumping21",
+      "file": "d15_rate300M_distpumping21.txt"
+    },
+    {
+      "name": "d15_rate300M_distpumping31",
+      "file": "d15_rate300M_distpumping31.txt"
+    },
+    {
+      "name": "d15_rate300M_distrecurrence21",
+      "file": "d15_rate300M_distrecurrence21.txt"
+    },
+    {
+      "name": "d15_rate300M_distrecurrence31",
+      "file": "d15_rate300M_distrecurrence31.txt"
+    },
+    {
+      "name": "d15_rate350M_distnone",
+      "file": "d15_rate350M_distnone.txt"
+    },
+    {
+      "name": "d15_rate350M_distpumping21",
+      "file": "d15_rate350M_distpumping21.txt"
+    },
+    {
+      "name": "d15_rate350M_distpumping31",
+      "file": "d15_rate350M_distpumping31.txt"
+    },
+    {
+      "name": "d15_rate350M_distrecurrence21",
+      "file": "d15_rate350M_distrecurrence21.txt"
+    },
+    {
+      "name": "d15_rate350M_distrecurrence31",
+      "file": "d15_rate350M_distrecurrence31.txt"
+    },
+    {
+      "name": "d15_rate400M_distnone",
+      "file": "d15_rate400M_distnone.txt"
+    },
+    {
+      "name": "d15_rate400M_distpumping21",
+      "file": "d15_rate400M_distpumping21.txt"
+    },
+    {
+      "name": "d15_rate400M_distpumping31",
+      "file": "d15_rate400M_distpumping31.txt"
+    },
+    {
+      "name": "d15_rate400M_distrecurrence21",
+      "file": "d15_rate400M_distrecurrence21.txt"
+    },
+    {
+      "name": "d15_rate400M_distrecurrence31",
+      "file": "d15_rate400M_distrecurrence31.txt"
+    },
+    {
+      "name": "d15_rate450M_distnone",
+      "file": "d15_rate450M_distnone.txt"
+    },
+    {
+      "name": "d15_rate450M_distpumping21",
+      "file": "d15_rate450M_distpumping21.txt"
+    },
+    {
+      "name": "d15_rate450M_distpumping31",
+      "file": "d15_rate450M_distpumping31.txt"
+    },
+    {
+      "name": "d15_rate450M_distrecurrence21",
+      "file": "d15_rate450M_distrecurrence21.txt"
+    },
+    {
+      "name": "d15_rate450M_distrecurrence31",
+      "file": "d15_rate450M_distrecurrence31.txt"
+    },
+    {
+      "name": "d15_rate500M_distnone",
+      "file": "d15_rate500M_distnone.txt"
+    },
+    {
+      "name": "d15_rate500M_distpumping21",
+      "file": "d15_rate500M_distpumping21.txt"
+    },
+    {
+      "name": "d15_rate500M_distpumping31",
+      "file": "d15_rate500M_distpumping31.txt"
+    },
+    {
+      "name": "d15_rate500M_distrecurrence21",
+      "file": "d15_rate500M_distrecurrence21.txt"
+    },
+    {
+      "name": "d15_rate500M_distrecurrence31",
+      "file": "d15_rate500M_distrecurrence31.txt"
+    },
+    {
+      "name": "d17_rate150M_distnone",
+      "file": "d17_rate150M_distnone.txt"
+    },
+    {
+      "name": "d17_rate150M_distpumping21",
+      "file": "d17_rate150M_distpumping21.txt"
+    },
+    {
+      "name": "d17_rate150M_distpumping31",
+      "file": "d17_rate150M_distpumping31.txt"
+    },
+    {
+      "name": "d17_rate150M_distrecurrence21",
+      "file": "d17_rate150M_distrecurrence21.txt"
+    },
+    {
+      "name": "d17_rate150M_distrecurrence31",
+      "file": "d17_rate150M_distrecurrence31.txt"
+    },
+    {
+      "name": "d17_rate250M_distnone",
+      "file": "d17_rate250M_distnone.txt"
+    },
+    {
+      "name": "d17_rate250M_distpumping21",
+      "file": "d17_rate250M_distpumping21.txt"
+    },
+    {
+      "name": "d17_rate250M_distpumping31",
+      "file": "d17_rate250M_distpumping31.txt"
+    },
+    {
+      "name": "d17_rate250M_distrecurrence21",
+      "file": "d17_rate250M_distrecurrence21.txt"
+    },
+    {
+      "name": "d17_rate250M_distrecurrence31",
+      "file": "d17_rate250M_distrecurrence31.txt"
+    },
+    {
+      "name": "d17_rate300M_distnone",
+      "file": "d17_rate300M_distnone.txt"
+    },
+    {
+      "name": "d17_rate300M_distpumping21",
+      "file": "d17_rate300M_distpumping21.txt"
+    },
+    {
+      "name": "d17_rate300M_distpumping31",
+      "file": "d17_rate300M_distpumping31.txt"
+    },
+    {
+      "name": "d17_rate300M_distrecurrence21",
+      "file": "d17_rate300M_distrecurrence21.txt"
+    },
+    {
+      "name": "d17_rate300M_distrecurrence31",
+      "file": "d17_rate300M_distrecurrence31.txt"
+    },
+    {
+      "name": "d17_rate350M_distnone",
+      "file": "d17_rate350M_distnone.txt"
+    },
+    {
+      "name": "d17_rate350M_distpumping21",
+      "file": "d17_rate350M_distpumping21.txt"
+    },
+    {
+      "name": "d17_rate350M_distpumping31",
+      "file": "d17_rate350M_distpumping31.txt"
+    },
+    {
+      "name": "d17_rate350M_distrecurrence21",
+      "file": "d17_rate350M_distrecurrence21.txt"
+    },
+    {
+      "name": "d17_rate350M_distrecurrence31",
+      "file": "d17_rate350M_distrecurrence31.txt"
+    },
+    {
+      "name": "d17_rate400M_distnone",
+      "file": "d17_rate400M_distnone.txt"
+    },
+    {
+      "name": "d17_rate400M_distpumping21",
+      "file": "d17_rate400M_distpumping21.txt"
+    },
+    {
+      "name": "d17_rate400M_distpumping31",
+      "file": "d17_rate400M_distpumping31.txt"
+    },
+    {
+      "name": "d17_rate400M_distrecurrence21",
+      "file": "d17_rate400M_distrecurrence21.txt"
+    },
+    {
+      "name": "d17_rate400M_distrecurrence31",
+      "file": "d17_rate400M_distrecurrence31.txt"
+    },
+    {
+      "name": "d17_rate450M_distnone",
+      "file": "d17_rate450M_distnone.txt"
+    },
+    {
+      "name": "d17_rate450M_distpumping21",
+      "file": "d17_rate450M_distpumping21.txt"
+    },
+    {
+      "name": "d17_rate450M_distpumping31",
+      "file": "d17_rate450M_distpumping31.txt"
+    },
+    {
+      "name": "d17_rate450M_distrecurrence21",
+      "file": "d17_rate450M_distrecurrence21.txt"
+    },
+    {
+      "name": "d17_rate450M_distrecurrence31",
+      "file": "d17_rate450M_distrecurrence31.txt"
+    },
+    {
+      "name": "d17_rate500M_distnone",
+      "file": "d17_rate500M_distnone.txt"
+    },
+    {
+      "name": "d17_rate500M_distpumping21",
+      "file": "d17_rate500M_distpumping21.txt"
+    },
+    {
+      "name": "d17_rate500M_distpumping31",
+      "file": "d17_rate500M_distpumping31.txt"
+    },
+    {
+      "name": "d17_rate500M_distrecurrence21",
+      "file": "d17_rate500M_distrecurrence21.txt"
+    },
+    {
+      "name": "d17_rate500M_distrecurrence31",
+      "file": "d17_rate500M_distrecurrence31.txt"
+    }
+  ]
+}

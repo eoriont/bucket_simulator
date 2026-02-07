@@ -1,0 +1,9 @@
+# Distance 5 Monte Carlo comparison
+code_distance 5
+rounds 5
+code_type rotated_memory_x
+physical_error 0.01
+measurement_error 0.01
+reset_error 0.01
+total_shots 100000
+mode monte_carlo

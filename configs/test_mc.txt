@@ -1,0 +1,17 @@
+# Monte Carlo test
+code_distance 13
+rounds 13
+code_type rotated_memory_x
+physical_error 0.001
+measurement_error 0.001
+reset_error 0.001
+total_shots 100K
+mode monte_carlo
+distributed true
+entanglement_rate 350e6
+T1 125e-6
+T2 200e-6
+measurement_delay 660e-9
+raw_epr_fidelity 0.99
+distillation_protocol recurrence_3to1
+distillation_rounds 1

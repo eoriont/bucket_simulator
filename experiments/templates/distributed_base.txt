@@ -1,0 +1,28 @@
+# Base template for distributed QEC experiments
+# Variables marked with {{VAR}} will be substituted by the config generator
+
+code_distance {{CODE_DISTANCE}}
+rounds {{ROUNDS}}
+code_type rotated_memory_x
+physical_error {{PHYSICAL_ERROR}}
+measurement_error {{MEASUREMENT_ERROR}}
+reset_error {{RESET_ERROR}}
+total_shots {{TOTAL_SHOTS}}
+
+mode {{MODE}}
+distributed true
+interconnect_error 0.0
+
+# Entanglement parameters
+entanglement_rate {{ENTANGLEMENT_RATE}}
+T1 {{T1}}
+T2 {{T2}}
+measurement_delay {{MEASUREMENT_DELAY}}
+
+# Distillation parameters
+raw_epr_fidelity {{RAW_EPR_FIDELITY}}
+distillation_protocol {{DISTILLATION_PROTOCOL}}
+distillation_rounds {{DISTILLATION_ROUNDS}}
+
+# Bucket mode parameters (only used when mode=bucket)
+max_bias_bound {{MAX_BIAS_BOUND}}

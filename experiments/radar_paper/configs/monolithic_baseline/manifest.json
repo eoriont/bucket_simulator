@@ -1,0 +1,19 @@
+{
+  "experiment": "monolithic_baseline",
+  "template": "monolithic_base.txt",
+  "num_configs": 3,
+  "configs": [
+    {
+      "name": "d13",
+      "file": "d13.txt"
+    },
+    {
+      "name": "d15",
+      "file": "d15.txt"
+    },
+    {
+      "name": "d17",
+      "file": "d17.txt"
+    }
+  ]
+}

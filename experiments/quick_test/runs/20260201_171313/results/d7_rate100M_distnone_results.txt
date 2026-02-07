@@ -1,0 +1,25 @@
+Configuration:
+  Code Distance: 7
+  Rounds: 7
+  Physical Error Rate: 0.001
+  Measurement Error Rate: 0.001
+  Reset Error Rate: 0.001
+  Total Shots: 10000
+  Code Type: rotated_memory_x
+  Simulation Mode: Monte Carlo
+  Distributed QEC: Yes
+  Interconnect Error Rate: 0
+  Entanglement Rate: 100 MHz
+  T1 Coherence Time: 125 μs
+  T2 Coherence Time: 200 μs
+  Measurement Delay: 660 ns
+
+Results:
+  Logical Error Rate: 0.000100 (1/10000)
+
+Runtime Statistics:
+  Total Runtime: 0 hours, 0 minutes, 0 seconds
+  Shots per Second: 119048
+
+Per-Rank Statistics:
+  Rank 0: 10000 shots, 0.1s, 119048 shots/s

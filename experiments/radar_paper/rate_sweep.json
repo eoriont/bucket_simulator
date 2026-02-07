@@ -1,0 +1,26 @@
+{
+    "name": "radar_rate_sweep",
+    "template": "distributed_base.txt",
+    "description": "Figure 6 style: LER vs entanglement rate (20-100 MHz) showing timing constraint effects",
+
+    "defaults": {
+        "physical_error": 0.001,
+        "measurement_error": 0.001,
+        "reset_error": 0.001,
+        "total_shots": "1M",
+        "mode": "monte_carlo",
+        "T1": "125e-6",
+        "T2": "200e-6",
+        "measurement_delay": "660e-9",
+        "raw_epr_fidelity": 0.99,
+        "distillation_rounds": 1,
+        "distillation_protocol": "none"
+    },
+
+    "_comment": "Sweep very low to medium rates to show timing threshold (~45 MHz)",
+
+    "sweep": [
+        {"var": "code_distance", "values": [15]},
+        {"var": "entanglement_rate", "values": ["20e6", "30e6", "40e6", "50e6", "60e6", "70e6", "80e6", "90e6", "100e6"]}
+    ]
+}

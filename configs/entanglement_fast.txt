@@ -1,0 +1,13 @@
+# Distributed QEC test with fast entanglement
+code_distance 5
+rounds 5
+code_type rotated_memory_x
+physical_error 0.001
+measurement_error 0.001
+reset_error 0.001
+total_shots 100000
+distributed true
+interconnect_error 0.01
+entanglement_rate 1e7      # 10 MHz (fast entanglement)
+T1 100e-6                   # 100 μs coherence time
+mode monte_carlo

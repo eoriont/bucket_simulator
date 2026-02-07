@@ -1,0 +1,17 @@
+{
+    "name": "monolithic_baseline",
+    "template": "monolithic_base.txt",
+    "description": "Monolithic surface code baselines for comparison (Figure 4)",
+
+    "defaults": {
+        "physical_error": 0.001,
+        "measurement_error": 0.001,
+        "reset_error": 0.001,
+        "total_shots": "10M",
+        "mode": "monte_carlo"
+    },
+
+    "sweep": [
+        {"var": "code_distance", "values": [13, 15, 17]}
+    ]
+}

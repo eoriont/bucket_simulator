@@ -1,0 +1,25 @@
+# Base template for distributed QEC experiments
+# Variables marked with {{VAR}} will be substituted by the config generator
+
+code_distance 17
+rounds 17
+code_type rotated_memory_x
+physical_error 0.001
+measurement_error 0.001
+reset_error 0.001
+total_shots 10M
+
+mode monte_carlo
+distributed true
+interconnect_error 0.0
+
+# Entanglement parameters
+entanglement_rate 250e6
+T1 125e-6
+T2 200e-6
+measurement_delay 660e-9
+
+# Distillation parameters
+raw_epr_fidelity 0.99
+distillation_protocol pumping_2to1
+distillation_rounds 1

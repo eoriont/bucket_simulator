@@ -1,0 +1,43 @@
+{
+  "experiment": "radar_rate_sweep",
+  "template": "distributed_base.txt",
+  "num_configs": 9,
+  "configs": [
+    {
+      "name": "d15_rate20M",
+      "file": "d15_rate20M.txt"
+    },
+    {
+      "name": "d15_rate30M",
+      "file": "d15_rate30M.txt"
+    },
+    {
+      "name": "d15_rate40M",
+      "file": "d15_rate40M.txt"
+    },
+    {
+      "name": "d15_rate50M",
+      "file": "d15_rate50M.txt"
+    },
+    {
+      "name": "d15_rate60M",
+      "file": "d15_rate60M.txt"
+    },
+    {
+      "name": "d15_rate70M",
+      "file": "d15_rate70M.txt"
+    },
+    {
+      "name": "d15_rate80M",
+      "file": "d15_rate80M.txt"
+    },
+    {
+      "name": "d15_rate90M",
+      "file": "d15_rate90M.txt"
+    },
+    {
+      "name": "d15_rate100M",
+      "file": "d15_rate100M.txt"
+    }
+  ]
+}

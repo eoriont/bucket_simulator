@@ -1,0 +1,16 @@
+# Pumping distillation (N=3)
+code_distance 5
+rounds 5
+code_type rotated_memory_x
+physical_error 0.001
+measurement_error 0.001
+reset_error 0.001
+total_shots 100000
+distributed true
+raw_epr_fidelity 0.95
+distillation_protocol pumping
+pumping_rounds 3
+interconnect_error 0.0
+entanglement_rate 1e6
+T1 100e-6
+mode monte_carlo

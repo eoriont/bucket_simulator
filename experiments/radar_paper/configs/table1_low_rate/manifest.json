@@ -1,0 +1,79 @@
+{
+  "experiment": "radar_table1_low_rate",
+  "template": "distributed_base.txt",
+  "num_configs": 18,
+  "configs": [
+    {
+      "name": "d13_rate80M_distnone",
+      "file": "d13_rate80M_distnone.txt"
+    },
+    {
+      "name": "d13_rate80M_distpumping21",
+      "file": "d13_rate80M_distpumping21.txt"
+    },
+    {
+      "name": "d13_rate80M_distrecurrence21",
+      "file": "d13_rate80M_distrecurrence21.txt"
+    },
+    {
+      "name": "d13_rate90M_distnone",
+      "file": "d13_rate90M_distnone.txt"
+    },
+    {
+      "name": "d13_rate90M_distpumping21",
+      "file": "d13_rate90M_distpumping21.txt"
+    },
+    {
+      "name": "d13_rate90M_distrecurrence21",
+      "file": "d13_rate90M_distrecurrence21.txt"
+    },
+    {
+      "name": "d13_rate100M_distnone",
+      "file": "d13_rate100M_distnone.txt"
+    },
+    {
+      "name": "d13_rate100M_distpumping21",
+      "file": "d13_rate100M_distpumping21.txt"
+    },
+    {
+      "name": "d13_rate100M_distrecurrence21",
+      "file": "d13_rate100M_distrecurrence21.txt"
+    },
+    {
+      "name": "d15_rate80M_distnone",
+      "file": "d15_rate80M_distnone.txt"
+    },
+    {
+      "name": "d15_rate80M_distpumping21",
+      "file": "d15_rate80M_distpumping21.txt"
+    },
+    {
+      "name": "d15_rate80M_distrecurrence21",
+      "file": "d15_rate80M_distrecurrence21.txt"
+    },
+    {
+      "name": "d15_rate90M_distnone",
+      "file": "d15_rate90M_distnone.txt"
+    },
+    {
+      "name": "d15_rate90M_distpumping21",
+      "file": "d15_rate90M_distpumping21.txt"
+    },
+    {
+      "name": "d15_rate90M_distrecurrence21",
+      "file": "d15_rate90M_distrecurrence21.txt"
+    },
+    {
+      "name": "d15_rate100M_distnone",
+      "file": "d15_rate100M_distnone.txt"
+    },
+    {
+      "name": "d15_rate100M_distpumping21",
+      "file": "d15_rate100M_distpumping21.txt"
+    },
+    {
+      "name": "d15_rate100M_distrecurrence21",
+      "file": "d15_rate100M_distrecurrence21.txt"
+    }
+  ]
+}
