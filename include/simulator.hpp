@@ -44,6 +44,7 @@ private:
 
     uint64_t local_errors_;
     double local_runtime_;
+    std::string annotated_circuit_str_;  // Pragma-annotated stim text (if available)
 
     // Bucket mode statistics
     uint32_t num_sampled_buckets_;
@@ -57,6 +58,7 @@ private:
 
     void initialize_circuit();
     void initialize_lattice_surgery_circuit();
+    void initialize_distributed_lattice_surgery_circuit();
     void initialize_decoder();
     void inject_interconnect_noise();
     void inject_entanglement_idling_noise();
@@ -80,7 +82,7 @@ private:
     void run_bucket();
 
 public:
-    SurfaceCodeSimulator(const Config& config, int rank, int size);
+    SurfaceCodeSimulator(const Config& config, int rank, int size, bool skip_decoder = false);
 
     void run();
 
@@ -98,6 +100,7 @@ public:
 
     // Get the generated circuit (for visualization/debugging)
     const stim::Circuit& get_circuit() const { return circuit_; }
+    const std::string& get_annotated_circuit_str() const { return annotated_circuit_str_; }
 };
 
 } // namespace bucket_sim

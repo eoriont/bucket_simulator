@@ -21,6 +21,7 @@ set(SIMULATOR_FILES
     src/dem_analyzer.cpp
     src/bucket_sampler.cpp
     src/lattice_surgery.cpp
+    src/distributed_lattice_surgery.cpp
 )
 
 # Create executable
@@ -52,3 +53,13 @@ target_link_libraries(bucket_simulator PRIVATE
     ${MPI_C_LIBRARIES}
     ${MPI_CXX_LIBRARIES}
 )
+
+# Test: distributed lattice surgery invariants
+add_executable(distributed_lattice_surgery_invariants_test
+    tests/distributed_lattice_surgery_invariants.cpp
+    src/distributed_lattice_surgery.cpp
+    src/config.cpp
+)
+target_include_directories(distributed_lattice_surgery_invariants_test PRIVATE include)
+target_link_libraries(distributed_lattice_surgery_invariants_test PRIVATE libstim)
+target_compile_definitions(distributed_lattice_surgery_invariants_test PRIVATE PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")

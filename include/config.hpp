@@ -12,9 +12,10 @@ enum class SimulationMode {
 
 // Lattice surgery merge type
 enum class MergeType {
-    NONE,       // No lattice surgery (standard memory experiment)
-    XX_MERGE,   // X-basis merge (measures XX between patches)
-    ZZ_MERGE    // Z-basis merge (measures ZZ between patches)
+    NONE,                // No lattice surgery (standard memory experiment)
+    XX_MERGE,            // X-basis merge (measures XX between patches)
+    ZZ_MERGE,            // Z-basis merge (measures ZZ between patches)
+    XX_MERGE_DISTRIBUTED // Distributed XX merge: no merge data qubits, remote CNOTs only, flipped Patch B
 };
 
 enum class DistillationProtocol {

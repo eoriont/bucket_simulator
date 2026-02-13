@@ -1,4 +1,5 @@
 #include "decoder.hpp"
+#include <exception>
 
 namespace bucket_sim {
 
@@ -21,15 +22,25 @@ uint64_t decode_batch(
             }
         }
 
-        // Decode the detection events to predict observable flips
-        auto decoded_result = pm::decode_detection_events_for_up_to_64_observables(mwpm, hits, false);
+        // Decode the detection events to predict observable flips.
+        // Some distributed circuits can yield odd-parity components that are
+        // undecodable by strict MWPM. Treat these shots as decoding failures
+        // (counted as mistakes) instead of aborting the full run.
+        uint64_t decoded_obs_mask = 0;
+        bool decode_ok = true;
+        try {
+            auto decoded_result = pm::decode_detection_events_for_up_to_64_observables(mwpm, hits, false);
+            decoded_obs_mask = decoded_result.obs_mask;
+        } catch (const std::exception&) {
+            decode_ok = false;
+        }
 
         // Get actual observable flip (assuming single observable at index 0)
         // For multiple observables, need to iterate and build the mask
         uint64_t actual_obs = observable_flips[0][shot_idx] ? 1ULL : 0ULL;
 
         // Compare decoded vs actual observable
-        if (decoded_result.obs_mask != actual_obs) {
+        if (!decode_ok || decoded_obs_mask != actual_obs) {
             num_mistakes++;
         }
     }

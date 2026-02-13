@@ -192,12 +192,17 @@ int main(int argc, char** argv) {
         bucket_sim::Config config = bucket_sim::parse_config(config_file);
 
         // Create simulator (this generates the circuit)
-        bucket_sim::SurfaceCodeSimulator simulator(config, world_rank, world_size);
+        bucket_sim::SurfaceCodeSimulator simulator(config, world_rank, world_size, dump_circuit);
 
         // If dump-circuit flag is set, output circuit and exit
         if (dump_circuit) {
             if (world_rank == 0) {
-                std::cout << simulator.get_circuit().str() << std::endl;
+                const auto& annotated = simulator.get_annotated_circuit_str();
+                if (!annotated.empty()) {
+                    std::cout << annotated;
+                } else {
+                    std::cout << simulator.get_circuit().str() << std::endl;
+                }
             }
             MPI_Finalize();
             return 0;

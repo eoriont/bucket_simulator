@@ -132,9 +132,11 @@ Config parse_config(const std::string& filename) {
                     config.merge_type = MergeType::XX_MERGE;
                 } else if (value == "zz" || value == "ZZ" || value == "zz_merge") {
                     config.merge_type = MergeType::ZZ_MERGE;
+                } else if (value == "distributed_xx" || value == "xx_distributed" || value == "DISTRIBUTED_XX") {
+                    config.merge_type = MergeType::XX_MERGE_DISTRIBUTED;
                 } else {
                     throw std::invalid_argument("Unknown merge type: " + value +
-                        ". Valid options: none, xx, zz");
+                        ". Valid options: none, xx, zz, distributed_xx");
                 }
             } else if (key == "merge_rounds") {
                 config.merge_rounds = std::stoul(value);

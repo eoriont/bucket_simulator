@@ -3,6 +3,7 @@
 #include "dem_analyzer.hpp"
 #include "bucket_sampler.hpp"
 #include "lattice_surgery.hpp"
+#include "distributed_lattice_surgery.hpp"
 #include <stim/circuit/circuit.h>
 #include <stim/simulators/error_analyzer.h>
 #include <pymatching/sparse_blossom/driver/user_graph.h>
@@ -15,7 +16,7 @@ namespace bucket_sim {
 
 constexpr uint64_t BATCH_SIZE = 1000000; // Process 1M shots per batch
 
-SurfaceCodeSimulator::SurfaceCodeSimulator(const Config& config, int rank, int size)
+SurfaceCodeSimulator::SurfaceCodeSimulator(const Config& config, int rank, int size, bool skip_decoder)
     : config_(config),
       mpi_rank_(rank),
       mpi_size_(size),
@@ -47,11 +48,17 @@ SurfaceCodeSimulator::SurfaceCodeSimulator(const Config& config, int rank, int s
     }
 
     initialize_circuit();
-    initialize_decoder();
+    if (!skip_decoder) {
+        initialize_decoder();
+    }
 }
 
 void SurfaceCodeSimulator::initialize_circuit() {
     // Check if we're doing lattice surgery
+    if (config_.merge_type == MergeType::XX_MERGE_DISTRIBUTED) {
+        initialize_distributed_lattice_surgery_circuit();
+        return;
+    }
     if (config_.merge_type != MergeType::NONE) {
         initialize_lattice_surgery_circuit();
         return;
@@ -109,6 +116,27 @@ void SurfaceCodeSimulator::initialize_lattice_surgery_circuit() {
         std::cout << "  Observables: " << circuit_.count_observables() << std::endl;
         std::cout << "  Merge stabilizers cross QPU boundary: "
                   << (config_.distributed ? "yes (remote CNOTs required)" : "n/a") << std::endl;
+    }
+}
+
+void SurfaceCodeSimulator::initialize_distributed_lattice_surgery_circuit() {
+    if (mpi_rank_ == 0) {
+        std::cout << "Initializing DISTRIBUTED lattice surgery circuit:" << std::endl;
+        std::cout << "  Mode: Remote CNOTs only, no merge data qubits, flipped Patch B" << std::endl;
+        std::cout << "  Code distance: " << config_.code_distance << std::endl;
+        std::cout << "  Merge rounds: " << (config_.merge_rounds > 0 ? config_.merge_rounds : config_.code_distance) << std::endl;
+    }
+
+    DistributedLatticeSurgeryCircuit dls_circuit(config_);
+    circuit_ = dls_circuit.generate();
+    annotated_circuit_str_ = dls_circuit.annotated_stim_str();
+
+    if (mpi_rank_ == 0) {
+        std::cout << "Distributed lattice surgery circuit generated:" << std::endl;
+        std::cout << "  Total qubits: " << circuit_.count_qubits() << std::endl;
+        std::cout << "  Data qubits: " << dls_circuit.num_data_qubits() << std::endl;
+        std::cout << "  Detectors: " << circuit_.count_detectors() << std::endl;
+        std::cout << "  Observables: " << circuit_.count_observables() << std::endl;
     }
 }
 
