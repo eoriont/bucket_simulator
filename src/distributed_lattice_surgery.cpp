@@ -380,8 +380,6 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         }
     }
 
-    double interconnect_err = config_.interconnect_error;
-
     // Counts for offset arithmetic
     size_t patch_z_count = z_ancillas.size();
     size_t patch_x_count = x_ancillas.size();
@@ -462,16 +460,12 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         circuit_.safe_append_u("TICK", {}, {});
 
         // CNOT layers: interior patch + merge
+        // Noise is injected later by inject_interconnect_noise() in the simulator.
         auto emit_merge_layer = [&](const std::vector<uint32_t>& interior_cx,
                                      const std::vector<uint32_t>& merge_cx) {
             std::vector<uint32_t> combined = interior_cx;
             combined.insert(combined.end(), merge_cx.begin(), merge_cx.end());
             if (!combined.empty()) circuit_.safe_append_u("CX", combined, {});
-
-            // Add interconnect noise on merge CNOTs
-            if (interconnect_err > 0.0 && !merge_cx.empty()) {
-                circuit_.safe_append_u("DEPOLARIZE2", merge_cx, {interconnect_err});
-            }
 
             circuit_.safe_append_u("TICK", {}, {});
         };

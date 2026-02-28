@@ -122,14 +122,24 @@ void SurfaceCodeSimulator::initialize_lattice_surgery_circuit() {
 void SurfaceCodeSimulator::initialize_distributed_lattice_surgery_circuit() {
     if (mpi_rank_ == 0) {
         std::cout << "Initializing DISTRIBUTED lattice surgery circuit:" << std::endl;
-        std::cout << "  Mode: Remote CNOTs only, no merge data qubits, flipped Patch B" << std::endl;
+        std::cout << "  Mode: Remote CNOTs only, no merge data qubits" << std::endl;
         std::cout << "  Code distance: " << config_.code_distance << std::endl;
         std::cout << "  Merge rounds: " << (config_.merge_rounds > 0 ? config_.merge_rounds : config_.code_distance) << std::endl;
     }
 
     DistributedLatticeSurgeryCircuit dls_circuit(config_);
     circuit_ = dls_circuit.generate();
+
+    // Seed annotated string with pragma polygons so inject_interconnect_noise
+    // preserves them when rewriting the circuit text.
     annotated_circuit_str_ = dls_circuit.annotated_stim_str();
+
+    // Inject interconnect noise (remote merge CNOTs get fidelity-derived error,
+    // local merge CNOTs get physical_error)
+    inject_interconnect_noise();
+
+    // Inject entanglement-limited idling noise if configured
+    inject_entanglement_idling_noise();
 
     if (mpi_rank_ == 0) {
         std::cout << "Distributed lattice surgery circuit generated:" << std::endl;
@@ -207,19 +217,22 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
     // Get qubit coordinate mapping
     auto coords = circuit_.get_final_qubit_coords();
 
-    // Determine split position (middle of code)
+    // Determine split position (boundary between QPU A and QPU B)
+    // QPU A owns x <= split_x, QPU B owns x > split_x.
+    // Merge ancillas at x = split_x are on QPU A.
     double split_x = config_.code_distance;
 
-    // Get circuit as string
-    std::string circuit_str = circuit_.str();
+    // Local gate error for merge CNOTs that don't cross the boundary
+    double local_error = config_.physical_error;
+
+    // Use pragma-annotated string if available, otherwise raw circuit
+    std::string circuit_str = annotated_circuit_str_.empty()
+        ? circuit_.str() : annotated_circuit_str_;
     std::istringstream iss(circuit_str);
     std::ostringstream oss;
 
     std::string line;
     while (std::getline(iss, line)) {
-        // Write original line
-        oss << line << "\n";
-
         // Check if this line is a CX/CNOT instruction
         if (line.find("CX ") == 0 || line.find("CNOT ") == 0) {
             // Parse qubit pairs from the line
@@ -227,34 +240,50 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
             std::string gate;
             line_stream >> gate;  // Read CX or CNOT
 
-            std::vector<std::pair<uint32_t, uint32_t>> crossing_pairs;
+            std::vector<std::pair<uint32_t, uint32_t>> all_pairs;
+            std::vector<std::pair<uint32_t, uint32_t>> remote_pairs;
             uint32_t ctrl, tgt;
             while (line_stream >> ctrl >> tgt) {
-                // Get x-coordinates
+                all_pairs.push_back({ctrl, tgt});
                 if (coords.count(ctrl) && coords.count(tgt)) {
                     double ctrl_x = coords[ctrl][0];
                     double tgt_x = coords[tgt][0];
 
-                    // Check if crossing boundary
-                    bool crosses = (ctrl_x < split_x && tgt_x >= split_x) ||
-                                  (ctrl_x >= split_x && tgt_x < split_x);
-
+                    // Remote: one qubit on QPU A (x <= split_x), other on QPU B (x > split_x)
+                    bool crosses = (ctrl_x <= split_x && tgt_x > split_x) ||
+                                  (ctrl_x > split_x && tgt_x <= split_x);
                     if (crosses) {
-                        crossing_pairs.push_back({ctrl, tgt});
+                        remote_pairs.push_back({ctrl, tgt});
                     }
                 }
             }
 
-            // Add DEPOLARIZE2 for crossing pairs
-            if (!crossing_pairs.empty()) {
-                oss << "DEPOLARIZE2(" << total_error << ")";
-                for (const auto& pair : crossing_pairs) {
+            oss << line << "\n";
+
+            // Baseline DEPOLARIZE2(physical_error) on ALL CX pairs
+            if (!all_pairs.empty() && local_error > 0) {
+                oss << "DEPOLARIZE2(" << local_error << ")";
+                for (const auto& pair : all_pairs) {
                     oss << " " << pair.first << " " << pair.second;
                 }
                 oss << "\n";
             }
+
+            // Additional DEPOLARIZE2(remote_error) on remote pairs only
+            if (!remote_pairs.empty()) {
+                oss << "DEPOLARIZE2(" << total_error << ")";
+                for (const auto& pair : remote_pairs) {
+                    oss << " " << pair.first << " " << pair.second;
+                }
+                oss << "  # interconnect (" << remote_pairs.size() << " remote CX)\n";
+            }
+        } else {
+            oss << line << "\n";
         }
     }
+
+    // Save annotated text (with comments) before parsing, since Stim strips comments
+    annotated_circuit_str_ = oss.str();
 
     // Parse modified circuit
     circuit_ = stim::Circuit(oss.str().c_str());
