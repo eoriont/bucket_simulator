@@ -142,6 +142,11 @@ Config parse_config(const std::string& filename) {
                 config.merge_rounds = std::stoul(value);
             } else if (key == "split_after_merge") {
                 config.split_after_merge = (value == "true" || value == "1");
+            } else if (key == "superstab_ys") {
+                config.superstab_ys.clear();
+                std::istringstream vs(value);
+                uint32_t y;
+                while (vs >> y) config.superstab_ys.push_back(y);
             } else {
                 std::cerr << "Warning: Unknown config key '" << key
                          << "' at line " << line_number << std::endl;

@@ -1,0 +1,12 @@
+# d=5 distributed XX merge, superstabilizer at top X-merge position (y=1)
+code_distance 5
+merge_type distributed_xx
+merge_rounds 5
+distributed true
+physical_error 0.001
+measurement_error 0.001
+reset_error 0.001
+total_shots 1K
+mode monte_carlo
+entanglement_rate 5000000
+superstab_ys 1

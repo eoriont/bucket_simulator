@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cstdint>
+#include <vector>
 
 namespace bucket_sim {
 
@@ -62,6 +63,7 @@ struct Config {
     // Lattice surgery parameters
     MergeType merge_type;             // Type of merge operation
     uint32_t merge_rounds;            // Number of stabilizer rounds during merge
+    std::vector<uint32_t> superstab_ys; // y-coords in merge column to superstabilize (XX_MERGE_DISTRIBUTED only)
     bool split_after_merge;           // Whether to split patches after merge
 
     // Default constructor

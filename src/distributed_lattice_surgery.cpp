@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include <set>
+#include <unordered_set>
 
 // Helper to create record target for DETECTOR/OBSERVABLE_INCLUDE
 static inline uint32_t drec(int32_t offset) {
@@ -25,6 +26,9 @@ DistributedLatticeSurgeryCircuit::DistributedLatticeSurgeryCircuit(const Config&
     }
     if (distance_ < 3 || distance_ % 2 == 0) {
         throw std::invalid_argument("Code distance must be odd and >= 3");
+    }
+    if (!config_.superstab_ys.empty() && merge_type_ != MergeType::XX_MERGE_DISTRIBUTED) {
+        throw std::invalid_argument("superstab_ys is only supported for XX_MERGE_DISTRIBUTED");
     }
 
     initialize_layout();
@@ -164,9 +168,9 @@ void DistributedLatticeSurgeryCircuit::initialize_layout() {
         add_qubit(DQubitType::X_ANCILLA, DPatchID::PATCH_B, static_cast<double>(right_x), y);
     }
 
-    std::cout << "Distributed lattice surgery layout:" << std::endl;
-    std::cout << "  Distance: " << d << std::endl;
-    std::cout << "  Total qubits: " << qubits_.size() << std::endl;
+    std::cerr << "Distributed lattice surgery layout:" << std::endl;
+    std::cerr << "  Distance: " << d << std::endl;
+    std::cerr << "  Total qubits: " << qubits_.size() << std::endl;
 
     size_t n_data = 0, n_anc = 0, n_merge = 0, n_seam = 0;
     for (const auto& q : qubits_) {
@@ -175,11 +179,11 @@ void DistributedLatticeSurgeryCircuit::initialize_layout() {
         else if (q.patch == DPatchID::SEAM_A || q.patch == DPatchID::SEAM_B) n_seam++;
         else n_anc++;
     }
-    std::cout << "  Data qubits: " << n_data << " (2 × " << d*d << " = " << 2*d*d << ")" << std::endl;
-    std::cout << "  Patch ancillas: " << n_anc << std::endl;
-    std::cout << "  Seam ancillas: " << n_seam << " (" << n_seam/2 << " per patch)" << std::endl;
-    std::cout << "  Merge ancillas: " << n_merge << " (single column)" << std::endl;
-    std::cout << "  No merge data qubits (remote CNOTs only)" << std::endl;
+    std::cerr << "  Data qubits: " << n_data << " (2 × " << d*d << " = " << 2*d*d << ")" << std::endl;
+    std::cerr << "  Patch ancillas: " << n_anc << std::endl;
+    std::cerr << "  Seam ancillas: " << n_seam << " (" << n_seam/2 << " per patch)" << std::endl;
+    std::cerr << "  Merge ancillas: " << n_merge << " (single column)" << std::endl;
+    std::cerr << "  No merge data qubits (remote CNOTs only)" << std::endl;
 }
 
 void DistributedLatticeSurgeryCircuit::build_stabilizers() {
@@ -243,21 +247,21 @@ void DistributedLatticeSurgeryCircuit::build_stabilizers() {
         }
     }
 
-    std::cout << "  Patch A stabilizers: " << patch_a_stabilizers_.size() << std::endl;
-    std::cout << "  Patch B stabilizers: " << patch_b_stabilizers_.size() << std::endl;
-    std::cout << "  Seam A stabilizers: " << seam_a_stabilizers_.size() << std::endl;
-    std::cout << "  Seam B stabilizers: " << seam_b_stabilizers_.size() << std::endl;
-    std::cout << "  Merge stabilizers: " << merge_stabilizers_.size() << std::endl;
+    std::cerr << "  Patch A stabilizers: " << patch_a_stabilizers_.size() << std::endl;
+    std::cerr << "  Patch B stabilizers: " << patch_b_stabilizers_.size() << std::endl;
+    std::cerr << "  Seam A stabilizers: " << seam_a_stabilizers_.size() << std::endl;
+    std::cerr << "  Seam B stabilizers: " << seam_b_stabilizers_.size() << std::endl;
+    std::cerr << "  Merge stabilizers: " << merge_stabilizers_.size() << std::endl;
 
     size_t cross_count = 0;
     for (const auto& s : merge_stabilizers_) {
         if (s.crosses_boundary) cross_count++;
-        std::cout << "    Merge " << (s.is_x_type ? "X" : "Z") << " ancilla "
+        std::cerr << "    Merge " << (s.is_x_type ? "X" : "Z") << " ancilla "
                   << s.ancilla << " at (" << qubits_[s.ancilla].x << ", " << qubits_[s.ancilla].y
                   << ") weight=" << s.data_qubits.size()
                   << (s.crosses_boundary ? " [CROSS-BOUNDARY]" : "") << std::endl;
     }
-    std::cout << "  Cross-boundary stabilizers: " << cross_count << std::endl;
+    std::cerr << "  Cross-boundary stabilizers: " << cross_count << std::endl;
 }
 
 void DistributedLatticeSurgeryCircuit::generate_circuit() {
@@ -326,6 +330,38 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     //   Layer 3: NW (-0.5, -0.5)
     //   Layer 4: SW (-0.5, +0.5)
 
+    // === Superstabilizer classification ===
+    // For each X-type merge-column position listed in config_.superstab_ys, replace the remote
+    // merge-X measurement with local seam_a[j] × seam_b[j] (the superstabilizer).
+    // seam_a_x_ancillas[j] and merge_x_ancillas[j] share the same y-coordinate (both ordered
+    // y=1,3,...,d-2), so a direct index correspondence holds.
+    std::unordered_set<uint32_t> ss_y_set(
+        config_.superstab_ys.begin(), config_.superstab_ys.end());
+
+    std::vector<size_t> ss_seam_indices;      // indices into seam_a/b arrays (superstab positions)
+    std::vector<size_t> normal_seam_indices;  // indices into seam_a/b arrays (non-superstab positions)
+    std::vector<uint32_t> ss_seam_a, ss_seam_b;
+    std::vector<uint32_t> normal_merge_x;
+    std::unordered_set<uint32_t> ss_merge_x_anc_set; // merge-X ancilla indices to suppress in merge CX
+    std::unordered_set<uint32_t> ss_seam_anc_set;    // seam ancilla indices to activate in merge CX
+
+    for (size_t j = 0; j < seam_a_x_ancillas.size(); j++) {
+        uint32_t y = static_cast<uint32_t>(std::round(qubits_[seam_a_x_ancillas[j]].y));
+        if (ss_y_set.count(y)) {
+            ss_seam_indices.push_back(j);
+            ss_seam_a.push_back(seam_a_x_ancillas[j]);
+            ss_seam_b.push_back(seam_b_x_ancillas[j]);
+            ss_merge_x_anc_set.insert(merge_x_ancillas[j]);
+            ss_seam_anc_set.insert(seam_a_x_ancillas[j]);
+            ss_seam_anc_set.insert(seam_b_x_ancillas[j]);
+        } else {
+            normal_seam_indices.push_back(j);
+            normal_merge_x.push_back(merge_x_ancillas[j]);
+        }
+    }
+
+    const size_t ss_count = ss_seam_a.size();
+
     std::vector<uint32_t> cx_layer1, cx_layer2, cx_layer3, cx_layer4;
     std::vector<uint32_t> seam_cx1, seam_cx2, seam_cx3, seam_cx4;
     std::vector<uint32_t> merge_cx1, merge_cx2, merge_cx3, merge_cx4;
@@ -380,6 +416,38 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         }
     }
 
+    // === CX layer filtering for superstabilizer positions ===
+    // normal_mcx*: merge-column CX pairs with ss_merge_x ancillas removed (remote ops)
+    // ss_scx*:     seam CX pairs for ss positions only (local ops replacing remote merge-X)
+    auto filter_cx_excl = [](const std::vector<uint32_t>& cx,
+                              const std::unordered_set<uint32_t>& excl) {
+        std::vector<uint32_t> out;
+        for (size_t i = 0; i < cx.size(); i += 2) {
+            if (!excl.count(cx[i]) && !excl.count(cx[i + 1]))
+                out.push_back(cx[i]), out.push_back(cx[i + 1]);
+        }
+        return out;
+    };
+    auto filter_cx_keep = [](const std::vector<uint32_t>& cx,
+                              const std::unordered_set<uint32_t>& keep) {
+        std::vector<uint32_t> out;
+        for (size_t i = 0; i < cx.size(); i += 2) {
+            if (keep.count(cx[i]) || keep.count(cx[i + 1]))
+                out.push_back(cx[i]), out.push_back(cx[i + 1]);
+        }
+        return out;
+    };
+
+    auto norm_mcx1 = filter_cx_excl(merge_cx1, ss_merge_x_anc_set);
+    auto norm_mcx2 = filter_cx_excl(merge_cx2, ss_merge_x_anc_set);
+    auto norm_mcx3 = filter_cx_excl(merge_cx3, ss_merge_x_anc_set);
+    auto norm_mcx4 = filter_cx_excl(merge_cx4, ss_merge_x_anc_set);
+
+    auto ss_scx1 = filter_cx_keep(seam_cx1, ss_seam_anc_set);
+    auto ss_scx2 = filter_cx_keep(seam_cx2, ss_seam_anc_set);
+    auto ss_scx3 = filter_cx_keep(seam_cx3, ss_seam_anc_set);
+    auto ss_scx4 = filter_cx_keep(seam_cx4, ss_seam_anc_set);
+
     // Counts for offset arithmetic
     size_t patch_z_count = z_ancillas.size();
     size_t patch_x_count = x_ancillas.size();
@@ -388,11 +456,15 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     size_t seam_count = seam_a_count + seam_b_count;
     size_t merge_z_count = merge_z_ancillas.size();
     size_t merge_x_count = merge_x_ancillas.size();
+    size_t normal_merge_x_count = normal_merge_x.size(); // = merge_x_count - ss_count
 
     // Pre-merge round measurement order: M(z_ancillas), MX(x_ancillas), MX(seam_a), MX(seam_b)
     size_t pre_total = patch_z_count + patch_x_count + seam_count;
-    // Merge round measurement order: M(z_ancillas), M(merge_z), MX(x_ancillas), MX(merge_x)
+    // Merge round measurement order:
+    //   M(z), M(merge_z), MX(x), MX(normal_merge_x), MX(ss_seam_a), MX(ss_seam_b)
+    // ss_merge_total = merge_total + ss_count (when ss_count==0 reduces to merge_total exactly)
     size_t merge_total = patch_z_count + merge_z_count + patch_x_count + merge_x_count;
+    size_t ss_merge_total = merge_total + ss_count;
     // Post-merge = same as pre-merge
     size_t post_total = pre_total;
 
@@ -443,129 +515,133 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     }
 
     // ====== Merge rounds ======
+    // Block layout per round (ss_merge_total measurements):
+    //   M(z[0..pz-1])             offsets: -(ss_merge_total - i)
+    //   M(merge_z[0..mz-1])       offsets: -(ss_merge_total - pz - i)
+    //   MX(x[0..px-1])            offsets: -(ss_merge_total - pz - mz - i)
+    //   MX(normal_merge_x[0..nm]) offsets: -(2*ss + nm - m)
+    //   MX(ss_seam_a[0..ss-1])    offsets: -(2*ss - k)
+    //   MX(ss_seam_b[0..ss-1])    offsets: -(ss - k)          [last in block]
+    // When ss_count==0, ss_merge_total==merge_total and all formulas reduce to the original.
     for (uint32_t r = 0; r < merge_rounds_; r++) {
         if (r < merge_rounds_ - 1) {
             circuit_.safe_append_u("TICK", {}, {});
         }
 
-        // Reset all ancillas (interior patch + merge)
+        // Reset: interior Z + merge_z; interior X + normal_merge_x + ss_seam_a + ss_seam_b
         std::vector<uint32_t> all_z_reset = z_ancillas;
         all_z_reset.insert(all_z_reset.end(), merge_z_ancillas.begin(), merge_z_ancillas.end());
         circuit_.safe_append_u("R", all_z_reset, {});
 
         std::vector<uint32_t> all_x_reset = x_ancillas;
-        all_x_reset.insert(all_x_reset.end(), merge_x_ancillas.begin(), merge_x_ancillas.end());
+        all_x_reset.insert(all_x_reset.end(), normal_merge_x.begin(), normal_merge_x.end());
+        all_x_reset.insert(all_x_reset.end(), ss_seam_a.begin(), ss_seam_a.end());
+        all_x_reset.insert(all_x_reset.end(), ss_seam_b.begin(), ss_seam_b.end());
         circuit_.safe_append_u("RX", all_x_reset, {});
 
         circuit_.safe_append_u("TICK", {}, {});
 
-        // CNOT layers: interior patch + merge
+        // CNOT layers: interior + normal remote merge + local ss seam
         // Noise is injected later by inject_interconnect_noise() in the simulator.
-        auto emit_merge_layer = [&](const std::vector<uint32_t>& interior_cx,
-                                     const std::vector<uint32_t>& merge_cx) {
-            std::vector<uint32_t> combined = interior_cx;
-            combined.insert(combined.end(), merge_cx.begin(), merge_cx.end());
+        auto emit_ss_merge_layer = [&](const std::vector<uint32_t>& int_cx,
+                                       const std::vector<uint32_t>& nm_cx,
+                                       const std::vector<uint32_t>& ss_cx) {
+            std::vector<uint32_t> combined = int_cx;
+            combined.insert(combined.end(), nm_cx.begin(), nm_cx.end());
+            combined.insert(combined.end(), ss_cx.begin(), ss_cx.end());
             if (!combined.empty()) circuit_.safe_append_u("CX", combined, {});
-
             circuit_.safe_append_u("TICK", {}, {});
         };
 
-        emit_merge_layer(cx_layer1, merge_cx1);
-        emit_merge_layer(cx_layer2, merge_cx2);
-        emit_merge_layer(cx_layer3, merge_cx3);
-        emit_merge_layer(cx_layer4, merge_cx4);
+        emit_ss_merge_layer(cx_layer1, norm_mcx1, ss_scx1);
+        emit_ss_merge_layer(cx_layer2, norm_mcx2, ss_scx2);
+        emit_ss_merge_layer(cx_layer3, norm_mcx3, ss_scx3);
+        emit_ss_merge_layer(cx_layer4, norm_mcx4, ss_scx4);
 
-        // Measurements: M(z_ancillas, merge_z), MX(x_ancillas, merge_x)
+        // Measurements: M(z, merge_z), MX(x, normal_merge_x, ss_seam_a, ss_seam_b)
         std::vector<uint32_t> all_z_meas = z_ancillas;
         all_z_meas.insert(all_z_meas.end(), merge_z_ancillas.begin(), merge_z_ancillas.end());
         circuit_.safe_append_u("M", all_z_meas, {});
 
         std::vector<uint32_t> all_x_meas = x_ancillas;
-        all_x_meas.insert(all_x_meas.end(), merge_x_ancillas.begin(), merge_x_ancillas.end());
+        all_x_meas.insert(all_x_meas.end(), normal_merge_x.begin(), normal_merge_x.end());
+        all_x_meas.insert(all_x_meas.end(), ss_seam_a.begin(), ss_seam_a.end());
+        all_x_meas.insert(all_x_meas.end(), ss_seam_b.begin(), ss_seam_b.end());
         circuit_.safe_append_u("MX", all_x_meas, {});
 
-        // ---- Detectors for merge round r ----
-        // Previous round size depends on whether this is the first merge round
-        size_t prev_total_size = (r == 0) ? pre_total : merge_total;
+        // ---- Detectors ----
+        const size_t pz = patch_z_count, mz = merge_z_count, px = patch_x_count;
+        const size_t nm = normal_merge_x_count, ss = ss_count;
 
-        // Current measurement record layout (merge_total measurements just emitted):
-        //   offset from end of block:
-        //     merge_total-1 .. merge_total-patch_z_count       = patch Z
-        //     ... merge_z_count more                            = merge Z
-        //     ... patch_x_count more                            = patch X
-        //     ... merge_x_count more (at end)                   = merge X
-
-        // Patch Z-ancilla detectors: always compare with previous round
-        for (size_t i = 0; i < patch_z_count; i++) {
+        // Patch Z: compare with previous round
+        for (size_t i = 0; i < pz; i++) {
             const auto& q = qubits_[z_ancillas[i]];
-            int32_t curr = -(int32_t)(merge_total - i);
-            int32_t prev;
-            if (r == 0) {
-                // Previous was pre-merge: Z ancillas are at same position in that block
-                prev = -(int32_t)(merge_total + pre_total - i);
-            } else {
-                prev = -(int32_t)(merge_total + merge_total - i);
-            }
+            int32_t curr = -(int32_t)(ss_merge_total - i);
+            int32_t prev = (r == 0)
+                ? -(int32_t)(ss_merge_total + pre_total - i)
+                : -(int32_t)(2 * ss_merge_total - i);
             circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
                 {q.x, q.y, static_cast<double>(r + 1)});
         }
 
-        // Merge Z-ancilla detectors: NO detector on merge round 0 (anti-commutes with seam X)
+        // Merge Z: no detector on round 0 (anti-commutes with seam X → random first outcome)
         if (r >= 1) {
-            for (size_t i = 0; i < merge_z_count; i++) {
+            for (size_t i = 0; i < mz; i++) {
                 const auto& q = qubits_[merge_z_ancillas[i]];
-                int32_t curr = -(int32_t)(merge_total - patch_z_count - i);
-                int32_t prev = -(int32_t)(merge_total + merge_total - patch_z_count - i);
+                int32_t curr = -(int32_t)(ss_merge_total - pz - i);
+                int32_t prev = -(int32_t)(2 * ss_merge_total - pz - i);
                 circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
                     {q.x, q.y, static_cast<double>(r + 1)});
             }
         }
 
-        // Patch X-ancilla detectors: always compare with previous round
-        for (size_t i = 0; i < patch_x_count; i++) {
+        // Patch X: compare with previous round
+        for (size_t i = 0; i < px; i++) {
             const auto& q = qubits_[x_ancillas[i]];
-            // Current: after all Z, offset from end of X block
-            int32_t curr = -(int32_t)(patch_x_count + merge_x_count - i);
-            int32_t prev;
-            if (r == 0) {
-                // Previous pre-merge: X ancillas are at positions patch_x_count + seam_count .. seam_count+1
-                // In pre-merge block: [z_ancillas | x_ancillas | seam_a | seam_b]
-                // patch X starts at offset pre_total - patch_z_count from end of that block
-                prev = -(int32_t)(merge_total + pre_total - patch_z_count - i);
-            } else {
-                prev = -(int32_t)(merge_total + patch_x_count + merge_x_count - i);
-            }
+            int32_t curr = -(int32_t)(ss_merge_total - pz - mz - i);
+            int32_t prev = (r == 0)
+                ? -(int32_t)(ss_merge_total + pre_total - pz - i)
+                : -(int32_t)(2 * ss_merge_total - pz - mz - i);
             circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
                 {q.x, q.y, static_cast<double>(r + 1)});
         }
 
-        // Merge X-ancilla detectors
-        if (r == 0) {
-            // Product detector: merge_x ⊕ seam_a_prev ⊕ seam_b_prev
-            // merge_x[i] corresponds to seam_a[i] and seam_b[i] (same y ordering)
-            for (size_t i = 0; i < merge_x_count; i++) {
-                const auto& q = qubits_[merge_x_ancillas[i]];
-                // Current merge_x measurement: at end of current block
-                int32_t curr = -(int32_t)(merge_x_count - i);
-                // Previous seam_a measurement: in pre-merge block
-                // Pre-merge layout: [z(patch_z_count) | x(patch_x_count) | seam_a(seam_a_count) | seam_b(seam_b_count)]
-                // seam_a[i] is at offset seam_count - i from end of pre-merge block
-                int32_t prev_seam_a = -(int32_t)(merge_total + seam_count - i);
-                // seam_b[i] is at offset seam_b_count - i from end of pre-merge block
-                int32_t prev_seam_b = -(int32_t)(merge_total + seam_b_count - i);
-                circuit_.safe_append_u("DETECTOR",
-                    {drec(curr), drec(prev_seam_a), drec(prev_seam_b)},
+        // Normal merge-X positions: 3-term transition (r==0) or 2-term steady-state (r>0)
+        for (size_t m = 0; m < nm; m++) {
+            const auto& q = qubits_[normal_merge_x[m]];
+            int32_t curr = -(int32_t)(2 * ss + nm - m);
+            size_t j = normal_seam_indices[m]; // index in seam_a/seam_b arrays
+            if (r == 0) {
+                // merge_x ⊕ seam_a_prev ⊕ seam_b_prev  (transition from pre-merge)
+                int32_t prev_a = -(int32_t)(ss_merge_total + seam_count - j);
+                int32_t prev_b = -(int32_t)(ss_merge_total + seam_b_count - j);
+                circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev_a), drec(prev_b)},
                     {q.x, q.y, static_cast<double>(r + 1)});
-            }
-        } else {
-            // Compare with previous merge round
-            for (size_t i = 0; i < merge_x_count; i++) {
-                const auto& q = qubits_[merge_x_ancillas[i]];
-                int32_t curr = -(int32_t)(merge_x_count - i);
-                int32_t prev = -(int32_t)(merge_total + merge_x_count - i);
+            } else {
+                int32_t prev = -(int32_t)(ss_merge_total + 2 * ss + nm - m);
                 circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
                     {q.x, q.y, static_cast<double>(r + 1)});
             }
+        }
+
+        // Superstabilizer positions: always 4-term seam_a ⊕ seam_b ⊕ prev_seam_a ⊕ prev_seam_b
+        for (size_t k = 0; k < ss; k++) {
+            const auto& q = qubits_[ss_seam_a[k]];
+            int32_t curr_a = -(int32_t)(2 * ss - k);
+            int32_t curr_b = -(int32_t)(ss - k);
+            int32_t prev_a, prev_b;
+            if (r == 0) {
+                // Compare with seam_a/b from pre-merge round
+                size_t j = ss_seam_indices[k];
+                prev_a = -(int32_t)(ss_merge_total + seam_count - j);
+                prev_b = -(int32_t)(ss_merge_total + seam_b_count - j);
+            } else {
+                prev_a = -(int32_t)(ss_merge_total + 2 * ss - k);
+                prev_b = -(int32_t)(ss_merge_total + ss - k);
+            }
+            circuit_.safe_append_u("DETECTOR",
+                {drec(curr_a), drec(curr_b), drec(prev_a), drec(prev_b)},
+                {q.x, q.y, static_cast<double>(r + 1)});
         }
 
         circuit_.safe_append_u("TICK", {}, {});
@@ -602,39 +678,54 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         circuit_.safe_append_u("M", z_ancillas, {});
         circuit_.safe_append_u("MX", all_x_post, {});
 
-        // Post-merge detectors: compare with last merge round
+        // Post-merge detectors: previous round was the last ss_merge round
         uint32_t final_round = merge_rounds_ + 1;
+        const size_t pz = patch_z_count, mz = merge_z_count;
+        const size_t nm = normal_merge_x_count, ss = ss_count;
 
-        // Patch Z: compare post with last merge
+        // Patch Z: compare with last ss_merge round
         for (size_t i = 0; i < patch_z_count; i++) {
             const auto& q = qubits_[z_ancillas[i]];
             int32_t curr = -(int32_t)(post_total - i);
-            int32_t prev = -(int32_t)(post_total + merge_total - i);
+            int32_t prev = -(int32_t)(post_total + ss_merge_total - i);
             circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
                 {q.x, q.y, static_cast<double>(final_round)});
         }
 
-        // Patch X: compare post with last merge
+        // Patch X: compare with last ss_merge round
         for (size_t i = 0; i < patch_x_count; i++) {
             const auto& q = qubits_[x_ancillas[i]];
-            int32_t curr = -(int32_t)(post_total - patch_z_count - i);
-            int32_t prev = -(int32_t)(post_total + patch_x_count + merge_x_count - i);
+            int32_t curr = -(int32_t)(post_total - pz - i);
+            // x[i] in ss_merge sits at -(ss_merge_total - pz - mz - i) from that block's end
+            int32_t prev = -(int32_t)(post_total + ss_merge_total - pz - mz - i);
             circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
                 {q.x, q.y, static_cast<double>(final_round)});
         }
 
-        // Seam X: product detector = seam_a ⊕ seam_b ⊕ last_merge_x
-        // (inverse of merge entry transition)
-        for (size_t i = 0; i < seam_a_count; i++) {
-            const auto& q = qubits_[seam_a_x_ancillas[i]];
-            // Current seam_a[i]: at offset seam_count - i from end of post-merge block
-            int32_t curr_seam_a = -(int32_t)(seam_count - i);
-            // Current seam_b[i]: at offset seam_b_count - i from end of post-merge block
-            int32_t curr_seam_b = -(int32_t)(seam_b_count - i);
-            // Previous merge_x[i]: at offset merge_x_count - i from end of last merge block
-            int32_t prev_merge_x = -(int32_t)(post_total + merge_x_count - i);
+        // Seam X exit: inverse of the merge-entry transition.
+        // Normal positions (j ∈ normal_seam_indices): 3-term seam_a ⊕ seam_b ⊕ last_nmx
+        for (size_t m = 0; m < nm; m++) {
+            size_t j = normal_seam_indices[m];
+            const auto& q = qubits_[seam_a_x_ancillas[j]];
+            int32_t curr_a = -(int32_t)(seam_count - j);
+            int32_t curr_b = -(int32_t)(seam_b_count - j);
+            // normal_merge_x[m] in ss_merge: -(2*ss + nm - m) from that block's end
+            int32_t prev_nmx = -(int32_t)(post_total + 2 * ss + nm - m);
             circuit_.safe_append_u("DETECTOR",
-                {drec(curr_seam_a), drec(curr_seam_b), drec(prev_merge_x)},
+                {drec(curr_a), drec(curr_b), drec(prev_nmx)},
+                {q.x, q.y, static_cast<double>(final_round)});
+        }
+        // Superstabilizer positions (k ∈ ss_seam_indices): 4-term seam_a ⊕ seam_b ⊕ prev_a ⊕ prev_b
+        for (size_t k = 0; k < ss; k++) {
+            size_t j = ss_seam_indices[k];
+            const auto& q = qubits_[ss_seam_a[k]];
+            int32_t curr_a = -(int32_t)(seam_count - j);
+            int32_t curr_b = -(int32_t)(seam_b_count - j);
+            // ss_seam_a[k]/ss_seam_b[k] in ss_merge: -(2*ss-k) and -(ss-k) from that block's end
+            int32_t prev_a = -(int32_t)(post_total + 2 * ss - k);
+            int32_t prev_b = -(int32_t)(post_total + ss - k);
+            circuit_.safe_append_u("DETECTOR",
+                {drec(curr_a), drec(curr_b), drec(prev_a), drec(prev_b)},
                 {q.x, q.y, static_cast<double>(final_round)});
         }
 
@@ -744,10 +835,11 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
     // for stabilizer coloring in the Stim interactive viewer.
     //
     // Colors:
-    //   Blue   (0,0,1,0.25)   = Patch X-stabilizer
-    //   Red    (1,0,0,0.25)   = Patch Z-stabilizer
-    //   Green  (0,0.7,0,0.3)  = Merge X-stabilizer
-    //   Orange (1,0.5,0,0.3)  = Merge Z-stabilizer
+    //   Blue    (0,0,1,0.25)   = Patch X-stabilizer
+    //   Red     (1,0,0,0.25)   = Patch Z-stabilizer
+    //   Green   (0,0.7,0,0.3)  = Merge X-stabilizer
+    //   Orange  (1,0.5,0,0.3)  = Merge Z-stabilizer
+    //   Magenta (1,0,1,0.5)    = Remote CNOT edge (one per ancilla↔Patch-B data qubit)
 
     // Helper: generate a POLYGON pragma for one stabilizer
     auto make_polygon = [this](const DStabilizer& stab, bool is_merge) -> std::string {
@@ -805,6 +897,18 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
         merge_pragmas += make_polygon(stab, true) + "\n";
     }
 
+    // Remote CNOT edges: one 2-qubit polygon per (merge ancilla, Patch B data) pair
+    std::string remote_cx_pragmas;
+    for (const auto& stab : merge_stabilizers_) {
+        for (uint32_t dq : stab.data_qubits) {
+            if (qubits_[dq].patch == DPatchID::PATCH_B) {
+                std::ostringstream oss;
+                oss << "#!pragma POLYGON(1,0,1,0.5) " << stab.ancilla << " " << dq;
+                remote_cx_pragmas += oss.str() + "\n";
+            }
+        }
+    }
+
     // Split circuit text into lines
     std::string base = circuit_.str();
     std::vector<std::string> lines;
@@ -843,8 +947,8 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
             reset_group++;
             if (reset_group >= 2 &&
                 reset_group <= 1 + static_cast<int>(merge_rounds_)) {
-                // Before a merge round: show patch + merge stabilizers (no seam)
-                out << patch_pragmas << merge_pragmas;
+                // Before a merge round: show patch + merge stabilizers + remote CX edges
+                out << patch_pragmas << merge_pragmas << remote_cx_pragmas;
             } else if (reset_group == 2 + static_cast<int>(merge_rounds_)) {
                 // Before post-merge round: show patch + seam stabilizers (no merge)
                 out << patch_pragmas << seam_pragmas;

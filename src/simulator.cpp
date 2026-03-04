@@ -36,15 +36,15 @@ SurfaceCodeSimulator::SurfaceCodeSimulator(const Config& config, int rank, int s
     }
 
     if (mpi_rank_ == 0) {
-        std::cout << "Initializing simulator with configuration:" << std::endl;
-        std::cout << "  Code distance: " << config_.code_distance << std::endl;
-        std::cout << "  Rounds: " << config_.rounds << std::endl;
-        std::cout << "  Physical error: " << config_.physical_error << std::endl;
-        std::cout << "  Measurement error: " << config_.measurement_error << std::endl;
-        std::cout << "  Reset error: " << config_.reset_error << std::endl;
-        std::cout << "  Total shots: " << config_.total_shots << std::endl;
-        std::cout << "  Code type: " << config_.code_type << std::endl;
-        std::cout << "  MPI ranks: " << mpi_size_ << std::endl;
+        std::cerr << "Initializing simulator with configuration:" << std::endl;
+        std::cerr << "  Code distance: " << config_.code_distance << std::endl;
+        std::cerr << "  Rounds: " << config_.rounds << std::endl;
+        std::cerr << "  Physical error: " << config_.physical_error << std::endl;
+        std::cerr << "  Measurement error: " << config_.measurement_error << std::endl;
+        std::cerr << "  Reset error: " << config_.reset_error << std::endl;
+        std::cerr << "  Total shots: " << config_.total_shots << std::endl;
+        std::cerr << "  Code type: " << config_.code_type << std::endl;
+        std::cerr << "  MPI ranks: " << mpi_size_ << std::endl;
     }
 
     initialize_circuit();
@@ -83,24 +83,24 @@ void SurfaceCodeSimulator::initialize_circuit() {
     inject_entanglement_idling_noise();
 
     if (mpi_rank_ == 0) {
-        std::cout << "Circuit generated:" << std::endl;
-        std::cout << "  Qubits: " << circuit_.count_qubits() << std::endl;
-        std::cout << "  Detectors: " << circuit_.count_detectors() << std::endl;
-        std::cout << "  Observables: " << circuit_.count_observables() << std::endl;
+        std::cerr << "Circuit generated:" << std::endl;
+        std::cerr << "  Qubits: " << circuit_.count_qubits() << std::endl;
+        std::cerr << "  Detectors: " << circuit_.count_detectors() << std::endl;
+        std::cerr << "  Observables: " << circuit_.count_observables() << std::endl;
         if (config_.distributed) {
-            std::cout << "  Mode: Distributed QEC" << std::endl;
-            std::cout << "  Interconnect Error: " << config_.interconnect_error << std::endl;
+            std::cerr << "  Mode: Distributed QEC" << std::endl;
+            std::cerr << "  Interconnect Error: " << config_.interconnect_error << std::endl;
         }
     }
 }
 
 void SurfaceCodeSimulator::initialize_lattice_surgery_circuit() {
     if (mpi_rank_ == 0) {
-        std::cout << "Initializing lattice surgery circuit:" << std::endl;
-        std::cout << "  Merge type: " << (config_.merge_type == MergeType::XX_MERGE ? "XX" : "ZZ") << std::endl;
-        std::cout << "  Code distance: " << config_.code_distance << std::endl;
-        std::cout << "  Merge rounds: " << (config_.merge_rounds > 0 ? config_.merge_rounds : config_.code_distance) << std::endl;
-        std::cout << "  Distributed: " << (config_.distributed ? "yes" : "no") << std::endl;
+        std::cerr << "Initializing lattice surgery circuit:" << std::endl;
+        std::cerr << "  Merge type: " << (config_.merge_type == MergeType::XX_MERGE ? "XX" : "ZZ") << std::endl;
+        std::cerr << "  Code distance: " << config_.code_distance << std::endl;
+        std::cerr << "  Merge rounds: " << (config_.merge_rounds > 0 ? config_.merge_rounds : config_.code_distance) << std::endl;
+        std::cerr << "  Distributed: " << (config_.distributed ? "yes" : "no") << std::endl;
     }
 
     // Create lattice surgery circuit generator
@@ -110,21 +110,21 @@ void SurfaceCodeSimulator::initialize_lattice_surgery_circuit() {
     circuit_ = ls_circuit.generate();
 
     if (mpi_rank_ == 0) {
-        std::cout << "Lattice surgery circuit generated:" << std::endl;
-        std::cout << "  Total qubits: " << circuit_.count_qubits() << std::endl;
-        std::cout << "  Detectors: " << circuit_.count_detectors() << std::endl;
-        std::cout << "  Observables: " << circuit_.count_observables() << std::endl;
-        std::cout << "  Merge stabilizers cross QPU boundary: "
+        std::cerr << "Lattice surgery circuit generated:" << std::endl;
+        std::cerr << "  Total qubits: " << circuit_.count_qubits() << std::endl;
+        std::cerr << "  Detectors: " << circuit_.count_detectors() << std::endl;
+        std::cerr << "  Observables: " << circuit_.count_observables() << std::endl;
+        std::cerr << "  Merge stabilizers cross QPU boundary: "
                   << (config_.distributed ? "yes (remote CNOTs required)" : "n/a") << std::endl;
     }
 }
 
 void SurfaceCodeSimulator::initialize_distributed_lattice_surgery_circuit() {
     if (mpi_rank_ == 0) {
-        std::cout << "Initializing DISTRIBUTED lattice surgery circuit:" << std::endl;
-        std::cout << "  Mode: Remote CNOTs only, no merge data qubits" << std::endl;
-        std::cout << "  Code distance: " << config_.code_distance << std::endl;
-        std::cout << "  Merge rounds: " << (config_.merge_rounds > 0 ? config_.merge_rounds : config_.code_distance) << std::endl;
+        std::cerr << "Initializing DISTRIBUTED lattice surgery circuit:" << std::endl;
+        std::cerr << "  Mode: Remote CNOTs only, no merge data qubits" << std::endl;
+        std::cerr << "  Code distance: " << config_.code_distance << std::endl;
+        std::cerr << "  Merge rounds: " << (config_.merge_rounds > 0 ? config_.merge_rounds : config_.code_distance) << std::endl;
     }
 
     DistributedLatticeSurgeryCircuit dls_circuit(config_);
@@ -142,11 +142,11 @@ void SurfaceCodeSimulator::initialize_distributed_lattice_surgery_circuit() {
     inject_entanglement_idling_noise();
 
     if (mpi_rank_ == 0) {
-        std::cout << "Distributed lattice surgery circuit generated:" << std::endl;
-        std::cout << "  Total qubits: " << circuit_.count_qubits() << std::endl;
-        std::cout << "  Data qubits: " << dls_circuit.num_data_qubits() << std::endl;
-        std::cout << "  Detectors: " << circuit_.count_detectors() << std::endl;
-        std::cout << "  Observables: " << circuit_.count_observables() << std::endl;
+        std::cerr << "Distributed lattice surgery circuit generated:" << std::endl;
+        std::cerr << "  Total qubits: " << circuit_.count_qubits() << std::endl;
+        std::cerr << "  Data qubits: " << dls_circuit.num_data_qubits() << std::endl;
+        std::cerr << "  Detectors: " << circuit_.count_detectors() << std::endl;
+        std::cerr << "  Observables: " << circuit_.count_observables() << std::endl;
     }
 }
 
@@ -167,7 +167,7 @@ void SurfaceCodeSimulator::initialize_decoder() {
     mwpm_decoder_ = pm::detector_error_model_to_mwpm(dem, num_buckets);
 
     if (mpi_rank_ == 0) {
-        std::cout << "MWPM decoder initialized" << std::endl;
+        std::cerr << "MWPM decoder initialized" << std::endl;
     }
 }
 
@@ -192,22 +192,22 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
     }
 
     if (mpi_rank_ == 0) {
-        std::cout << "Entanglement distillation:" << std::endl;
-        std::cout << "  Protocol: ";
+        std::cerr << "Entanglement distillation:" << std::endl;
+        std::cerr << "  Protocol: ";
         switch (config_.distillation_protocol) {
-            case DistillationProtocol::PUMPING_2TO1: std::cout << "2→1 Pumping"; break;
-            case DistillationProtocol::PUMPING_3TO1: std::cout << "3→1 Pumping"; break;
-            case DistillationProtocol::RECURRENCE_2TO1: std::cout << "2→1 Recurrence"; break;
-            case DistillationProtocol::RECURRENCE_3TO1: std::cout << "3→1 Recurrence"; break;
-            default: std::cout << "None"; break;
+            case DistillationProtocol::PUMPING_2TO1: std::cerr << "2→1 Pumping"; break;
+            case DistillationProtocol::PUMPING_3TO1: std::cerr << "3→1 Pumping"; break;
+            case DistillationProtocol::RECURRENCE_2TO1: std::cerr << "2→1 Recurrence"; break;
+            case DistillationProtocol::RECURRENCE_3TO1: std::cerr << "3→1 Recurrence"; break;
+            default: std::cerr << "None"; break;
         }
-        std::cout << std::endl;
-        std::cout << "  Distillation rounds: " << config_.distillation_rounds << std::endl;
-        std::cout << "  Raw EPR fidelity: " << config_.raw_epr_fidelity << std::endl;
-        std::cout << "  Distilled EPR fidelity: " << distill.output_fidelity << std::endl;
-        std::cout << "  Distillation success prob: " << distill.success_probability << std::endl;
-        std::cout << "  Raw pairs per distilled: " << distill.raw_pairs_consumed << std::endl;
-        std::cout << "  Remote CNOT error (Eq.1): " << total_error << std::endl;
+        std::cerr << std::endl;
+        std::cerr << "  Distillation rounds: " << config_.distillation_rounds << std::endl;
+        std::cerr << "  Raw EPR fidelity: " << config_.raw_epr_fidelity << std::endl;
+        std::cerr << "  Distilled EPR fidelity: " << distill.output_fidelity << std::endl;
+        std::cerr << "  Distillation success prob: " << distill.success_probability << std::endl;
+        std::cerr << "  Raw pairs per distilled: " << distill.raw_pairs_consumed << std::endl;
+        std::cerr << "  Remote CNOT error (Eq.1): " << total_error << std::endl;
     }
 
     if (total_error <= 0) {
@@ -546,15 +546,15 @@ void SurfaceCodeSimulator::inject_entanglement_idling_noise() {
     double p_idle_total = p_X + p_Y + p_Z;
 
     if (mpi_rank_ == 0) {
-        std::cout << "Entanglement-limited idling (Eq. 2):" << std::endl;
-        std::cout << "  Remote CNOTs per cycle: " << N_remote << std::endl;
-        std::cout << "  Raw pairs per distilled: " << distill.raw_pairs_consumed << std::endl;
-        std::cout << "  Distillation time: " << (t_dist * 1e9) << " ns" << std::endl;
-        std::cout << "  Measurement delay: " << (config_.measurement_delay * 1e9) << " ns" << std::endl;
-        std::cout << "  Idling time (max): " << (t_idle * 1e6) << " μs" << std::endl;
-        std::cout << "  Timing constraint satisfied: " << (timing_safe ? "YES" : "NO - cycle extended!") << std::endl;
-        std::cout << "  Idling errors (pX, pY, pZ): (" << p_X << ", " << p_Y << ", " << p_Z << ")" << std::endl;
-        std::cout << "  Total idling error: " << p_idle_total << std::endl;
+        std::cerr << "Entanglement-limited idling (Eq. 2):" << std::endl;
+        std::cerr << "  Remote CNOTs per cycle: " << N_remote << std::endl;
+        std::cerr << "  Raw pairs per distilled: " << distill.raw_pairs_consumed << std::endl;
+        std::cerr << "  Distillation time: " << (t_dist * 1e9) << " ns" << std::endl;
+        std::cerr << "  Measurement delay: " << (config_.measurement_delay * 1e9) << " ns" << std::endl;
+        std::cerr << "  Idling time (max): " << (t_idle * 1e6) << " μs" << std::endl;
+        std::cerr << "  Timing constraint satisfied: " << (timing_safe ? "YES" : "NO - cycle extended!") << std::endl;
+        std::cerr << "  Idling errors (pX, pY, pZ): (" << p_X << ", " << p_Y << ", " << p_Z << ")" << std::endl;
+        std::cerr << "  Total idling error: " << p_idle_total << std::endl;
     }
 
     if (p_idle_total <= 0) {
@@ -637,7 +637,7 @@ void SurfaceCodeSimulator::run_monte_carlo() {
         // Progress reporting (only rank 0, occasionally)
         if (mpi_rank_ == 0 && (shots_this_rank_ - remaining_shots) % (10 * BATCH_SIZE) == 0) {
             double progress = 100.0 * (shots_this_rank_ - remaining_shots) / shots_this_rank_;
-            std::cout << "Rank 0 progress: " << progress << "%" << std::endl;
+            std::cerr << "Rank 0 progress: " << progress << "%" << std::endl;
         }
     }
 }
@@ -658,8 +658,8 @@ void SurfaceCodeSimulator::run_bucket() {
     auto errors = analyzer.get_errors();
 
     if (mpi_rank_ == 0) {
-        std::cout << "Bucket mode: " << errors.size() << " error mechanisms" << std::endl;
-        std::cout << "Total error rate: " << analyzer.get_total_error_rate() << std::endl;
+        std::cerr << "Bucket mode: " << errors.size() << " error mechanisms" << std::endl;
+        std::cerr << "Total error rate: " << analyzer.get_total_error_rate() << std::endl;
     }
 
     // Compute bucket probabilities
@@ -672,7 +672,7 @@ void SurfaceCodeSimulator::run_bucket() {
     }
 
     if (mpi_rank_ == 0) {
-        std::cout << "Max bucket: " << max_bucket << std::endl;
+        std::cerr << "Max bucket: " << max_bucket << std::endl;
     }
 
     auto analysis = analyzer.compute_bucket_probabilities(
@@ -681,10 +681,10 @@ void SurfaceCodeSimulator::run_bucket() {
     auto& buckets = analysis.buckets;
 
     if (mpi_rank_ == 0) {
-        std::cout << "Sampled buckets: " << buckets.size() << std::endl;
-        std::cout << "Sampled probability mass: " << std::fixed << std::setprecision(6)
+        std::cerr << "Sampled buckets: " << buckets.size() << std::endl;
+        std::cerr << "Sampled probability mass: " << std::fixed << std::setprecision(6)
                   << analysis.sampled_probability_mass << std::endl;
-        std::cout << "Bias bound: " << std::scientific << std::setprecision(2)
+        std::cerr << "Bias bound: " << std::scientific << std::setprecision(2)
                   << analysis.bias_bound << std::endl;
     }
 
@@ -705,7 +705,7 @@ void SurfaceCodeSimulator::run_bucket() {
         if (bucket.target_samples == 0) continue;
 
         if (mpi_rank_ == 0 && bucket.error_count <= 5) {
-            std::cout << "Bucket " << bucket.error_count << ": "
+            std::cerr << "Bucket " << bucket.error_count << ": "
                      << "P=" << bucket.probability << ", "
                      << "samples=" << bucket.target_samples << std::endl;
         }
@@ -743,9 +743,9 @@ void SurfaceCodeSimulator::run_bucket() {
     has_bucket_stats_ = true;
 
     if (mpi_rank_ == 0) {
-        std::cout << "Total samples taken: " << total_samples << std::endl;
+        std::cerr << "Total samples taken: " << total_samples << std::endl;
         double estimated_ler = weighted_error_count / shots_this_rank_;
-        std::cout << "Estimated LER: " << std::fixed << std::setprecision(6)
+        std::cerr << "Estimated LER: " << std::fixed << std::setprecision(6)
                   << estimated_ler << " ± " << std::setprecision(6)
                   << (2.0 * standard_error) << " (95% CI)" << std::endl;
     }
