@@ -66,6 +66,16 @@ private:
     std::unordered_set<uint32_t> removed_data_qubits_;
     // Merge-Z ancillas suppressed during merge (weight-1 after data qubit removal)
     std::unordered_set<uint32_t> merge_suppressed_z_ancillas_;
+    // Partner data qubits of suppressed merge-Z ancillas: the surviving side loses Z
+    // coverage during merge rounds, so they are excluded from merge CX layers too.
+    std::unordered_set<uint32_t> merge_excluded_data_qubits_;
+    // All suppressed merge ancillas (Z or X): not measured during merge rounds.
+    // Superset of merge_suppressed_z_ancillas_ — also includes X ancillas suppressed
+    // by the boundary cascade (touched both the removed and the excluded data qubit).
+    std::unordered_set<uint32_t> merge_suppressed_ancillas_;
+
+    // True when interior-SS gauge ancillas are present (splits merge rounds into half-rounds)
+    bool has_gauges_ = false;
 
     // Circuit
     stim::Circuit circuit_;

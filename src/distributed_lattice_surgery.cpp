@@ -278,6 +278,41 @@ void DistributedLatticeSurgeryCircuit::build_stabilizers() {
         }
     }
 
+    // Collect partner data qubits of suppressed merge-Z ancillas.
+    // When a merge-Z becomes weight-1, its surviving data qubit (the Patch A side)
+    // loses all Z-type syndrome coverage during merge rounds. Exclude it from merge
+    // CX layers so no stabilizer incorrectly couples to it during merge.
+    for (const auto& stab : merge_stabilizers_) {
+        if (!stab.is_x_type && merge_suppressed_z_ancillas_.count(stab.ancilla)) {
+            for (uint32_t dq : stab.data_qubits) {
+                merge_excluded_data_qubits_.insert(dq);
+                std::cerr << "  Excluding partner data qubit " << dq
+                          << " at (" << qubits_[dq].x << ", " << qubits_[dq].y
+                          << ") from merge rounds (lost Z coverage)" << std::endl;
+            }
+        }
+    }
+
+    // Populate the general suppressed-ancilla set.
+    // Seed with all suppressed Z ancillas, then add any merge ancilla (X or Z)
+    // that touches a merge_excluded data qubit — these are the weight-4 ancillas
+    // that touched both deleted qubits in the boundary cascade (step 3 of
+    // surface_general_defect's handle_boundary_data logic).
+    merge_suppressed_ancillas_ = merge_suppressed_z_ancillas_;
+    for (const auto& stab : merge_stabilizers_) {
+        if (merge_suppressed_ancillas_.count(stab.ancilla)) continue;
+        for (uint32_t dq : stab.data_qubits) {
+            if (merge_excluded_data_qubits_.count(dq)) {
+                merge_suppressed_ancillas_.insert(stab.ancilla);
+                std::cerr << "  Suppressing merge " << (stab.is_x_type ? "X" : "Z")
+                          << " ancilla " << stab.ancilla
+                          << " at (" << qubits_[stab.ancilla].x << ", " << qubits_[stab.ancilla].y
+                          << ") (touched excluded data qubit " << dq << ")" << std::endl;
+                break;
+            }
+        }
+    }
+
     std::cerr << "  Patch A stabilizers: " << patch_a_stabilizers_.size() << std::endl;
     std::cerr << "  Patch B stabilizers: " << patch_b_stabilizers_.size() << std::endl;
     std::cerr << "  Seam A stabilizers: " << seam_a_stabilizers_.size() << std::endl;
@@ -291,7 +326,7 @@ void DistributedLatticeSurgeryCircuit::build_stabilizers() {
                   << s.ancilla << " at (" << qubits_[s.ancilla].x << ", " << qubits_[s.ancilla].y
                   << ") weight=" << s.data_qubits.size()
                   << (s.crosses_boundary ? " [CROSS-BOUNDARY]" : "")
-                  << (merge_suppressed_z_ancillas_.count(s.ancilla) ? " [SUPPRESSED]" : "") << std::endl;
+                  << (merge_suppressed_ancillas_.count(s.ancilla) ? " [SUPPRESSED]" : "") << std::endl;
     }
     std::cerr << "  Cross-boundary stabilizers: " << cross_count << std::endl;
 }
@@ -350,14 +385,16 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             else patch_b_data.push_back(q.index);
         } else if (q.type == DQubitType::Z_ANCILLA) {
             if (q.patch == DPatchID::MERGE) {
-                if (!merge_suppressed_z_ancillas_.count(q.index))
+                if (!merge_suppressed_ancillas_.count(q.index))
                     merge_z_ancillas.push_back(q.index);
             } else {
                 z_ancillas.push_back(q.index);
             }
         } else if (q.type == DQubitType::X_ANCILLA) {
-            if (q.patch == DPatchID::MERGE) merge_x_ancillas.push_back(q.index);
-            else if (q.patch == DPatchID::SEAM_A) seam_a_x_ancillas.push_back(q.index);
+            if (q.patch == DPatchID::MERGE) {
+                if (!merge_suppressed_ancillas_.count(q.index)) merge_x_ancillas.push_back(q.index);
+                // suppressed merge X ancillas are dropped entirely
+            } else if (q.patch == DPatchID::SEAM_A) seam_a_x_ancillas.push_back(q.index);
             else if (q.patch == DPatchID::SEAM_B) seam_b_x_ancillas.push_back(q.index);
             else x_ancillas.push_back(q.index);
         }
@@ -401,6 +438,7 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         for (const auto& q : qubits_) {
             if (q.type != DQubitType::DATA) continue;
             if (removed_data_qubits_.count(q.index)) continue;
+            if (merge_excluded_data_qubits_.count(q.index)) continue;
             if (std::abs(q.x - tx) > 0.1 || std::abs(q.y - ty) > 0.1) continue;
             if (owner == DPatchID::SEAM_A && q.patch != DPatchID::PATCH_A) continue;
             if (owner == DPatchID::SEAM_B && q.patch != DPatchID::PATCH_B) continue;
@@ -448,8 +486,8 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         bool is_seam = (q.patch == DPatchID::SEAM_A || q.patch == DPatchID::SEAM_B);
         bool is_x = (q.type == DQubitType::X_ANCILLA);
 
-        // Skip suppressed merge-Z ancillas: not measured, so no CX gates needed
-        if (is_merge && !is_x && merge_suppressed_z_ancillas_.count(q.index)) continue;
+        // Skip suppressed merge ancillas: not measured, so no CX gates needed
+        if (is_merge && merge_suppressed_ancillas_.count(q.index)) continue;
 
         // Ancillas (patch or merge) adjacent to a disabled (non-boundary) SS data qubit
         // are gauges: their CX pairs go into separate gauge layers.
@@ -561,6 +599,7 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         normal_merge_x   = std::move(new_mx);
     }
     bool has_gauges = !x_gauge_ancillas.empty() || !z_gauge_ancillas.empty();
+    has_gauges_ = has_gauges;
     std::cerr << "  X gauge ancillas (" << x_gauge_ancillas.size() << "):" << std::endl;
     for (uint32_t idx : x_gauge_ancillas)
         std::cerr << "    idx=" << idx << " coords=(" << qubits_[idx].x << "," << qubits_[idx].y << ")" << std::endl;
@@ -1106,7 +1145,9 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
 
     // Helper: generate a POLYGON pragma for one stabilizer.
     // include_removed=true also adds SS data qubits (for pre/post rounds).
-    auto make_polygon = [this](const DStabilizer& stab, bool is_merge, bool include_removed = false) -> std::string {
+    // exclude_merge_excluded=true drops merge_excluded_data_qubits_ (for merge rounds).
+    // Returns empty string if the resulting polygon has no vertices.
+    auto make_polygon = [this](const DStabilizer& stab, bool is_merge, bool include_removed = false, bool exclude_merge_excluded = false) -> std::string {
         const char* color;
         if (is_merge) {
             color = stab.is_x_type ? "0,0.7,0,0.3" : "1,0.5,0,0.3";
@@ -1120,6 +1161,7 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
         // Map data qubits by their relative position to the ancilla
         std::map<std::pair<int,int>, uint32_t> pos_map;
         for (uint32_t q : stab.data_qubits) {
+            if (exclude_merge_excluded && merge_excluded_data_qubits_.count(q)) continue;
             int dx = static_cast<int>(std::round((qubits_[q].x - ax) * 2));
             int dy = static_cast<int>(std::round((qubits_[q].y - ay) * 2));
             pos_map[{dx, dy}] = q;
@@ -1141,6 +1183,8 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
             }
         }
 
+        if (pos_map.empty()) return "";
+
         // Order clockwise: SW, SE, NE, NW
         std::vector<std::pair<int,int>> cw = {{-1,-1}, {1,-1}, {1,1}, {-1,1}};
         std::ostringstream oss;
@@ -1160,12 +1204,12 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
     std::string patch_pragmas_full;
     std::string patch_pragmas;
     for (const auto& stab : patch_a_stabilizers_) {
-        patch_pragmas_full += make_polygon(stab, false, true) + "\n";
-        patch_pragmas      += make_polygon(stab, false, false) + "\n";
+        patch_pragmas_full += make_polygon(stab, false, true, false) + "\n";
+        patch_pragmas      += make_polygon(stab, false, false, true) + "\n";
     }
     for (const auto& stab : patch_b_stabilizers_) {
-        patch_pragmas_full += make_polygon(stab, false, true) + "\n";
-        patch_pragmas      += make_polygon(stab, false, false) + "\n";
+        patch_pragmas_full += make_polygon(stab, false, true, false) + "\n";
+        patch_pragmas      += make_polygon(stab, false, false, true) + "\n";
     }
 
     // Seam stabilizers: full-weight for pre/post rounds, reduced for merge rounds
@@ -1182,12 +1226,14 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
 
     std::string merge_pragmas;
     for (const auto& stab : merge_stabilizers_) {
-        merge_pragmas += make_polygon(stab, true) + "\n";
+        if (merge_suppressed_ancillas_.count(stab.ancilla)) continue;
+        merge_pragmas += make_polygon(stab, true, false, true) + "\n";
     }
 
     // Remote CNOT edges: one 2-qubit polygon per (merge ancilla, Patch B data) pair
     std::string remote_cx_pragmas;
     for (const auto& stab : merge_stabilizers_) {
+        if (merge_suppressed_ancillas_.count(stab.ancilla)) continue;
         for (uint32_t dq : stab.data_qubits) {
             if (qubits_[dq].patch == DPatchID::PATCH_B) {
                 std::ostringstream oss;
@@ -1216,7 +1262,10 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
     //   Group 1                               = pre-merge round (initial pragmas already shown)
     //   Groups 2 .. 1 + halves*merge_rounds   = merge rounds (patch + merge pragmas)
     //   Group  2 + halves*merge_rounds         = post-merge round (patch + seam pragmas)
-    const int halves_per_merge = removed_data_qubits_.empty() ? 1 : 2;
+    // halves_per_merge matches the circuit: 2 only when gauge ancillas are present
+    // (interior SS qubits split each merge round into two half-rounds).
+    // Boundary SS qubits suppress ancillas but do not create gauges, so halves=1.
+    const int halves_per_merge = has_gauges_ ? 2 : 1;
     const int merge_half_groups = halves_per_merge * static_cast<int>(merge_rounds_);
 
     std::ostringstream out;
