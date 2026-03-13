@@ -773,10 +773,6 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                 x_meas.insert(x_meas.end(), normal_merge_x.begin(), normal_merge_x.end());
                 circuit_.safe_append_u("MX", x_meas, {});
 
-                // Mirror of the r==0 x_gauge reset: on the last merge round measure
-                // x_gauge ancillas to flush their state before leaving merge context.
-                if (r == merge_rounds_ - 1)
-                    circuit_.safe_append_u("MX", x_gauge_ancillas, {});
             }
         }
 
@@ -847,7 +843,7 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                 const auto& q = qubits_[z_ancillas[i]];
                 int32_t curr = -(int32_t)(merge_h2 - i);
                 int32_t prev = (r == 0)
-                    ? -(int32_t)(merge_h2 + pre_full - i)
+                    ? -(int32_t)(merge_h2 + merge_h1 + pre_total - i)
                     : -(int32_t)(merge_h2 + merge_h1 + merge_h2 - i);
                 circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
                     {q.x, q.y, static_cast<double>(r + 1)});
@@ -869,8 +865,7 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                 const auto& q = qubits_[x_ancillas[i]];
                 int32_t curr = -(int32_t)(patch_x_count + normal_merge_x_count - i);
                 int32_t prev = (r == 0)
-                    ? -(int32_t)(merge_h2 - patch_z_count - merge_z_count - zg_count - i
-                                 + pre_h1 - patch_z_count - i)
+                    ? -(int32_t)(merge_h2 + merge_h1 + pre_total - patch_z_count - patch_zg_count - i)
                     : -(int32_t)(merge_full + patch_x_count + normal_merge_x_count - i);
                 circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
                     {q.x, q.y, static_cast<double>(r + 1)});
@@ -880,13 +875,13 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             // with those in the previous half1.
             // x_gauge[i] in current half1 is at -(merge_h2 + xg_count - i) from end of half2.
             // x_gauge[i] in previous half1: go back another merge_h2 + merge_h1 (prev round).
-            if (!x_gauge_ancillas.empty()) {
+            // r==0 gauge detectors omitted: first merge half compares weight-3 against
+            // the weight-4 pre-round measurement — non-deterministic across the boundary.
+            if (!x_gauge_ancillas.empty() && r > 0) {
                 std::vector<uint32_t> tgts;
                 for (size_t i = 0; i < xg_count; i++) {
                     int32_t curr = -(int32_t)(merge_h2 + xg_count - i);
-                    int32_t prev = (r == 0)
-                        ? -(int32_t)(merge_h2 + xg_count - i + pre_h2 + pre_h1)
-                        : -(int32_t)(merge_h2 + xg_count - i + merge_full);
+                    int32_t prev = -(int32_t)(merge_h2 + xg_count - i + merge_full);
                     tgts.push_back(drec(curr));
                     tgts.push_back(drec(prev));
                 }
@@ -894,16 +889,11 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                 circuit_.safe_append_u("DETECTOR", tgts, {q.x, q.y, static_cast<double>(r + 1)});
             }
 
-            // Z-gauge superstabilizer: XOR of all z_gauge measurements in current half2
-            // with those in the previous half2.
-            // z_gauge[i] in current half2 is at -(zg_count - i) from end of half2.
-            if (!z_gauge_ancillas.empty()) {
+            if (!z_gauge_ancillas.empty() && r > 0) {
                 std::vector<uint32_t> tgts;
                 for (size_t i = 0; i < zg_count; i++) {
                     int32_t curr = -(int32_t)(zg_count - i);
-                    int32_t prev = (r == 0)
-                        ? -(int32_t)(zg_count - i + pre_full + merge_h1)
-                        : -(int32_t)(zg_count - i + merge_full);
+                    int32_t prev = -(int32_t)(zg_count - i + merge_full);
                     tgts.push_back(drec(curr));
                     tgts.push_back(drec(prev));
                 }
@@ -958,17 +948,26 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             circuit_.safe_append_u("M", all_z_post, {});
             circuit_.safe_append_u("MX", all_x_post, {});
 
+            // Use correct last-merge-round measurement totals for has_gauges vs no-gauges.
+            // For has_gauges: z_anc in half2 is at -(post_total + merge_h2 - i) from end of post-round.
+            // For no-gauges: z_anc is at -(post_total + ss_merge_total - i).
             for (size_t i = 0; i < patch_z_count; i++) {
                 const auto& q = qubits_[z_ancillas[i]];
                 int32_t curr = -(int32_t)(post_total - i);
-                int32_t prev = -(int32_t)(post_total + ss_merge_total - i);
+                int32_t prev = has_gauges
+                    ? -(int32_t)(post_total + merge_h2 - i)
+                    : -(int32_t)(post_total + ss_merge_total - i);
                 circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
                     {q.x, q.y, static_cast<double>(final_round)});
             }
             for (size_t i = 0; i < patch_x_count; i++) {
                 const auto& q = qubits_[x_ancillas[i]];
-                int32_t curr = -(int32_t)(post_total - pz - i);
-                int32_t prev = -(int32_t)(post_total + ss_merge_total - pz - mz - i);
+                int32_t curr = has_gauges
+                    ? -(int32_t)(post_total - patch_z_count - patch_zg_count - i)
+                    : -(int32_t)(post_total - pz - i);
+                int32_t prev = has_gauges
+                    ? -(int32_t)(post_total + patch_x_count + normal_merge_x_count - i)
+                    : -(int32_t)(post_total + ss_merge_total - pz - mz - i);
                 circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
                     {q.x, q.y, static_cast<double>(final_round)});
             }
@@ -1001,10 +1000,9 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             if (z_ancillas[k] == ancilla_idx)
                 return (int32_t)(all_data.size() + post_total - k);
         }
-        for (size_t k = 0; k < patch_z_gauge.size(); k++) {
-            if (patch_z_gauge[k] == ancilla_idx)
-                return (int32_t)(all_data.size() + post_total - patch_z_count - k);
-        }
+        // Gauge ancillas are intentionally excluded: their post-round measurement is
+        // weight-4 while the last merge half was weight-3, making cross-boundary
+        // detectors non-deterministic.
         return -1; // not found
     };
 
@@ -1018,8 +1016,15 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         }
     };
 
+    // Set of gauge ancilla indices — their final data detectors are skipped because
+    // the last post-round measurement is weight-4 while the last merge measurement
+    // was weight-3, making a cross-boundary detector non-deterministic.
+    std::unordered_set<uint32_t> gauge_ancilla_set(
+        z_gauge_ancillas.begin(), z_gauge_ancillas.end());
+
     for (const auto& stab : patch_a_stabilizers_) {
         if (stab.is_x_type) continue;
+        if (gauge_ancilla_set.count(stab.ancilla)) continue;
         const auto& aq = qubits_[stab.ancilla];
 
         std::vector<uint32_t> det_targets;
@@ -1031,6 +1036,7 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
 
     for (const auto& stab : patch_b_stabilizers_) {
         if (stab.is_x_type) continue;
+        if (gauge_ancilla_set.count(stab.ancilla)) continue;
         const auto& aq = qubits_[stab.ancilla];
 
         std::vector<uint32_t> det_targets;
