@@ -1,6 +1,0 @@
-code_distance 5
-merge_type xx
-merge_rounds 5
-distributed true
-physical_error 0.001
-measurement_error 0.001

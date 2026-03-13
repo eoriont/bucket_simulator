@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <vector>
 #include <map>
+#include <unordered_set>
 
 namespace bucket_sim {
 
@@ -60,6 +61,11 @@ private:
     std::vector<DStabilizer> seam_a_stabilizers_;  // Seam X stabs owned by Patch A
     std::vector<DStabilizer> seam_b_stabilizers_;  // Seam X stabs owned by Patch B
     std::vector<DStabilizer> merge_stabilizers_;   // Boundary stabilizers during merge
+
+    // Removed data qubits (data qubit removal superstabilizer approach)
+    std::unordered_set<uint32_t> removed_data_qubits_;
+    // Merge-Z ancillas suppressed during merge (weight-1 after data qubit removal)
+    std::unordered_set<uint32_t> merge_suppressed_z_ancillas_;
 
     // Circuit
     stim::Circuit circuit_;

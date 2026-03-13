@@ -194,14 +194,31 @@ int main(int argc, char** argv) {
         // Create simulator (this generates the circuit)
         bucket_sim::SurfaceCodeSimulator simulator(config, world_rank, world_size, dump_circuit);
 
-        // If dump-circuit flag is set, output circuit and exit
+        // If dump-circuit flag is set, write circuit to output dir and exit
         if (dump_circuit) {
             if (world_rank == 0) {
+                ensure_output_directory(output_dir);
+
+                // Derive filename from config stem
+                std::string stem = config_file;
+                auto slash = stem.rfind('/');
+                if (slash != std::string::npos) stem = stem.substr(slash + 1);
+                auto dot = stem.rfind('.');
+                if (dot != std::string::npos) stem = stem.substr(0, dot);
+                std::string out_path = output_dir + "/" + stem + ".stim";
+
                 const auto& annotated = simulator.get_annotated_circuit_str();
-                if (!annotated.empty()) {
-                    std::cout << annotated;
+                const std::string& content = annotated.empty()
+                    ? simulator.get_circuit().str()
+                    : annotated;
+
+                std::ofstream f(out_path);
+                if (f.is_open()) {
+                    f << content;
+                    std::cerr << "Circuit written to " << out_path << std::endl;
                 } else {
-                    std::cout << simulator.get_circuit().str() << std::endl;
+                    std::cerr << "Warning: could not open " << out_path << ", writing to stdout" << std::endl;
+                    std::cout << content;
                 }
             }
             MPI_Finalize();

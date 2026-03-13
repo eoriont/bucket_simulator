@@ -9,4 +9,4 @@ reset_error 0.001
 total_shots 1K
 mode monte_carlo
 entanglement_rate 5000000
-superstab_ys 1 3
+superstabilizers (5.5,0.5) (5.5,4.5)

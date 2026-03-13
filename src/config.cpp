@@ -142,11 +142,23 @@ Config parse_config(const std::string& filename) {
                 config.merge_rounds = std::stoul(value);
             } else if (key == "split_after_merge") {
                 config.split_after_merge = (value == "true" || value == "1");
-            } else if (key == "superstab_ys") {
-                config.superstab_ys.clear();
-                std::istringstream vs(value);
-                uint32_t y;
-                while (vs >> y) config.superstab_ys.push_back(y);
+            } else if (key == "superstabilizers") {
+                config.superstabilizers.clear();
+                // Parse list of (x,y) pairs, e.g. "(5.5,2.5) (6.5,1.5)"
+                std::string v = value;
+                size_t pos = 0;
+                while ((pos = v.find('(', pos)) != std::string::npos) {
+                    size_t end = v.find(')', pos);
+                    if (end == std::string::npos) break;
+                    std::string tok = v.substr(pos + 1, end - pos - 1);
+                    auto comma = tok.find(',');
+                    if (comma != std::string::npos) {
+                        double x = std::stod(tok.substr(0, comma));
+                        double y = std::stod(tok.substr(comma + 1));
+                        config.superstabilizers.push_back({x, y});
+                    }
+                    pos = end + 1;
+                }
             } else {
                 std::cerr << "Warning: Unknown config key '" << key
                          << "' at line " << line_number << std::endl;

@@ -1,9 +1,8 @@
-# d=5 distributed XX merge, superstabilizer at y=3
-# Note: d=5 has only 2 X-type merge positions (y=1, y=3); no true middle exists.
-# This config uses y=3 as the "lower interior" position.
+# d=5 distributed XX merge, superstabilizer disabling interior data qubit at (5.5, 2.5)
+# Disables the Patch B qubit between the two X-merge ancillas, creating a gauge superstabilizer.
 code_distance 5
 merge_type distributed_xx
-merge_rounds 5
+merge_rounds 1
 distributed true
 physical_error 0.001
 measurement_error 0.001
@@ -11,4 +10,4 @@ reset_error 0.001
 total_shots 1K
 mode monte_carlo
 entanglement_rate 5000000
-superstab_ys 3
+superstabilizers (5.5,2.5)

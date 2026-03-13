@@ -1,8 +1,0 @@
-# Small test configuration
-code_distance 3
-rounds 3
-code_type rotated_memory_x
-physical_error 0.01
-measurement_error 0.01
-reset_error 0.01
-total_shots 1000
