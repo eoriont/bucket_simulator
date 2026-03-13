@@ -313,6 +313,63 @@ void DistributedLatticeSurgeryCircuit::build_stabilizers() {
         }
     }
 
+    // Extended cascade for patch ancillas.
+    // A patch ancilla adjacent to a removed boundary data qubit can become weight-1 in
+    // merge rounds (build_stabilizers uses find_data_qubit which already excludes
+    // removed_data_qubits_). Suppress it in merge rounds and cascade its surviving
+    // partner data qubit into merge_excluded_data_qubits_, then suppress any patch
+    // ancilla touching that excluded qubit (same 3-step logic as for merge ancillas).
+    std::vector<std::vector<DStabilizer>*> patch_lists = {&patch_a_stabilizers_, &patch_b_stabilizers_};
+
+    // Step 1 extended: weight-1 patch ancillas in merge rounds
+    for (auto* lst : patch_lists) {
+        for (const auto& stab : *lst) {
+            if (stab.data_qubits.size() != 1) continue;
+            if (merge_suppressed_ancillas_.count(stab.ancilla)) continue;
+            merge_suppressed_ancillas_.insert(stab.ancilla);
+            merge_excluded_data_qubits_.insert(stab.data_qubits[0]);
+            std::cerr << "  Suppressing weight-1 patch " << (stab.is_x_type ? "X" : "Z")
+                      << " ancilla " << stab.ancilla
+                      << " at (" << qubits_[stab.ancilla].x << ", " << qubits_[stab.ancilla].y
+                      << "), excluding partner data qubit " << stab.data_qubits[0]
+                      << " at (" << qubits_[stab.data_qubits[0]].x << ", " << qubits_[stab.data_qubits[0]].y << ")" << std::endl;
+        }
+    }
+    // Step 3 extended: suppress patch ancillas touching BOTH a removed qubit AND a
+    // merge-excluded qubit. This mirrors the reference cascade (handle_boundary_data
+    // step 3): only the weight-4 syndrome that touches both deleted data qubits is
+    // deleted. An ancilla touching only the excluded partner (but not the originally
+    // removed qubit) is left active.
+    // Because find_data_qubit already strips removed qubits from stab.data_qubits,
+    // we check the 4 diagonal neighbors directly for removed qubit membership.
+    const std::pair<double,double> diag_dirs[4] = {{0.5,-0.5},{0.5,0.5},{-0.5,-0.5},{-0.5,0.5}};
+    auto touches_removed = [&](const DStabilizer& stab) -> bool {
+        const auto& aq = qubits_[stab.ancilla];
+        for (auto [dx, dy] : diag_dirs) {
+            double tx = aq.x + dx, ty = aq.y + dy;
+            for (uint32_t ridx : removed_data_qubits_) {
+                const auto& rq = qubits_[ridx];
+                if (std::abs(rq.x - tx) < 0.1 && std::abs(rq.y - ty) < 0.1) return true;
+            }
+        }
+        return false;
+    };
+    for (auto* lst : patch_lists) {
+        for (const auto& stab : *lst) {
+            if (merge_suppressed_ancillas_.count(stab.ancilla)) continue;
+            bool hits_excluded = false;
+            for (uint32_t dq : stab.data_qubits)
+                if (merge_excluded_data_qubits_.count(dq)) { hits_excluded = true; break; }
+            if (!hits_excluded) continue;
+            if (!touches_removed(stab)) continue;  // must also touch the originally removed qubit
+            merge_suppressed_ancillas_.insert(stab.ancilla);
+            std::cerr << "  Suppressing patch " << (stab.is_x_type ? "X" : "Z")
+                      << " ancilla " << stab.ancilla
+                      << " at (" << qubits_[stab.ancilla].x << ", " << qubits_[stab.ancilla].y
+                      << ") (touches both removed and excluded data qubits)" << std::endl;
+        }
+    }
+
     std::cerr << "  Patch A stabilizers: " << patch_a_stabilizers_.size() << std::endl;
     std::cerr << "  Patch B stabilizers: " << patch_b_stabilizers_.size() << std::endl;
     std::cerr << "  Seam A stabilizers: " << seam_a_stabilizers_.size() << std::endl;
@@ -415,10 +472,24 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     // No gauge splitting — all merge-X ancillas and all seam positions are treated uniformly.
     // (Gauge-split approach commented out; see git history if needed.)
     const size_t ss_count = 0;
-    std::vector<size_t> normal_seam_indices;
     std::vector<uint32_t> normal_merge_x = merge_x_ancillas;
+
+    // Match each surviving merge-X ancilla to its seam counterpart by y-coordinate.
+    // When a merge-X is suppressed its y position is absent from normal_merge_x,
+    // so seam positions at that y become "orphans" with no merge-X partner.
+    std::vector<size_t> normal_seam_indices(normal_merge_x.size(), SIZE_MAX);
+    std::vector<size_t> orphan_seam_indices;
     for (size_t j = 0; j < seam_a_x_ancillas.size(); j++) {
-        normal_seam_indices.push_back(j);
+        double seam_y = qubits_[seam_a_x_ancillas[j]].y;
+        bool matched = false;
+        for (size_t m = 0; m < normal_merge_x.size(); m++) {
+            if (std::abs(qubits_[normal_merge_x[m]].y - seam_y) < 0.1) {
+                normal_seam_indices[m] = j;
+                matched = true;
+                break;
+            }
+        }
+        if (!matched) orphan_seam_indices.push_back(j);
     }
 
     std::vector<uint32_t> cx_layer1, cx_layer2, cx_layer3, cx_layer4;           // merge rounds (excludes ss_data)
@@ -460,6 +531,27 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         return -1;
     };
 
+    // Returns true if any diagonal neighbor of ancilla (ax, ay) is a removed or
+    // merge-excluded data qubit that lies on the code boundary. These ancillas change
+    // weight between pre/post rounds (full weight) and merge rounds (reduced weight),
+    // so their transition detectors are non-deterministic and must be skipped.
+    auto has_boundary_ss_neighbor = [this](double ax, double ay) -> bool {
+        const std::pair<double,double> dirs[4] = {{0.5,-0.5},{0.5,0.5},{-0.5,-0.5},{-0.5,0.5}};
+        for (auto [dx, dy] : dirs) {
+            double tx = ax + dx, ty = ay + dy;
+            for (const auto& q : qubits_) {
+                if (q.type != DQubitType::DATA) continue;
+                if (std::abs(q.x - tx) > 0.1 || std::abs(q.y - ty) > 0.1) continue;
+                if (removed_data_qubits_.count(q.index) || merge_excluded_data_qubits_.count(q.index)) {
+                    bool on_boundary = (std::abs(q.y - 0.5) < 0.1 ||
+                                        std::abs(q.y - (distance_ - 0.5)) < 0.1);
+                    if (on_boundary) return true;
+                }
+            }
+        }
+        return false;
+    };
+
     // Returns true if any diagonal neighbor of ancilla (ax, ay) is an interior
     // disabled data qubit — i.e., a superstabilizer position not on the code boundary.
     // "Interior" means the qubit's y coordinate is strictly between the top and bottom
@@ -486,8 +578,9 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         bool is_seam = (q.patch == DPatchID::SEAM_A || q.patch == DPatchID::SEAM_B);
         bool is_x = (q.type == DQubitType::X_ANCILLA);
 
-        // Skip suppressed merge ancillas: not measured, so no CX gates needed
-        if (is_merge && merge_suppressed_ancillas_.count(q.index)) continue;
+        // Skip suppressed ancillas in merge rounds: applies to merge ancillas and any
+        // patch ancilla suppressed by the extended boundary cascade.
+        if (merge_suppressed_ancillas_.count(q.index)) continue;
 
         // Ancillas (patch or merge) adjacent to a disabled (non-boundary) SS data qubit
         // are gauges: their CX pairs go into separate gauge layers.
@@ -600,6 +693,30 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     }
     bool has_gauges = !x_gauge_ancillas.empty() || !z_gauge_ancillas.empty();
     has_gauges_ = has_gauges;
+
+    // Boundary-weight-changing ancillas: patch ancillas (not gauge, not seam, not merge)
+    // that neighbor a boundary SS qubit. Their stabilizer weight differs between pre/post
+    // rounds and merge rounds, so the transition detectors (r==0 entry, post-merge exit)
+    // are non-deterministic and must be skipped.
+    std::unordered_set<uint32_t> boundary_changing_x_set, boundary_changing_z_set;
+    for (uint32_t idx : x_ancillas) {
+        if (has_boundary_ss_neighbor(qubits_[idx].x, qubits_[idx].y))
+            boundary_changing_x_set.insert(idx);
+    }
+    for (uint32_t idx : z_ancillas) {
+        if (has_boundary_ss_neighbor(qubits_[idx].x, qubits_[idx].y))
+            boundary_changing_z_set.insert(idx);
+    }
+    if (!boundary_changing_x_set.empty() || !boundary_changing_z_set.empty()) {
+        std::cerr << "  Boundary-weight-changing X ancillas (" << boundary_changing_x_set.size() << "):";
+        for (uint32_t idx : boundary_changing_x_set)
+            std::cerr << " " << idx << "(" << qubits_[idx].x << "," << qubits_[idx].y << ")";
+        std::cerr << "\n";
+        std::cerr << "  Boundary-weight-changing Z ancillas (" << boundary_changing_z_set.size() << "):";
+        for (uint32_t idx : boundary_changing_z_set)
+            std::cerr << " " << idx << "(" << qubits_[idx].x << "," << qubits_[idx].y << ")";
+        std::cerr << "\n";
+    }
     std::cerr << "  X gauge ancillas (" << x_gauge_ancillas.size() << "):" << std::endl;
     for (uint32_t idx : x_gauge_ancillas)
         std::cerr << "    idx=" << idx << " coords=(" << qubits_[idx].x << "," << qubits_[idx].y << ")" << std::endl;
@@ -821,8 +938,10 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             const size_t nm = normal_merge_x_count, ss = ss_count;
 
             // Patch Z: compare with previous round
+            // Skip r==0 for boundary-weight-changing ancillas (non-deterministic transition)
             for (size_t i = 0; i < pz; i++) {
                 const auto& q = qubits_[z_ancillas[i]];
+                if (r == 0 && boundary_changing_z_set.count(z_ancillas[i])) continue;
                 int32_t curr = -(int32_t)(ss_merge_total - i);
                 int32_t prev = (r == 0)
                     ? -(int32_t)(ss_merge_total + pre_total - i)
@@ -843,8 +962,10 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             }
 
             // Patch X: compare with previous round
+            // Skip r==0 for boundary-weight-changing ancillas (weight-4 pre vs weight-3 merge → non-det)
             for (size_t i = 0; i < px; i++) {
                 const auto& q = qubits_[x_ancillas[i]];
+                if (r == 0 && boundary_changing_x_set.count(x_ancillas[i])) continue;
                 int32_t curr = -(int32_t)(ss_merge_total - pz - mz - i);
                 int32_t prev = (r == 0)
                     ? -(int32_t)(ss_merge_total + pre_total - pz - i)
@@ -990,8 +1111,11 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             // Use correct last-merge-round measurement totals for has_gauges vs no-gauges.
             // For has_gauges: z_anc in half2 is at -(post_total + merge_h2 - i) from end of post-round.
             // For no-gauges: z_anc is at -(post_total + ss_merge_total - i).
+            // Skip boundary-weight-changing ancillas: their post-round measurement is weight-4 while
+            // the last merge measurement was weight-3, making the transition detector non-deterministic.
             for (size_t i = 0; i < patch_z_count; i++) {
                 const auto& q = qubits_[z_ancillas[i]];
+                if (boundary_changing_z_set.count(z_ancillas[i])) continue;
                 int32_t curr = -(int32_t)(post_total - i);
                 int32_t prev = has_gauges
                     ? -(int32_t)(post_total + merge_h2 - i)
@@ -1001,6 +1125,7 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             }
             for (size_t i = 0; i < patch_x_count; i++) {
                 const auto& q = qubits_[x_ancillas[i]];
+                if (boundary_changing_x_set.count(x_ancillas[i])) continue;
                 int32_t curr = has_gauges
                     ? -(int32_t)(post_total - patch_z_count - patch_zg_count - i)
                     : -(int32_t)(post_total - pz - i);
@@ -1020,6 +1145,11 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                     {drec(curr_a), drec(curr_b), drec(prev_nmx)},
                     {q.x, q.y, static_cast<double>(final_round)});
             }
+
+            // Orphan seam positions (merge-X suppressed at this y): no valid post-merge
+            // detector. The seam X stabilizer anti-commutes with the adjacent merge-round
+            // Z stabilizer because the excluded data qubit removes one of the two qubit
+            // overlaps that normally cancel — leaving a net anti-commutation. Skipped.
         }
 
         circuit_.safe_append_u("TICK", {}, {});
@@ -1060,6 +1190,8 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     // was weight-3, making a cross-boundary detector non-deterministic.
     std::unordered_set<uint32_t> gauge_ancilla_set(
         z_gauge_ancillas.begin(), z_gauge_ancillas.end());
+    // Also exclude boundary-weight-changing Z ancillas from final data detectors
+    gauge_ancilla_set.insert(boundary_changing_z_set.begin(), boundary_changing_z_set.end());
 
     for (const auto& stab : patch_a_stabilizers_) {
         if (stab.is_x_type) continue;
@@ -1205,11 +1337,13 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
     std::string patch_pragmas;
     for (const auto& stab : patch_a_stabilizers_) {
         patch_pragmas_full += make_polygon(stab, false, true, false) + "\n";
-        patch_pragmas      += make_polygon(stab, false, false, true) + "\n";
+        if (!merge_suppressed_ancillas_.count(stab.ancilla))
+            patch_pragmas += make_polygon(stab, false, false, true) + "\n";
     }
     for (const auto& stab : patch_b_stabilizers_) {
         patch_pragmas_full += make_polygon(stab, false, true, false) + "\n";
-        patch_pragmas      += make_polygon(stab, false, false, true) + "\n";
+        if (!merge_suppressed_ancillas_.count(stab.ancilla))
+            patch_pragmas += make_polygon(stab, false, false, true) + "\n";
     }
 
     // Seam stabilizers: full-weight for pre/post rounds, reduced for merge rounds
