@@ -32,6 +32,24 @@ struct DistillationResult {
     double distillation_time;    // Time required for distillation (seconds)
 };
 
+// Summary of computed noise parameters for a distributed circuit run
+struct NoiseSummary {
+    // Remote CNOT noise
+    double distilled_fidelity   = 0.0;  // EPR fidelity after distillation
+    double remote_cnot_error    = 0.0;  // p_cnot from Eq. 1
+    uint32_t raw_pairs_per_distilled = 0; // raw EPR pairs consumed per distilled pair
+    uint32_t remote_cnots_per_cycle  = 0; // remote CX pairs in one merge round
+    uint32_t epr_pairs_per_round     = 0; // raw_pairs_per_distilled * remote_cnots_per_cycle
+
+    // Idling noise
+    double distillation_time_ns = 0.0;  // t_dist in nanoseconds
+    double idling_time_us       = 0.0;  // t_idle = max(t_meas, t_dist) in microseconds
+    double p_X = 0.0;
+    double p_Y = 0.0;
+    double p_Z = 0.0;
+    bool timing_constraint_satisfied = true;
+};
+
 class SurfaceCodeSimulator {
 private:
     Config config_;
@@ -45,6 +63,8 @@ private:
     uint64_t local_errors_;
     double local_runtime_;
     std::string annotated_circuit_str_;  // Pragma-annotated stim text (if available)
+
+    NoiseSummary noise_summary_;
 
     // Bucket mode statistics
     uint32_t num_sampled_buckets_;
@@ -97,6 +117,8 @@ public:
     double get_statistical_error() const { return statistical_error_; }
 
     RankStats get_rank_stats() const;
+
+    const NoiseSummary& get_noise_summary() const { return noise_summary_; }
 
     // Get the generated circuit (for visualization/debugging)
     const stim::Circuit& get_circuit() const { return circuit_; }

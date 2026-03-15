@@ -15,7 +15,8 @@ uint64_t decode_batch(
     const stim::simd_bit_table<stim::MAX_BITWORD_WIDTH>& detection_events,
     const stim::simd_bit_table<stim::MAX_BITWORD_WIDTH>& observable_flips,
     size_t num_shots,
-    size_t num_detectors
+    size_t num_detectors,
+    size_t num_observables
 );
 
 } // namespace bucket_sim

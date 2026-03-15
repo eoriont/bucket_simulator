@@ -33,6 +33,25 @@ uint64_t parse_magnitude(const std::string& input) {
     }
 }
 
+std::vector<std::pair<double,double>> parse_superstabilizers(const std::string& value) {
+    std::vector<std::pair<double,double>> result;
+    if (value == "none" || value.empty()) return result;
+    size_t pos = 0;
+    while ((pos = value.find('(', pos)) != std::string::npos) {
+        size_t end = value.find(')', pos);
+        if (end == std::string::npos) break;
+        std::string tok = value.substr(pos + 1, end - pos - 1);
+        auto comma = tok.find(',');
+        if (comma != std::string::npos) {
+            double x = std::stod(tok.substr(0, comma));
+            double y = std::stod(tok.substr(comma + 1));
+            result.push_back({x, y});
+        }
+        pos = end + 1;
+    }
+    return result;
+}
+
 Config parse_config(const std::string& filename) {
     Config config;
     std::ifstream file(filename);
@@ -94,6 +113,23 @@ Config parse_config(const std::string& filename) {
                 config.num_sampled_buckets = std::stoul(value);
             } else if (key == "max_bias_bound") {
                 config.max_bias_bound = std::stod(value);
+            } else if (key == "per_bucket_shots") {
+                // Format: "k1:n1 k2:n2 ..."  e.g. "1:1000 2:5000 3:500"
+                config.per_bucket_shots.clear();
+                std::istringstream vs(value);
+                std::string token;
+                while (vs >> token) {
+                    auto colon = token.find(':');
+                    if (colon == std::string::npos)
+                        throw std::invalid_argument("per_bucket_shots: expected k:n pairs, got '" + token + "'");
+                    uint32_t k = static_cast<uint32_t>(std::stoul(token.substr(0, colon)));
+                    uint64_t n = parse_magnitude(token.substr(colon + 1));
+                    config.per_bucket_shots[k] = n;
+                }
+            } else if (key == "target_faults_per_bucket") {
+                config.target_faults_per_bucket = static_cast<uint32_t>(std::stoul(value));
+            } else if (key == "calib_shots_per_bucket") {
+                config.calib_shots_per_bucket = parse_magnitude(value);
             } else if (key == "distributed") {
                 config.distributed = (value == "true" || value == "1");
             } else if (key == "interconnect_error") {
@@ -143,22 +179,7 @@ Config parse_config(const std::string& filename) {
             } else if (key == "split_after_merge") {
                 config.split_after_merge = (value == "true" || value == "1");
             } else if (key == "superstabilizers") {
-                config.superstabilizers.clear();
-                // Parse list of (x,y) pairs, e.g. "(5.5,2.5) (6.5,1.5)"
-                std::string v = value;
-                size_t pos = 0;
-                while ((pos = v.find('(', pos)) != std::string::npos) {
-                    size_t end = v.find(')', pos);
-                    if (end == std::string::npos) break;
-                    std::string tok = v.substr(pos + 1, end - pos - 1);
-                    auto comma = tok.find(',');
-                    if (comma != std::string::npos) {
-                        double x = std::stod(tok.substr(0, comma));
-                        double y = std::stod(tok.substr(comma + 1));
-                        config.superstabilizers.push_back({x, y});
-                    }
-                    pos = end + 1;
-                }
+                config.superstabilizers = parse_superstabilizers(value);
             } else {
                 std::cerr << "Warning: Unknown config key '" << key
                          << "' at line " << line_number << std::endl;

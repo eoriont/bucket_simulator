@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdint>
 #include <vector>
+#include <map>
 
 namespace bucket_sim {
 
@@ -42,6 +43,9 @@ struct Config {
     uint64_t min_shots_per_bucket;
     uint32_t num_sampled_buckets;  // 0 = all buckets
     double max_bias_bound;  // 0.0 = disabled, >0 = auto-select buckets to keep bias <= this
+    std::map<uint32_t, uint64_t> per_bucket_shots;  // explicit k -> shots; empty = disabled
+    uint32_t target_faults_per_bucket;  // 0 = disabled; >0 = auto-calibrate shots to reach this many faults per bucket
+    uint64_t calib_shots_per_bucket;    // calibration shots used in target_faults_per_bucket mode (default: 500)
 
     // Distributed QEC parameters
     bool distributed;  // false = monolithic (default), true = distributed
@@ -80,6 +84,8 @@ struct Config {
           min_shots_per_bucket(1000),
           num_sampled_buckets(0),
           max_bias_bound(0.0),
+          target_faults_per_bucket(0),
+          calib_shots_per_bucket(500),
           distributed(false),
           interconnect_error(0.0),
           entanglement_rate(100e6),    // Default: 100 MHz
@@ -99,5 +105,8 @@ Config parse_config(const std::string& filename);
 
 // Helper function to parse magnitude suffixes (K, M, B, G)
 uint64_t parse_magnitude(const std::string& input);
+
+// Parse superstabilizer list from a string, e.g. "(5.5,0.5) (5.5,4.5)" or "none"/""
+std::vector<std::pair<double,double>> parse_superstabilizers(const std::string& value);
 
 } // namespace bucket_sim

@@ -1,5 +1,5 @@
-# d=5 distributed XX merge, superstabilizer at bottom X-merge position (y=3)
-# Note: for d=5 this is identical to middle (only 2 X-type positions: y=1, y=3)
+# Memory experiment: d=5 distributed XX merge, sweep over superstabilizer configs
+# 10K shots per run for reasonable LER statistics
 code_distance 5
 merge_type distributed_xx
 merge_rounds 5
@@ -7,10 +7,8 @@ distributed true
 physical_error 0.001
 measurement_error 0.001
 reset_error 0.001
-total_shots 1K
-mode bucket
-target_faults_per_bucket 100
-calib_shots_per_bucket 500
+total_shots 10K
+mode monte_carlo
 entanglement_rate 5000000
 raw_epr_fidelity 0.99
 distillation_protocol none
@@ -18,4 +16,3 @@ distillation_rounds 1
 T1 125e-6
 T2 200e-6
 measurement_delay 660e-9
-superstabilizers (5.5,4.5)

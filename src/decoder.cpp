@@ -8,7 +8,8 @@ uint64_t decode_batch(
     const stim::simd_bit_table<stim::MAX_BITWORD_WIDTH>& detection_events,
     const stim::simd_bit_table<stim::MAX_BITWORD_WIDTH>& observable_flips,
     size_t num_shots,
-    size_t num_detectors
+    size_t num_detectors,
+    size_t num_observables
 ) {
     uint64_t num_mistakes = 0;
 
@@ -35,9 +36,11 @@ uint64_t decode_batch(
             decode_ok = false;
         }
 
-        // Get actual observable flip (assuming single observable at index 0)
-        // For multiple observables, need to iterate and build the mask
-        uint64_t actual_obs = observable_flips[0][shot_idx] ? 1ULL : 0ULL;
+        // Build actual observable mask from all observables
+        uint64_t actual_obs = 0;
+        for (size_t i = 0; i < num_observables; i++) {
+            if (observable_flips[i][shot_idx]) actual_obs |= (1ULL << i);
+        }
 
         // Compare decoded vs actual observable
         if (!decode_ok || decoded_obs_mask != actual_obs) {

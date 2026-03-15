@@ -210,6 +210,11 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
         std::cerr << "  Remote CNOT error (Eq.1): " << total_error << std::endl;
     }
 
+    // Populate noise summary (remote CNOT fields)
+    noise_summary_.distilled_fidelity       = distill.output_fidelity;
+    noise_summary_.remote_cnot_error        = total_error;
+    noise_summary_.raw_pairs_per_distilled  = distill.raw_pairs_consumed;
+
     if (total_error <= 0) {
         return;  // No error to inject
     }
@@ -564,6 +569,16 @@ void SurfaceCodeSimulator::inject_entanglement_idling_noise() {
         p_Z = std::max(0.0, p_Z);  // Ensure non-negative
     }
 
+    // Populate noise summary (idling fields)
+    noise_summary_.remote_cnots_per_cycle        = N_remote;
+    noise_summary_.epr_pairs_per_round           = N_remote * distill.raw_pairs_consumed;
+    noise_summary_.distillation_time_ns          = t_dist * 1e9;
+    noise_summary_.idling_time_us                = t_idle * 1e6;
+    noise_summary_.p_X                           = p_X;
+    noise_summary_.p_Y                           = p_Y;
+    noise_summary_.p_Z                           = p_Z;
+    noise_summary_.timing_constraint_satisfied   = timing_safe;
+
     // Total idle error for depolarizing approximation
     double p_idle_total = p_X + p_Y + p_Z;
 
@@ -751,7 +766,8 @@ void SurfaceCodeSimulator::run_monte_carlo() {
             detection_events,
             observable_flips,
             batch_shots,
-            num_detectors
+            num_detectors,
+            num_observables
         );
 
         local_errors_ += batch_errors;
@@ -799,7 +815,8 @@ void SurfaceCodeSimulator::run_bucket() {
     }
 
     auto analysis = analyzer.compute_bucket_probabilities(
-        max_bucket, shots_this_rank_, config_.num_sampled_buckets, config_.max_bias_bound
+        max_bucket, shots_this_rank_, config_.num_sampled_buckets, config_.max_bias_bound,
+        config_.per_bucket_shots
     );
     auto& buckets = analysis.buckets;
 
@@ -820,25 +837,69 @@ void SurfaceCodeSimulator::run_bucket() {
         std::random_device{}() + mpi_rank_
     );
 
-    // Sample each bucket
+    // Auto-calibration mode: run a calibration pass first, then scale shots to reach
+    // target_faults_per_bucket logical errors per bucket
+    if (config_.target_faults_per_bucket > 0) {
+        uint64_t calib = config_.calib_shots_per_bucket;
+
+        // Phase 1: calibration pass
+        for (auto& bucket : buckets) {
+            for (uint64_t shot = 0; shot < calib; shot++) {
+                bucket.logical_errors += sampler.sample_shot_with_k_errors(bucket.error_count);
+            }
+            bucket.actual_samples = calib;
+        }
+
+        // Phase 2: compute additional shots per bucket to reach target faults, then run them
+        for (auto& bucket : buckets) {
+            double ler_k = static_cast<double>(bucket.logical_errors) / calib;
+            uint64_t additional;
+            if (ler_k > 0.0) {
+                uint64_t total_target = static_cast<uint64_t>(
+                    std::ceil(config_.target_faults_per_bucket / ler_k)
+                );
+                additional = (total_target > calib) ? total_target - calib : 0;
+            } else {
+                // No faults observed in calibration; fall back to 10x calib shots
+                additional = calib * 10;
+            }
+
+            if (mpi_rank_ == 0 && bucket.error_count <= 5) {
+                std::cerr << "Bucket " << bucket.error_count << ": "
+                         << "P=" << bucket.probability << ", "
+                         << "calib_faults=" << bucket.logical_errors << "/"  << calib << ", "
+                         << "additional=" << additional << std::endl;
+            }
+
+            for (uint64_t shot = 0; shot < additional; shot++) {
+                bucket.logical_errors += sampler.sample_shot_with_k_errors(bucket.error_count);
+            }
+            bucket.actual_samples += additional;
+            bucket.target_samples = bucket.actual_samples;
+        }
+    } else {
+        // Standard sampling loop (proportional or per_bucket_shots allocation)
+        for (auto& bucket : buckets) {
+            if (bucket.target_samples == 0) continue;
+
+            if (mpi_rank_ == 0 && bucket.error_count <= 5) {
+                std::cerr << "Bucket " << bucket.error_count << ": "
+                         << "P=" << bucket.probability << ", "
+                         << "samples=" << bucket.target_samples << std::endl;
+            }
+
+            for (uint64_t shot = 0; shot < bucket.target_samples; shot++) {
+                bucket.logical_errors += sampler.sample_shot_with_k_errors(bucket.error_count);
+            }
+            bucket.actual_samples = bucket.target_samples;
+        }
+    }
+
+    // Accumulate weighted error count across all buckets
     double weighted_error_count = 0.0;
     uint64_t total_samples = 0;
-
     for (auto& bucket : buckets) {
-        if (bucket.target_samples == 0) continue;
-
-        if (mpi_rank_ == 0 && bucket.error_count <= 5) {
-            std::cerr << "Bucket " << bucket.error_count << ": "
-                     << "P=" << bucket.probability << ", "
-                     << "samples=" << bucket.target_samples << std::endl;
-        }
-
-        for (uint64_t shot = 0; shot < bucket.target_samples; shot++) {
-            uint64_t is_error = sampler.sample_shot_with_k_errors(bucket.error_count);
-            bucket.logical_errors += is_error;
-        }
-
-        bucket.actual_samples = bucket.target_samples;
+        if (bucket.actual_samples == 0) continue;
         total_samples += bucket.actual_samples;
 
         // Weighted contribution to total error count
@@ -854,7 +915,8 @@ void SurfaceCodeSimulator::run_bucket() {
         double bucket_ler = static_cast<double>(bucket.logical_errors) / bucket.actual_samples;
         variance_sum += bucket.probability * bucket_ler * (1.0 - bucket_ler);
     }
-    double standard_error = std::sqrt(variance_sum / shots_this_rank_);
+    uint64_t se_normalizer = (total_samples > 0) ? total_samples : 1;
+    double standard_error = std::sqrt(variance_sum / se_normalizer);
 
     local_errors_ = static_cast<uint64_t>(weighted_error_count);
 

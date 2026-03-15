@@ -1,5 +1,5 @@
-# d=5 distributed XX merge, superstabilizer at bottom X-merge position (y=3)
-# Note: for d=5 this is identical to middle (only 2 X-type positions: y=1, y=3)
+# Base config for superstab sweep experiment
+# superstabilizers, entanglement_rate, and merge_rounds are set per-run via CLI args
 code_distance 5
 merge_type distributed_xx
 merge_rounds 5
@@ -11,11 +11,9 @@ total_shots 1K
 mode bucket
 target_faults_per_bucket 100
 calib_shots_per_bucket 500
-entanglement_rate 5000000
 raw_epr_fidelity 0.99
 distillation_protocol none
 distillation_rounds 1
 T1 125e-6
 T2 200e-6
 measurement_delay 660e-9
-superstabilizers (5.5,4.5)

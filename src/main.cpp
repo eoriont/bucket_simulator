@@ -18,10 +18,15 @@ struct BucketStats {
 };
 
 void print_usage(const char* program_name) {
-    std::cout << "Usage: " << program_name << " -config <config_file> [-output <dir>] [-dump-circuit]" << std::endl;
-    std::cout << "  -config <file>     Path to configuration file (required)" << std::endl;
-    std::cout << "  -output <dir>      Output directory (default: <project_root>/output)" << std::endl;
-    std::cout << "  -dump-circuit      Output the Stim circuit and exit (for visualization)" << std::endl;
+    std::cout << "Usage: " << program_name << " -config <config_file> [-output <dir>] [-dump-circuit] [overrides...]" << std::endl;
+    std::cout << "  -config <file>              Path to configuration file (required)" << std::endl;
+    std::cout << "  -output <dir>               Output directory (default: <project_root>/output)" << std::endl;
+    std::cout << "  -dump-circuit               Output the Stim circuit and exit (for visualization)" << std::endl;
+    std::cout << "Config overrides (applied after loading the config file):" << std::endl;
+    std::cout << "  -entanglement_rate <Hz>     Override entanglement rate (e.g. 25e6)" << std::endl;
+    std::cout << "  -total_shots <N>            Override total shots (e.g. 10K)" << std::endl;
+    std::cout << "  -superstabilizers <spec>    Override superstabilizers (e.g. \"(5.5,0.5)\" or \"none\")" << std::endl;
+    std::cout << "  -merge_rounds <N>           Override number of merge rounds" << std::endl;
 }
 
 std::string get_timestamp() {
@@ -43,6 +48,7 @@ void ensure_output_directory(const std::string& output_dir) {
 void write_output_file(
     const std::string& output_dir,
     const bucket_sim::Config& config,
+    const bucket_sim::NoiseSummary& noise,
     uint64_t total_errors,
     double max_runtime,
     const std::vector<bucket_sim::RankStats>& all_rank_stats,
@@ -68,37 +74,71 @@ void write_output_file(
     outfile << "  Total Shots: " << config.total_shots << std::endl;
     outfile << "  Code Type: " << config.code_type << std::endl;
     outfile << "  Simulation Mode: " << (config.mode == bucket_sim::SimulationMode::MONTE_CARLO ? "Monte Carlo" : "Bucket") << std::endl;
+    if (config.mode == bucket_sim::SimulationMode::BUCKET) {
+        if (config.target_faults_per_bucket > 0) {
+            outfile << "  Bucket Shot Allocation: auto (target " << config.target_faults_per_bucket
+                    << " faults/bucket, calib=" << config.calib_shots_per_bucket << ")" << std::endl;
+        } else if (!config.per_bucket_shots.empty()) {
+            outfile << "  Bucket Shot Allocation: per-bucket explicit (";
+            bool first = true;
+            for (const auto& kv : config.per_bucket_shots) {
+                if (!first) outfile << ", ";
+                outfile << kv.first << ":" << kv.second;
+                first = false;
+            }
+            outfile << ")" << std::endl;
+        }
+    }
     if (config.distributed) {
         outfile << "  Distributed QEC: Yes" << std::endl;
 
-        // Distillation info
-        if (config.distillation_protocol != bucket_sim::DistillationProtocol::NONE) {
-            outfile << "  Distillation Protocol: ";
-            switch (config.distillation_protocol) {
-                case bucket_sim::DistillationProtocol::PUMPING_2TO1:
-                    outfile << "2→1 Pumping"; break;
-                case bucket_sim::DistillationProtocol::PUMPING_3TO1:
-                    outfile << "3→1 Pumping"; break;
-                case bucket_sim::DistillationProtocol::RECURRENCE_2TO1:
-                    outfile << "2→1 Recurrence"; break;
-                case bucket_sim::DistillationProtocol::RECURRENCE_3TO1:
-                    outfile << "3→1 Recurrence"; break;
-                default:
-                    outfile << "None"; break;
+        // Superstabilizers
+        if (!config.superstabilizers.empty()) {
+            outfile << "  Superstabilizers (" << config.superstabilizers.size() << "):";
+            for (const auto& ss : config.superstabilizers) {
+                outfile << " (" << ss.first << "," << ss.second << ")";
             }
             outfile << std::endl;
-            outfile << "  Distillation Rounds: " << config.distillation_rounds << std::endl;
-            outfile << "  Raw EPR Fidelity: " << config.raw_epr_fidelity << std::endl;
+        } else {
+            outfile << "  Superstabilizers: none" << std::endl;
         }
 
-        outfile << "  Interconnect Error Rate: " << config.interconnect_error << std::endl;
-
-        if (config.entanglement_rate > 0) {
-            outfile << "  Entanglement Rate: " << (config.entanglement_rate / 1e6) << " MHz" << std::endl;
-            outfile << "  T1 Coherence Time: " << (config.T1_coherence_time * 1e6) << " μs" << std::endl;
-            outfile << "  T2 Coherence Time: " << (config.T2_coherence_time * 1e6) << " μs" << std::endl;
-            outfile << "  Measurement Delay: " << (config.measurement_delay * 1e9) << " ns" << std::endl;
+        // Distillation / EPR
+        outfile << "  Raw EPR Fidelity: " << config.raw_epr_fidelity << std::endl;
+        outfile << "  Distillation Protocol: ";
+        switch (config.distillation_protocol) {
+            case bucket_sim::DistillationProtocol::PUMPING_2TO1:   outfile << "2→1 Pumping"; break;
+            case bucket_sim::DistillationProtocol::PUMPING_3TO1:   outfile << "3→1 Pumping"; break;
+            case bucket_sim::DistillationProtocol::RECURRENCE_2TO1: outfile << "2→1 Recurrence"; break;
+            case bucket_sim::DistillationProtocol::RECURRENCE_3TO1: outfile << "3→1 Recurrence"; break;
+            default: outfile << "None"; break;
         }
+        outfile << std::endl;
+        outfile << "  Distillation Rounds: " << config.distillation_rounds << std::endl;
+        outfile << "  Entanglement Rate: " << (config.entanglement_rate / 1e6) << " MHz" << std::endl;
+        outfile << "  T1 Coherence Time: " << (config.T1_coherence_time * 1e6) << " μs" << std::endl;
+        outfile << "  T2 Coherence Time: " << (config.T2_coherence_time * 1e6) << " μs" << std::endl;
+        outfile << "  Measurement Delay: " << (config.measurement_delay * 1e9) << " ns" << std::endl;
+        outfile << std::endl;
+
+        // Computed noise parameters
+        outfile << "Noise Parameters:" << std::endl;
+        outfile << "  Distilled EPR Fidelity: " << std::fixed << std::setprecision(6)
+                << noise.distilled_fidelity << std::endl;
+        outfile << "  Remote CNOT Error (Eq.1): " << std::scientific << std::setprecision(4)
+                << noise.remote_cnot_error << std::endl;
+        outfile << "  Raw EPR Pairs per Distilled: " << noise.raw_pairs_per_distilled << std::endl;
+        outfile << "  Remote CNOTs per Merge Round: " << noise.remote_cnots_per_cycle << std::endl;
+        outfile << "  EPR Pairs Required per Round: " << noise.epr_pairs_per_round << std::endl;
+        outfile << "  Distillation Time: " << std::fixed << std::setprecision(1)
+                << noise.distillation_time_ns << " ns" << std::endl;
+        outfile << "  Idling Time (max): " << std::fixed << std::setprecision(3)
+                << noise.idling_time_us << " μs" << std::endl;
+        outfile << "  Timing Constraint Satisfied: "
+                << (noise.timing_constraint_satisfied ? "Yes" : "No (cycle extended)") << std::endl;
+        outfile << "  Pauli Channel (pX, pY, pZ): ("
+                << std::scientific << std::setprecision(4)
+                << noise.p_X << ", " << noise.p_Y << ", " << noise.p_Z << ")" << std::endl;
     }
     outfile << std::endl;
 
@@ -160,6 +200,11 @@ int main(int argc, char** argv) {
     std::string config_file;
     std::string output_dir = std::string(PROJECT_SOURCE_DIR) + "/output";  // Default to project root
     bool dump_circuit = false;
+    std::optional<double> override_entanglement_rate;
+    std::optional<uint64_t> override_total_shots;
+    std::optional<std::vector<std::pair<double,double>>> override_superstabilizers;
+    std::optional<uint32_t> override_merge_rounds;
+    std::optional<uint32_t> override_code_distance;
 
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -169,6 +214,16 @@ int main(int argc, char** argv) {
             output_dir = argv[++i];
         } else if (arg == "-dump-circuit") {
             dump_circuit = true;
+        } else if (arg == "-entanglement_rate" && i + 1 < argc) {
+            override_entanglement_rate = std::stod(argv[++i]);
+        } else if (arg == "-total_shots" && i + 1 < argc) {
+            override_total_shots = bucket_sim::parse_magnitude(argv[++i]);
+        } else if (arg == "-superstabilizers" && i + 1 < argc) {
+            override_superstabilizers = bucket_sim::parse_superstabilizers(argv[++i]);
+        } else if (arg == "-merge_rounds" && i + 1 < argc) {
+            override_merge_rounds = static_cast<uint32_t>(std::stoul(argv[++i]));
+        } else if (arg == "-code_distance" && i + 1 < argc) {
+            override_code_distance = static_cast<uint32_t>(std::stoul(argv[++i]));
         } else if (arg == "-h" || arg == "--help") {
             if (world_rank == 0) {
                 print_usage(argv[0]);
@@ -190,6 +245,23 @@ int main(int argc, char** argv) {
     try {
         // Parse configuration
         bucket_sim::Config config = bucket_sim::parse_config(config_file);
+
+        // Apply CLI overrides
+        if (override_entanglement_rate.has_value()) {
+            config.entanglement_rate = override_entanglement_rate.value();
+        }
+        if (override_total_shots.has_value()) {
+            config.total_shots = override_total_shots.value();
+        }
+        if (override_superstabilizers.has_value()) {
+            config.superstabilizers = override_superstabilizers.value();
+        }
+        if (override_merge_rounds.has_value()) {
+            config.merge_rounds = override_merge_rounds.value();
+        }
+        if (override_code_distance.has_value()) {
+            config.code_distance = override_code_distance.value();
+        }
 
         // Create simulator (this generates the circuit)
         bucket_sim::SurfaceCodeSimulator simulator(config, world_rank, world_size, dump_circuit);
@@ -274,7 +346,7 @@ int main(int argc, char** argv) {
                 };
             }
 
-            write_output_file(output_dir, config, total_errors, max_runtime, all_rank_stats, bucket_stats);
+            write_output_file(output_dir, config, simulator.get_noise_summary(), total_errors, max_runtime, all_rank_stats, bucket_stats);
         }
 
     } catch (const std::exception& e) {

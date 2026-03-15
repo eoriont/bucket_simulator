@@ -8,6 +8,9 @@ build/
 output/*.txt
 !output/.gitkeep
 
+# Experiment run outputs (results, circuits, logs — reproducible)
+experiments/*/runs/
+
 # IDE files
 .vscode/
 .idea/

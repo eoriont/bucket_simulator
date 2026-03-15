@@ -7,7 +7,9 @@ physical_error 0.001
 measurement_error 0.001
 reset_error 0.001
 total_shots 1K
-mode monte_carlo
+mode bucket
+target_faults_per_bucket 100
+calib_shots_per_bucket 500
 entanglement_rate 5000000
 raw_epr_fidelity 0.99
 distillation_protocol none

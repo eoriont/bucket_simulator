@@ -2,6 +2,7 @@
 
 #include <stim.h>
 #include <vector>
+#include <map>
 #include <cstdint>
 
 namespace bucket_sim {
@@ -37,8 +38,9 @@ public:
     BucketAnalysis compute_bucket_probabilities(
         uint32_t max_bucket,
         uint64_t total_shots,
-        uint32_t num_sampled_buckets = 0,  // 0 = all buckets
-        double max_bias_bound = 0.0  // 0 = disabled, >0 = auto-select to keep bias <= this
+        uint32_t num_sampled_buckets = 0,   // 0 = all buckets
+        double max_bias_bound = 0.0,        // 0 = disabled, >0 = auto-select to keep bias <= this
+        const std::map<uint32_t, uint64_t>& per_bucket_shots = {}  // explicit k->shots; overrides proportional
     ) const;
 
 private:

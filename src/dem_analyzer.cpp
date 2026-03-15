@@ -2,6 +2,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <algorithm>
+#include <map>
 
 namespace bucket_sim {
 
@@ -37,7 +38,8 @@ BucketAnalysis DEMAnalyzer::compute_bucket_probabilities(
     uint32_t max_bucket,
     uint64_t total_shots,
     uint32_t num_sampled_buckets,
-    double max_bias_bound
+    double max_bias_bound,
+    const std::map<uint32_t, uint64_t>& per_bucket_shots
 ) const {
     std::vector<BucketInfo> all_buckets;
 
@@ -68,6 +70,24 @@ BucketAnalysis DEMAnalyzer::compute_bucket_probabilities(
               [](const BucketInfo& a, const BucketInfo& b) {
                   return a.probability > b.probability;
               });
+
+    // Explicit per-bucket allocation: use the provided map directly
+    if (!per_bucket_shots.empty()) {
+        std::vector<BucketInfo> sampled_buckets;
+        double sampled_probability_mass = 0.0;
+        for (auto& bucket : all_buckets) {
+            auto it = per_bucket_shots.find(bucket.error_count);
+            if (it == per_bucket_shots.end() || it->second == 0) continue;
+            bucket.target_samples = it->second;
+            sampled_probability_mass += bucket.probability;
+            sampled_buckets.push_back(bucket);
+        }
+        BucketAnalysis analysis;
+        analysis.buckets = sampled_buckets;
+        analysis.sampled_probability_mass = sampled_probability_mass;
+        analysis.bias_bound = 1.0 - sampled_probability_mass;
+        return analysis;
+    }
 
     // Select buckets based on either num_sampled_buckets or max_bias_bound
     size_t num_to_sample = all_buckets.size();
