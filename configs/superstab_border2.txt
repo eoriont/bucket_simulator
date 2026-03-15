@@ -10,4 +10,10 @@ reset_error 0.001
 total_shots 1K
 mode monte_carlo
 entanglement_rate 5000000
+raw_epr_fidelity 0.99
+distillation_protocol none
+distillation_rounds 1
+T1 125e-6
+T2 200e-6
+measurement_delay 660e-9
 superstabilizers (5.5,4.5)

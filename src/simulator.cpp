@@ -332,7 +332,29 @@ uint32_t SurfaceCodeSimulator::count_remote_cnots_in_cycle() {
         }
     }
 
-    return 0;
+    // Flat circuit fallback: sum all remote CX pairs across the entire circuit and
+    // divide by the number of merge rounds.  Pre/post-merge rounds have no remote CX,
+    // so the total is entirely from merge rounds.
+    uint32_t merge_rounds = config_.merge_rounds > 0 ? config_.merge_rounds : config_.code_distance;
+    if (merge_rounds == 0) return 0;
+
+    uint32_t total_remote = 0;
+    for (const auto& op : circuit_.operations) {
+        if (op.gate_type == stim::GateType::CX) {
+            for (size_t i = 0; i + 1 < op.targets.size(); i += 2) {
+                uint32_t ctrl = op.targets[i].qubit_value();
+                uint32_t tgt = op.targets[i + 1].qubit_value();
+                if (coords.count(ctrl) && coords.count(tgt)) {
+                    double ctrl_x = coords[ctrl][0];
+                    double tgt_x = coords[tgt][0];
+                    bool crosses = (ctrl_x < split_x && tgt_x >= split_x) ||
+                                  (ctrl_x >= split_x && tgt_x < split_x);
+                    if (crosses) total_remote++;
+                }
+            }
+        }
+    }
+    return total_remote / merge_rounds;
 }
 
 // Paper Equation 3: 2→1 Distillation output fidelity (DEJMPS bilateral protocol)
@@ -570,9 +592,11 @@ void SurfaceCodeSimulator::inject_entanglement_idling_noise() {
 
     // Modify circuit to add idling noise to REPEAT blocks
     stim::Circuit modified;
+    bool found_repeat = false;
 
     for (const auto& op : circuit_.operations) {
         if (op.gate_type == stim::GateType::REPEAT) {
+            found_repeat = true;
             uint64_t repeat_count = op.repeat_block_rep_count();
             stim::Circuit cycle_body = op.repeat_block_body(circuit_);
 
@@ -581,7 +605,6 @@ void SurfaceCodeSimulator::inject_entanglement_idling_noise() {
             stim::Circuit new_body;
 
             // Use PAULI_CHANNEL_1 for accurate T1/T2 noise (pX, pY, pZ)
-            // If not available, fall back to DEPOLARIZE1
             std::vector<double> pauli_probs = {p_X, p_Y, p_Z};
             new_body.safe_append_u("PAULI_CHANNEL_1", all_qubits, pauli_probs);
 
@@ -598,7 +621,107 @@ void SurfaceCodeSimulator::inject_entanglement_idling_noise() {
         }
     }
 
-    circuit_ = modified;
+    if (found_repeat) {
+        circuit_ = modified;
+        return;
+    }
+
+    // Flat circuit fallback: inject PAULI_CHANNEL_1 at the start of each merge round.
+    //
+    // Merge rounds are identified by "# interconnect" comments in annotated_circuit_str_,
+    // which inject_interconnect_noise() has already added.  We buffer each round (from
+    // its leading "R " reset line to just before the next "R " reset line) and prepend
+    // the noise channel only to rounds that contain remote CNOTs.
+    //
+    // The pre-merge round's "R " comes before any DETECTOR line (saw_detector=false),
+    // so it is emitted verbatim without triggering the buffering logic.
+
+    std::string src = annotated_circuit_str_.empty() ? circuit_.str() : annotated_circuit_str_;
+
+    // Build the PAULI_CHANNEL_1 injection line
+    std::string qubit_list;
+    for (size_t i = 0; i < num_qubits; i++) {
+        if (i > 0) qubit_list += " ";
+        qubit_list += std::to_string(i);
+    }
+    std::ostringstream pauli_oss;
+    pauli_oss << "PAULI_CHANNEL_1(" << p_X << "," << p_Y << "," << p_Z << ") " << qubit_list;
+    std::string pauli_line = pauli_oss.str();
+
+    std::istringstream iss(src);
+    std::ostringstream oss;
+
+    std::vector<std::string> round_buf;
+    bool round_has_remote = false;
+    bool saw_detector = false;  // true once we've passed the preamble and first round
+
+    std::string line;
+    while (std::getline(iss, line)) {
+        // A round start is an "R " line that appears after the preamble (post first DETECTOR).
+        // Using only "R " (not "RX ") avoids double-triggering on consecutive reset lines.
+        bool is_round_start = (line.size() >= 2 && line[0] == 'R' && line[1] == ' ') && saw_detector;
+        bool has_remote = line.find("# interconnect") != std::string::npos;
+
+        if (line.find("DETECTOR") == 0) saw_detector = true;
+
+        if (is_round_start && !round_buf.empty()) {
+            // Flush the buffered round, injecting noise after the leading R/RX resets
+            if (round_has_remote) {
+                size_t i = 0;
+                while (i < round_buf.size()) {
+                    const std::string& bl = round_buf[i];
+                    bool is_reset = (bl.size() >= 2 && bl[0] == 'R' &&
+                                    (bl[1] == ' ' || (bl[1] == 'X' && bl.size() >= 3 && bl[2] == ' ')));
+                    if (!is_reset) break;
+                    oss << bl << "\n";
+                    i++;
+                }
+                oss << pauli_line << "\n";
+                for (; i < round_buf.size(); i++) {
+                    oss << round_buf[i] << "\n";
+                }
+            } else {
+                for (const auto& l : round_buf) {
+                    oss << l << "\n";
+                }
+            }
+            round_buf.clear();
+            round_has_remote = false;
+        }
+
+        if (saw_detector) {
+            round_buf.push_back(line);
+            if (has_remote) round_has_remote = true;
+        } else {
+            oss << line << "\n";
+        }
+    }
+
+    // Flush the final buffered round (post-merge round + observables)
+    if (!round_buf.empty()) {
+        if (round_has_remote) {
+            size_t i = 0;
+            while (i < round_buf.size()) {
+                const std::string& bl = round_buf[i];
+                bool is_reset = (bl.size() >= 2 && bl[0] == 'R' &&
+                                (bl[1] == ' ' || (bl[1] == 'X' && bl.size() >= 3 && bl[2] == ' ')));
+                if (!is_reset) break;
+                oss << bl << "\n";
+                i++;
+            }
+            oss << pauli_line << "\n";
+            for (; i < round_buf.size(); i++) {
+                oss << round_buf[i] << "\n";
+            }
+        } else {
+            for (const auto& l : round_buf) {
+                oss << l << "\n";
+            }
+        }
+    }
+
+    annotated_circuit_str_ = oss.str();
+    circuit_ = stim::Circuit(oss.str().c_str());
 }
 
 void SurfaceCodeSimulator::run_monte_carlo() {
