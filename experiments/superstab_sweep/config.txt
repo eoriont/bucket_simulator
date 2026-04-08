@@ -1,5 +1,5 @@
 # Base config for superstab sweep experiment
-# superstabilizers, entanglement_rate, and merge_rounds are set per-run via CLI args
+# superstabilizers, entanglement_rate, merge_rounds, and experiment_phase are set per-run via CLI args
 code_distance 5
 merge_type distributed_xx
 merge_rounds 5

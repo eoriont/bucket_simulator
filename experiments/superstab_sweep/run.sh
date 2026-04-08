@@ -13,6 +13,7 @@
 #   -n, --num-procs NUM    MPI processes per sim (default: 4)
 #   -j, --parallel NUM     Simulations in parallel (default: 1)
 #   -d, --distances D,...  Comma-separated distances to sweep, e.g. 5,7,9 (default: use config value)
+#   -p, --phase PHASE      Experiment phase: merge_and_split, merge_only, split_only (default: merge_and_split)
 #   --dry-run              Print commands without executing
 #   --shots SHOTS          Override total_shots, e.g. 10K (default: use config value)
 #
@@ -30,12 +31,21 @@ PARALLEL_JOBS=1
 DRY_RUN=false
 SHOTS=""
 DISTANCES=()
+PHASE="merge_and_split"
 
 while [[ $# -gt 0 ]]; do
     case $1 in
         -n|--num-procs)   NUM_PROCS="$2"; shift 2 ;;
         -j|--parallel)    PARALLEL_JOBS="$2"; shift 2 ;;
         -d|--distances)   IFS=',' read -ra DISTANCES <<< "$2"; shift 2 ;;
+        -p|--phase)
+            PHASE="$2"
+            case "$PHASE" in
+                merge_and_split|merge_only|split_only|full) ;;
+                *) echo "Unknown phase: $PHASE"; exit 1 ;;
+            esac
+            shift 2
+            ;;
         --dry-run)        DRY_RUN=true; shift ;;
         --shots)          SHOTS="$2"; shift 2 ;;
         -h|--help)        head -20 "$0" | tail -18; exit 0 ;;
@@ -110,6 +120,7 @@ echo "Supers:    ${SUPERS[*]}"
 echo "Rates:     ${RATES[*]}"
 echo "Distances: ${DISTANCES[*]:-from config}"
 echo "Shots:     ${SHOTS:-from config}"
+echo "Phase:     $PHASE"
 echo "MPI:       $NUM_PROCS processes"
 echo "Parallel:  $PARALLEL_JOBS"
 echo "Configs:   $TOTAL_CONFIGS"
@@ -124,6 +135,7 @@ MPI Processes: $NUM_PROCS
 Parallel Jobs: $PARALLEL_JOBS
 Distances: ${DISTANCES[*]:-from config}
 Shots override: ${SHOTS:-none}
+Experiment phase: $PHASE
 Superstabilizer types: ${SUPERS[*]}
 Entanglement rates (Hz): ${RATES[*]}
 Host: $(hostname)
@@ -155,6 +167,7 @@ run_job() {
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "  mpirun -n $NUM_PROCS $SIMULATOR \\"
         echo "    -config $BASE_CONFIG \\"
+        echo "    -experiment_phase $PHASE \\"
         echo "    -superstabilizers \"$coords\" \\"
         echo "    -merge_rounds $mrounds \\"
         echo "    -entanglement_rate $rate \\"
@@ -167,6 +180,7 @@ run_job() {
     # Dump Stim circuit (single rank, no simulation)
     mpirun -n 1 "$SIMULATOR" \
             -config "$BASE_CONFIG" \
+            -experiment_phase "$PHASE" \
             -superstabilizers "$coords" \
             -merge_rounds "$mrounds" \
             -entanglement_rate "$rate" \
@@ -183,6 +197,7 @@ run_job() {
     start_time=$(date +%s)
     if mpirun -n "$NUM_PROCS" "$SIMULATOR" \
             -config "$BASE_CONFIG" \
+            -experiment_phase "$PHASE" \
             -superstabilizers "$coords" \
             -merge_rounds "$mrounds" \
             -entanglement_rate "$rate" \
@@ -202,7 +217,7 @@ run_job() {
     fi
 }
 export -f run_job get_super_coords get_merge_rounds
-export RESULTS_DIR CIRCUITS_DIR LOGS_DIR SIMULATOR NUM_PROCS DRY_RUN SHOTS BASE_CONFIG
+export RESULTS_DIR CIRCUITS_DIR LOGS_DIR SIMULATOR NUM_PROCS DRY_RUN SHOTS BASE_CONFIG PHASE
 
 echo ""
 echo "Running simulations..."
