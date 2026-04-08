@@ -63,3 +63,24 @@ add_executable(distributed_lattice_surgery_invariants_test
 target_include_directories(distributed_lattice_surgery_invariants_test PRIVATE include)
 target_link_libraries(distributed_lattice_surgery_invariants_test PRIVATE libstim)
 target_compile_definitions(distributed_lattice_surgery_invariants_test PRIVATE PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+
+add_executable(accurate_rcx_formulas_test
+    tests/accurate_rcx_formulas.cpp
+    src/simulator.cpp
+    src/config.cpp
+    src/decoder.cpp
+    src/dem_analyzer.cpp
+    src/bucket_sampler.cpp
+    src/lattice_surgery.cpp
+    src/distributed_lattice_surgery.cpp
+)
+target_include_directories(accurate_rcx_formulas_test PRIVATE include)
+target_link_libraries(accurate_rcx_formulas_test PRIVATE libstim libpymatching
+    ${MPI_C_LIBRARIES}
+    ${MPI_CXX_LIBRARIES}
+)
+target_include_directories(accurate_rcx_formulas_test PRIVATE
+    ${MPI_C_INCLUDE_PATH}
+    ${MPI_CXX_INCLUDE_PATH}
+)
+target_compile_definitions(accurate_rcx_formulas_test PRIVATE PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")

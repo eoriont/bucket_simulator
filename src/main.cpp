@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <vector>
 #include <optional>
+#include <cmath>
 
 struct BucketStats {
     uint32_t num_buckets;
@@ -27,6 +28,7 @@ void print_usage(const char* program_name) {
     std::cout << "  -total_shots <N>            Override total shots (e.g. 10K)" << std::endl;
     std::cout << "  -superstabilizers <spec>    Override superstabilizers (e.g. \"(5.5,0.5)\" or \"none\")" << std::endl;
     std::cout << "  -merge_rounds <N>           Override number of merge rounds" << std::endl;
+    std::cout << "  -accurate_rcx               Enable accurate RCX error folding" << std::endl;
 }
 
 std::string get_timestamp() {
@@ -91,6 +93,15 @@ void write_output_file(
     }
     if (config.distributed) {
         outfile << "  Distributed QEC: Yes" << std::endl;
+        outfile << "  Accurate RCX: " << (config.accurate_rcx ? "Yes" : "No") << std::endl;
+        outfile << "  Channel Depolarization Error: ";
+        if (std::isnan(config.channel_depolarization_error)) {
+            outfile << "derived_from_raw_epr_fidelity";
+        } else {
+            outfile << config.channel_depolarization_error;
+        }
+        outfile << std::endl;
+        outfile << "  Distillation Backup Batches: " << config.distillation_backup_batches << std::endl;
 
         // Superstabilizers
         if (!config.superstabilizers.empty()) {
@@ -123,9 +134,20 @@ void write_output_file(
 
         // Computed noise parameters
         outfile << "Noise Parameters:" << std::endl;
+        outfile << "  Distillation Feasible: " << (noise.distillation_feasible ? "Yes" : "No") << std::endl;
+        outfile << "  Raw Channel Error: " << std::scientific << std::setprecision(4)
+                << noise.raw_channel_error << std::endl;
+        outfile << "  Effective Channel Error: " << std::scientific << std::setprecision(4)
+                << noise.effective_channel_error << std::endl;
         outfile << "  Distilled EPR Fidelity: " << std::fixed << std::setprecision(6)
                 << noise.distilled_fidelity << std::endl;
-        outfile << "  Remote CNOT Error (Eq.1): " << std::scientific << std::setprecision(4)
+        outfile << "  Distilled Error: " << std::scientific << std::setprecision(4)
+                << noise.distilled_error << std::endl;
+        outfile << "  Distillation Success Probability: " << std::scientific << std::setprecision(4)
+                << noise.distillation_success_probability << std::endl;
+        outfile << "  P(All Backup Batches Fail): " << std::scientific << std::setprecision(4)
+                << noise.probability_all_distillation_fail << std::endl;
+        outfile << "  Final Remote CNOT Error: " << std::scientific << std::setprecision(4)
                 << noise.remote_cnot_error << std::endl;
         outfile << "  Raw EPR Pairs per Distilled: " << noise.raw_pairs_per_distilled << std::endl;
         outfile << "  Remote CNOTs per Merge Round: " << noise.remote_cnots_per_cycle << std::endl;
@@ -205,6 +227,7 @@ int main(int argc, char** argv) {
     std::optional<std::vector<std::pair<double,double>>> override_superstabilizers;
     std::optional<uint32_t> override_merge_rounds;
     std::optional<uint32_t> override_code_distance;
+    bool enable_accurate_rcx = false;
 
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -224,6 +247,8 @@ int main(int argc, char** argv) {
             override_merge_rounds = static_cast<uint32_t>(std::stoul(argv[++i]));
         } else if (arg == "-code_distance" && i + 1 < argc) {
             override_code_distance = static_cast<uint32_t>(std::stoul(argv[++i]));
+        } else if (arg == "-accurate_rcx") {
+            enable_accurate_rcx = true;
         } else if (arg == "-h" || arg == "--help") {
             if (world_rank == 0) {
                 print_usage(argv[0]);
@@ -261,6 +286,9 @@ int main(int argc, char** argv) {
         }
         if (override_code_distance.has_value()) {
             config.code_distance = override_code_distance.value();
+        }
+        if (enable_accurate_rcx) {
+            config.accurate_rcx = true;
         }
 
         // Create simulator (this generates the circuit)

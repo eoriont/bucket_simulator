@@ -35,8 +35,16 @@ struct DistillationResult {
 // Summary of computed noise parameters for a distributed circuit run
 struct NoiseSummary {
     // Remote CNOT noise
+    bool accurate_rcx_enabled  = false;
+    bool distillation_feasible = false;
+    uint32_t distillation_backup_batches = 1;
+    double raw_channel_error   = 0.0;
+    double effective_channel_error = 0.0;
     double distilled_fidelity   = 0.0;  // EPR fidelity after distillation
     double remote_cnot_error    = 0.0;  // p_cnot from Eq. 1
+    double distilled_error      = 0.0;
+    double distillation_success_probability = 1.0;
+    double probability_all_distillation_fail = 0.0;
     uint32_t raw_pairs_per_distilled = 0; // raw EPR pairs consumed per distilled pair
     uint32_t remote_cnots_per_cycle  = 0; // remote CX pairs in one merge round
     uint32_t epr_pairs_per_round     = 0; // raw_pairs_per_distilled * remote_cnots_per_cycle
@@ -48,6 +56,18 @@ struct NoiseSummary {
     double p_Y = 0.0;
     double p_Z = 0.0;
     bool timing_constraint_satisfied = true;
+};
+
+struct RemoteCnotNoiseModel {
+    double raw_channel_error = 0.0;
+    double effective_channel_error = 0.0;
+    double distilled_error = 0.0;
+    double distilled_fidelity = 0.0;
+    double distillation_success_probability = 1.0;
+    double probability_all_distillation_fail = 0.0;
+    double remote_cnot_error = 0.0;
+    bool distillation_feasible = false;
+    uint32_t distillation_backup_batches = 1;
 };
 
 class SurfaceCodeSimulator {
@@ -90,9 +110,14 @@ private:
     static double compute_2to1_success_prob(double F1, double F2);
     static double compute_3to1_fidelity(double F1, double F2);
     static double compute_3to1_success_prob(double F1, double F2);
+    double compute_raw_channel_error() const;
+    RemoteCnotNoiseModel compute_remote_cnot_noise_model() const;
 
     // Remote CNOT error (paper Equation 1)
     double compute_cnot_error_from_fidelity(double fidelity) const;
+    static double compute_remote_cnot_error_from_effective_channel(double effective_channel_error,
+                                                                   double physical_error,
+                                                                   bool accurate_rcx);
 
     // Timing calculations
     double compute_distillation_time(uint32_t num_remote_cnots, const DistillationResult& distill) const;

@@ -48,6 +48,13 @@ def generate_config(template_path: Path, output_path: Path, variables: dict):
 
     # Substitute all variables
     config = template
+    implicit_defaults = {
+        'ACCURATE_RCX': 'false',
+        'DISTILLATION_BACKUP_BATCHES': '1',
+        'CHANNEL_DEPOLARIZATION_ERROR': 'nan',
+    }
+    for placeholder, value in implicit_defaults.items():
+        config = config.replace("{{" + placeholder + "}}", value)
     for var, value in variables.items():
         placeholder = "{{" + var.upper() + "}}"
         config = config.replace(placeholder, parse_value(value))

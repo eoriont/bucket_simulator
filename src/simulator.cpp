@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <cmath>
 #include <stdexcept>
+#include <limits>
 
 namespace bucket_sim {
 
@@ -90,6 +91,7 @@ void SurfaceCodeSimulator::initialize_circuit() {
         if (config_.distributed) {
             std::cerr << "  Mode: Distributed QEC" << std::endl;
             std::cerr << "  Interconnect Error: " << config_.interconnect_error << std::endl;
+            std::cerr << "  Accurate RCX: " << (config_.accurate_rcx ? "enabled" : "disabled") << std::endl;
         }
     }
 }
@@ -176,23 +178,21 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
         return;
     }
 
-    // Compute distillation result using accurate formulas (paper Equations 3-6)
-    DistillationResult distill = compute_distillation(config_.distillation_rounds);
+    RemoteCnotNoiseModel remote_noise = compute_remote_cnot_noise_model();
+    double total_error = remote_noise.remote_cnot_error;
 
-    // Compute remote CNOT error using paper Equation 1
-    double p_cnot = compute_cnot_error_from_fidelity(distill.output_fidelity);
-
-    // If user specified interconnect_error > 0, add it to the distillation error
-    // (models additional noise beyond EPR infidelity)
-    double total_error = p_cnot;
+    // Keep interconnect_error as an extra independent error source after the
+    // effective-channel / accurate-RCX calculation so legacy configs remain explicit.
     if (config_.interconnect_error > 0) {
-        // Combine errors (assuming independent):
-        // p_total = 1 - (1-p_cnot)(1-p_interconnect)
-        total_error = 1.0 - (1.0 - p_cnot) * (1.0 - config_.interconnect_error);
+        // p_total = 1 - (1-p_remote)(1-p_interconnect)
+        total_error = 1.0 - (1.0 - remote_noise.remote_cnot_error) * (1.0 - config_.interconnect_error);
     }
 
     if (mpi_rank_ == 0) {
-        std::cerr << "Entanglement distillation:" << std::endl;
+        std::cerr << "Remote CNOT noise model:" << std::endl;
+        std::cerr << "  Accurate RCX: " << (config_.accurate_rcx ? "enabled" : "disabled") << std::endl;
+        std::cerr << "  Raw channel error: " << remote_noise.raw_channel_error << std::endl;
+        std::cerr << "  Distillation feasible: " << (remote_noise.distillation_feasible ? "YES" : "NO") << std::endl;
         std::cerr << "  Protocol: ";
         switch (config_.distillation_protocol) {
             case DistillationProtocol::PUMPING_2TO1: std::cerr << "2→1 Pumping"; break;
@@ -203,17 +203,30 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
         }
         std::cerr << std::endl;
         std::cerr << "  Distillation rounds: " << config_.distillation_rounds << std::endl;
+        std::cerr << "  Backup batches (m): " << remote_noise.distillation_backup_batches << std::endl;
         std::cerr << "  Raw EPR fidelity: " << config_.raw_epr_fidelity << std::endl;
-        std::cerr << "  Distilled EPR fidelity: " << distill.output_fidelity << std::endl;
-        std::cerr << "  Distillation success prob: " << distill.success_probability << std::endl;
-        std::cerr << "  Raw pairs per distilled: " << distill.raw_pairs_consumed << std::endl;
-        std::cerr << "  Remote CNOT error (Eq.1): " << total_error << std::endl;
+        std::cerr << "  Distilled EPR fidelity: " << remote_noise.distilled_fidelity << std::endl;
+        std::cerr << "  Distilled error: " << remote_noise.distilled_error << std::endl;
+        std::cerr << "  Distillation success prob: " << remote_noise.distillation_success_probability << std::endl;
+        std::cerr << "  Probability all backup batches fail: " << remote_noise.probability_all_distillation_fail << std::endl;
+        std::cerr << "  Effective channel error: " << remote_noise.effective_channel_error << std::endl;
+        std::cerr << "  Remote CNOT error: " << remote_noise.remote_cnot_error << std::endl;
+        std::cerr << "  Interconnect error add-on: " << config_.interconnect_error << std::endl;
+        std::cerr << "  Final injected remote CNOT error: " << total_error << std::endl;
     }
 
     // Populate noise summary (remote CNOT fields)
-    noise_summary_.distilled_fidelity       = distill.output_fidelity;
+    noise_summary_.accurate_rcx_enabled     = config_.accurate_rcx;
+    noise_summary_.distillation_feasible    = remote_noise.distillation_feasible;
+    noise_summary_.distillation_backup_batches = remote_noise.distillation_backup_batches;
+    noise_summary_.raw_channel_error        = remote_noise.raw_channel_error;
+    noise_summary_.effective_channel_error  = remote_noise.effective_channel_error;
+    noise_summary_.distilled_fidelity       = remote_noise.distilled_fidelity;
+    noise_summary_.distilled_error          = remote_noise.distilled_error;
+    noise_summary_.distillation_success_probability = remote_noise.distillation_success_probability;
+    noise_summary_.probability_all_distillation_fail = remote_noise.probability_all_distillation_fail;
     noise_summary_.remote_cnot_error        = total_error;
-    noise_summary_.raw_pairs_per_distilled  = distill.raw_pairs_consumed;
+    noise_summary_.raw_pairs_per_distilled  = compute_distillation(config_.distillation_rounds).raw_pairs_consumed;
 
     if (total_error <= 0) {
         return;  // No error to inject
@@ -292,6 +305,16 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
 
     // Parse modified circuit
     circuit_ = stim::Circuit(oss.str().c_str());
+}
+
+double SurfaceCodeSimulator::compute_raw_channel_error() const {
+    if (!std::isnan(config_.channel_depolarization_error)) {
+        return config_.channel_depolarization_error;
+    }
+
+    // Legacy compatibility: if no explicit channel error is provided, continue to
+    // derive the base remote error from raw EPR fidelity using the pre-existing path.
+    return compute_cnot_error_from_fidelity(config_.raw_epr_fidelity);
 }
 
 uint32_t SurfaceCodeSimulator::count_remote_cnots_in_cycle() {
@@ -509,6 +532,53 @@ double SurfaceCodeSimulator::compute_cnot_error_from_fidelity(double fidelity) c
     double p = config_.physical_error;
     double p_remote = 1.0 - fidelity * (1.0 - p) * (1.0 - p);
     return std::max(0.0, p_remote);
+}
+
+double SurfaceCodeSimulator::compute_remote_cnot_error_from_effective_channel(double effective_channel_error,
+                                                                              double physical_error,
+                                                                              bool accurate_rcx) {
+    if (!accurate_rcx) {
+        return std::max(0.0, effective_channel_error);
+    }
+
+    double p_remote = 1.0 - (1.0 - effective_channel_error) * (1.0 - physical_error) * (1.0 - physical_error);
+    return std::max(0.0, p_remote);
+}
+
+RemoteCnotNoiseModel SurfaceCodeSimulator::compute_remote_cnot_noise_model() const {
+    RemoteCnotNoiseModel model;
+    model.raw_channel_error = compute_raw_channel_error();
+    model.effective_channel_error = model.raw_channel_error;
+    model.distillation_backup_batches = config_.distillation_backup_batches;
+
+    DistillationResult distill = compute_distillation(config_.distillation_rounds);
+    model.distilled_fidelity = distill.output_fidelity;
+    model.distilled_error = 1.0 - distill.output_fidelity;
+    model.distillation_success_probability = distill.success_probability;
+
+    bool wants_distillation =
+        config_.distributed &&
+        config_.distillation_protocol != DistillationProtocol::NONE &&
+        config_.distillation_rounds > 0;
+    bool timing_feasible = check_timing_constraint(distill.distillation_time);
+    model.distillation_feasible = wants_distillation && timing_feasible;
+
+    if (model.distillation_feasible) {
+        model.probability_all_distillation_fail =
+            std::pow(1.0 - distill.success_probability, static_cast<double>(config_.distillation_backup_batches));
+        model.effective_channel_error =
+            (1.0 - model.probability_all_distillation_fail) * model.distilled_error +
+            model.probability_all_distillation_fail * model.raw_channel_error;
+    } else {
+        model.probability_all_distillation_fail = 1.0;
+        model.effective_channel_error = model.raw_channel_error;
+    }
+
+    model.remote_cnot_error = compute_remote_cnot_error_from_effective_channel(
+        model.effective_channel_error,
+        config_.physical_error,
+        config_.accurate_rcx);
+    return model;
 }
 
 // Compute time required for distillation

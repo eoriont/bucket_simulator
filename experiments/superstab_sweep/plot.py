@@ -158,9 +158,11 @@ def plot(run_dir: Path):
     ax.grid(True, alpha=0.35)
     ax.set_yscale("log")
 
-    # x-axis in MHz units
-    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x/1e6:.0f}"))
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(5e6))
+    # x-axis: one tick per data point, labeled in MHz
+    all_rates = sorted({r for st in data.values() for r in st.keys()})
+    ax.set_xticks(all_rates)
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.0f}"))
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", fontsize=9)
 
     # Annotate run ID
     run_id = run_dir.name

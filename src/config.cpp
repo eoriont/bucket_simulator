@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <iostream>
+#include <cmath>
 
 namespace bucket_sim {
 
@@ -134,6 +135,12 @@ Config parse_config(const std::string& filename) {
                 config.distributed = (value == "true" || value == "1");
             } else if (key == "interconnect_error") {
                 config.interconnect_error = std::stod(value);
+            } else if (key == "accurate_rcx") {
+                config.accurate_rcx = (value == "true" || value == "1");
+            } else if (key == "channel_depolarization_error") {
+                config.channel_depolarization_error = std::stod(value);
+            } else if (key == "distillation_backup_batches") {
+                config.distillation_backup_batches = static_cast<uint32_t>(std::stoul(value));
             } else if (key == "entanglement_rate") {
                 config.entanglement_rate = std::stod(value);
             } else if (key == "T1") {
@@ -209,6 +216,16 @@ Config parse_config(const std::string& filename) {
     }
     if (config.total_shots == 0) {
         throw std::invalid_argument("total_shots must be greater than 0");
+    }
+    if (config.interconnect_error < 0.0 || config.interconnect_error > 1.0) {
+        throw std::invalid_argument("interconnect_error must be in [0, 1]");
+    }
+    if (!std::isnan(config.channel_depolarization_error) &&
+        (config.channel_depolarization_error < 0.0 || config.channel_depolarization_error > 1.0)) {
+        throw std::invalid_argument("channel_depolarization_error must be in [0, 1]");
+    }
+    if (config.distillation_backup_batches == 0) {
+        throw std::invalid_argument("distillation_backup_batches must be greater than 0");
     }
 
     return config;

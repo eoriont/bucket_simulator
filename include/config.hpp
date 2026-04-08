@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <vector>
 #include <map>
+#include <limits>
 
 namespace bucket_sim {
 
@@ -50,6 +51,9 @@ struct Config {
     // Distributed QEC parameters
     bool distributed;  // false = monolithic (default), true = distributed
     double interconnect_error;  // Additional error rate for boundary CNOTs
+    bool accurate_rcx;  // Use accurate RCX transform on the effective channel error
+    double channel_depolarization_error;  // Raw channel/EPR error before RCX-local-gate folding
+    uint32_t distillation_backup_batches;  // Redundant distillation batches (m)
 
     // Entanglement-limited idling parameters
     double entanglement_rate;  // EPR pairs generated per second (Hz)
@@ -88,6 +92,9 @@ struct Config {
           calib_shots_per_bucket(500),
           distributed(false),
           interconnect_error(0.0),
+          accurate_rcx(false),
+          channel_depolarization_error(std::numeric_limits<double>::quiet_NaN()),
+          distillation_backup_batches(1),
           entanglement_rate(100e6),    // Default: 100 MHz
           T1_coherence_time(125e-6),   // Default: 125 μs (paper Section III.B)
           T2_coherence_time(200e-6),   // Default: 200 μs (paper Section III.B)

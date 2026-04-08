@@ -12,6 +12,8 @@ total_shots {{TOTAL_SHOTS}}
 mode {{MODE}}
 distributed true
 interconnect_error 0.0
+accurate_rcx false
+distillation_backup_batches 1
 
 # Entanglement parameters
 entanglement_rate {{ENTANGLEMENT_RATE}}
@@ -21,6 +23,7 @@ measurement_delay {{MEASUREMENT_DELAY}}
 
 # Distillation parameters
 raw_epr_fidelity {{RAW_EPR_FIDELITY}}
+channel_depolarization_error {{CHANNEL_DEPOLARIZATION_ERROR}}
 distillation_protocol {{DISTILLATION_PROTOCOL}}
 distillation_rounds {{DISTILLATION_ROUNDS}}
 
