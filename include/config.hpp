@@ -21,6 +21,12 @@ enum class MergeType {
     XX_MERGE_DISTRIBUTED // Distributed XX merge: no merge data qubits, remote CNOTs only, flipped Patch B
 };
 
+enum class ExperimentPhase {
+    MERGE_AND_SPLIT,  // Full circuit: merge then split (default)
+    MERGE_ONLY,       // Merge only: X-basis init/teardown, no split
+    SPLIT_ONLY,       // Split only: Z-basis init/teardown, no merge rounds
+};
+
 enum class DistillationProtocol {
     NONE,
     PUMPING_2TO1,      // 2→1 Pumping: linear resource cost O(b*k)
@@ -73,6 +79,7 @@ struct Config {
     uint32_t merge_rounds;            // Number of stabilizer rounds during merge
     std::vector<std::pair<double,double>> superstabilizers; // data qubit (x,y) positions to disable (XX_MERGE_DISTRIBUTED only)
     bool split_after_merge;           // Whether to split patches after merge
+    ExperimentPhase experiment_phase; // Which phase(s) of lattice surgery to simulate
 
     // Default constructor
     Config()
@@ -104,7 +111,8 @@ struct Config {
           distillation_rounds(1),      // Default: 1 round
           merge_type(MergeType::NONE),
           merge_rounds(0),             // 0 = use code_distance rounds
-          split_after_merge(false) {}
+          split_after_merge(false),
+          experiment_phase(ExperimentPhase::MERGE_AND_SPLIT) {}
 };
 
 // Parse configuration from file

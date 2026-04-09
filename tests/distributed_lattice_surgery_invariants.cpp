@@ -15,6 +15,7 @@ using bucket_sim::Config;
 using bucket_sim::DPatchID;
 using bucket_sim::DQubitType;
 using bucket_sim::DistributedLatticeSurgeryCircuit;
+using bucket_sim::ExperimentPhase;
 using bucket_sim::MergeType;
 
 namespace {
@@ -189,6 +190,42 @@ uint64_t count_remote_cx(const stim::Circuit& circuit, double split_x) {
     return count;
 }
 
+bool contains_token(const std::string &haystack, const std::string &needle) {
+    return haystack.find(needle) != std::string::npos;
+}
+
+void run_phase_case(uint32_t d, ExperimentPhase phase) {
+    Config cfg;
+    cfg.code_distance = d;
+    cfg.rounds = d;
+    cfg.merge_type = MergeType::XX_MERGE_DISTRIBUTED;
+    cfg.merge_rounds = d;
+    cfg.distributed = true;
+    cfg.total_shots = 1000;
+    cfg.experiment_phase = phase;
+
+    DistributedLatticeSurgeryCircuit ls(cfg);
+    auto circuit = ls.generate();
+    const auto circuit_str = circuit.str();
+    check_det_determinism(circuit, "phase case d=" + std::to_string(d));
+
+    const double split_x = static_cast<double>(d);
+    const uint64_t remote_cx = count_remote_cx(circuit, split_x);
+
+    if (phase == ExperimentPhase::MERGE_ONLY) {
+        require(remote_cx > 0, "merge_only should include remote CX operations");
+        require(contains_token(circuit_str, "\nRX "), "merge_only should initialize data in X basis");
+        require(contains_token(circuit_str, "\nMX "), "merge_only should contain X-basis measurements");
+        require(contains_token(circuit_str, "OBSERVABLE_INCLUDE(0)"), "merge_only should expose the merged X logical observable");
+        require(!contains_token(circuit_str, "OBSERVABLE_INCLUDE(1)"), "merge_only should expose one merged logical observable");
+    } else if (phase == ExperimentPhase::SPLIT_ONLY) {
+        require(remote_cx > 0, "split_only should include remote CX operations before the split");
+        require(contains_token(circuit_str, "\nR "), "split_only should initialize data in Z basis");
+        require(contains_token(circuit_str, "\nM "), "split_only should contain Z-basis measurements");
+        require(contains_token(circuit_str, "OBSERVABLE_INCLUDE(1)"), "split_only should expose both split logical observables");
+    }
+}
+
 void run_superstab_case(uint32_t d) {
     const double split_x = static_cast<double>(d);
 
@@ -211,7 +248,7 @@ void run_superstab_case(uint32_t d) {
     // Partial superstabilizer: only the first X position.
     if (!all_x_ys.empty()) {
         Config cfg_partial = cfg_normal;
-        cfg_partial.superstab_ys = {all_x_ys[0]};
+        cfg_partial.superstabilizers = {{static_cast<double>(d) + 0.5, static_cast<double>(all_x_ys[0]) + 0.5}};
         DistributedLatticeSurgeryCircuit ls_partial(cfg_partial);
         auto circ_partial = ls_partial.generate();
         check_det_determinism(circ_partial, "partial superstab d=" + std::to_string(d));
@@ -222,33 +259,34 @@ void run_superstab_case(uint32_t d) {
 
     // Full superstabilizer: all X positions.
     Config cfg_full = cfg_normal;
-    cfg_full.superstab_ys = all_x_ys;
+    for (uint32_t y : all_x_ys) {
+        cfg_full.superstabilizers.push_back({static_cast<double>(d) + 0.5, static_cast<double>(y) + 0.5});
+    }
     DistributedLatticeSurgeryCircuit ls_full(cfg_full);
     auto circ_full = ls_full.generate();
     check_det_determinism(circ_full, "full superstab d=" + std::to_string(d));
     uint64_t remote_cx_full = count_remote_cx(circ_full, split_x);
     require(remote_cx_full < remote_cx_normal,
             "full superstab should reduce remote CX count (d=" + std::to_string(d) + ")");
-    // Each superstabilized X position eliminates exactly 2 remote CX per round:
-    //   - seam_a (at x=d-0.125, A side) only touches Patch A data → local CX
-    //   - seam_b (at x=d+0.125, B side) only touches Patch B data → local CX
-    //   vs. merge-X (at x=d, A side) which had 2 CX to Patch B data (remote)
-    uint64_t expected_reduction = static_cast<uint64_t>(all_x_ys.size()) * 2 * d;
+    // Each superstabilized X position removes one remote CX per merge round in the
+    // current checkerboard/orientation convention: the surviving merge-X remains
+    // weight-3 and still performs one remote CNOT.
+    uint64_t expected_reduction = static_cast<uint64_t>(all_x_ys.size()) * d;
     require(remote_cx_normal - remote_cx_full == expected_reduction,
-            "full superstab should eliminate 2 remote CX per superstab position per round "
+            "full superstab should eliminate 1 remote CX per superstab position per round "
             "(expected reduction " + std::to_string(expected_reduction) +
             ", got " + std::to_string(remote_cx_normal - remote_cx_full) +
             ", d=" + std::to_string(d) + ")");
 
     // No-superstab with explicit empty list should behave identically to normal.
     Config cfg_empty = cfg_normal;
-    cfg_empty.superstab_ys = {};
+    cfg_empty.superstabilizers = {};
     DistributedLatticeSurgeryCircuit ls_empty(cfg_empty);
     auto circ_empty = ls_empty.generate();
-    check_det_determinism(circ_empty, "empty superstab_ys d=" + std::to_string(d));
+    check_det_determinism(circ_empty, "empty superstabilizers d=" + std::to_string(d));
     uint64_t remote_cx_empty = count_remote_cx(circ_empty, split_x);
     require(remote_cx_empty == remote_cx_normal,
-            "empty superstab_ys should produce same circuit as no superstab (d=" + std::to_string(d) + ")");
+            "empty superstabilizers should produce same circuit as no superstab (d=" + std::to_string(d) + ")");
 }
 
 }  // namespace
@@ -256,6 +294,10 @@ void run_superstab_case(uint32_t d) {
 int main() {
     run_case(3);
     run_case(5);
+    run_phase_case(3, ExperimentPhase::MERGE_ONLY);
+    run_phase_case(3, ExperimentPhase::SPLIT_ONLY);
+    run_phase_case(5, ExperimentPhase::MERGE_ONLY);
+    run_phase_case(5, ExperimentPhase::SPLIT_ONLY);
     run_superstab_case(3);
     run_superstab_case(5);
     std::cout << "[PASS] distributed lattice surgery invariants" << std::endl;

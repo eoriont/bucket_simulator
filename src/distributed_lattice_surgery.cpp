@@ -4,8 +4,11 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <queue>
 #include <sstream>
 #include <set>
+#include <map>
+#include <unordered_map>
 #include <unordered_set>
 
 // Helper to create record target for DETECTOR/OBSERVABLE_INCLUDE
@@ -14,6 +17,44 @@ static inline uint32_t drec(int32_t offset) {
 }
 
 namespace bucket_sim {
+
+static std::string dualize_xz_circuit_text(const std::string &input) {
+    std::istringstream iss(input);
+    std::ostringstream out;
+    std::string line;
+    while (std::getline(iss, line)) {
+        if (line.rfind("R ", 0) == 0) {
+            out << "RX" << line.substr(1) << "\n";
+            continue;
+        }
+        if (line.rfind("RX ", 0) == 0) {
+            out << "R" << line.substr(2) << "\n";
+            continue;
+        }
+        if (line.rfind("M ", 0) == 0) {
+            out << "MX" << line.substr(1) << "\n";
+            continue;
+        }
+        if (line.rfind("MX ", 0) == 0) {
+            out << "M" << line.substr(2) << "\n";
+            continue;
+        }
+        if (line.rfind("CX ", 0) == 0) {
+            std::istringstream ls(line);
+            std::string gate;
+            ls >> gate;
+            out << "CX";
+            uint32_t a, b;
+            while (ls >> a >> b) {
+                out << " " << b << " " << a;
+            }
+            out << "\n";
+            continue;
+        }
+        out << line << "\n";
+    }
+    return out.str();
+}
 
 DistributedLatticeSurgeryCircuit::DistributedLatticeSurgeryCircuit(const Config& config)
     : config_(config),
@@ -27,8 +68,10 @@ DistributedLatticeSurgeryCircuit::DistributedLatticeSurgeryCircuit(const Config&
     if (distance_ < 3 || distance_ % 2 == 0) {
         throw std::invalid_argument("Code distance must be odd and >= 3");
     }
-    if (!config_.superstabilizers.empty() && merge_type_ != MergeType::XX_MERGE_DISTRIBUTED) {
-        throw std::invalid_argument("superstabilizers is only supported for XX_MERGE_DISTRIBUTED");
+    if (!config_.superstabilizers.empty() &&
+        merge_type_ != MergeType::XX_MERGE_DISTRIBUTED &&
+        merge_type_ != MergeType::ZZ_MERGE) {
+        throw std::invalid_argument("superstabilizers is only supported for distributed_xx and distributed_zz");
     }
 
     initialize_layout();
@@ -401,6 +444,10 @@ void DistributedLatticeSurgeryCircuit::generate_circuit() {
     }
 
     generate_general_circuit();
+
+    if (merge_type_ == MergeType::ZZ_MERGE) {
+        circuit_ = stim::Circuit(dualize_xz_circuit_text(circuit_.str()).c_str());
+    }
 }
 
 void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
@@ -475,22 +522,27 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     std::vector<uint32_t> normal_merge_x = merge_x_ancillas;
 
     // Match each surviving merge-X ancilla to its seam counterpart by y-coordinate.
-    // When a merge-X is suppressed its y position is absent from normal_merge_x,
-    // so seam positions at that y become "orphans" with no merge-X partner.
-    std::vector<size_t> normal_seam_indices(normal_merge_x.size(), SIZE_MAX);
+    // This must be refreshed after any gauge extraction, because an interior
+    // superstabilizer can move a merge-X ancilla out of normal_merge_x.
+    std::vector<size_t> normal_seam_indices;
     std::vector<size_t> orphan_seam_indices;
-    for (size_t j = 0; j < seam_a_x_ancillas.size(); j++) {
-        double seam_y = qubits_[seam_a_x_ancillas[j]].y;
-        bool matched = false;
-        for (size_t m = 0; m < normal_merge_x.size(); m++) {
-            if (std::abs(qubits_[normal_merge_x[m]].y - seam_y) < 0.1) {
-                normal_seam_indices[m] = j;
-                matched = true;
-                break;
+    auto refresh_normal_seam_indices = [&]() {
+        normal_seam_indices.assign(normal_merge_x.size(), SIZE_MAX);
+        orphan_seam_indices.clear();
+        for (size_t j = 0; j < seam_a_x_ancillas.size(); j++) {
+            double seam_y = qubits_[seam_a_x_ancillas[j]].y;
+            bool matched = false;
+            for (size_t m = 0; m < normal_merge_x.size(); m++) {
+                if (std::abs(qubits_[normal_merge_x[m]].y - seam_y) < 0.1) {
+                    normal_seam_indices[m] = j;
+                    matched = true;
+                    break;
+                }
             }
+            if (!matched) orphan_seam_indices.push_back(j);
         }
-        if (!matched) orphan_seam_indices.push_back(j);
-    }
+    };
+    refresh_normal_seam_indices();
 
     std::vector<uint32_t> cx_layer1, cx_layer2, cx_layer3, cx_layer4;           // merge rounds (excludes ss_data)
     std::vector<uint32_t> pre_cx_layer1, pre_cx_layer2, pre_cx_layer3, pre_cx_layer4; // pre/post rounds (includes ss_data)
@@ -690,6 +742,7 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         }
         merge_z_ancillas = std::move(new_mz);
         normal_merge_x   = std::move(new_mx);
+        refresh_normal_seam_indices();
     }
     bool has_gauges = !x_gauge_ancillas.empty() || !z_gauge_ancillas.empty();
     has_gauges_ = has_gauges;
@@ -766,12 +819,24 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     // Post-merge = same as pre-merge
     size_t post_total = pre_total;
 
+    const auto phase = config_.experiment_phase;
+    const bool merge_only = (phase == ExperimentPhase::MERGE_ONLY);
+    const bool split_only = (phase == ExperimentPhase::SPLIT_ONLY);
+    const bool start_merged = split_only;
+
     // ====== Initial reset of all data qubits ======
+    // merge_only: init in X eigenstate (|+>) to test X-logical preservation
+    // split_only / merge_and_split: init in Z eigenstate (|0>)
     circuit_.safe_append_u("TICK", {}, {});
-    circuit_.safe_append_u("R", all_data, {});
+    if (merge_only) {
+        circuit_.safe_append_u("RX", all_data, {});
+    } else {
+        circuit_.safe_append_u("R", all_data, {});
+    }
 
     // ====== Round 0: Pre-merge round (interior patches + seam, no merge) ======
-    {
+    // Skipped in split_only mode, which starts from the merged configuration.
+    if (!start_merged) {
         std::vector<uint32_t> all_seam_x;
         all_seam_x.insert(all_seam_x.end(), seam_a_x_ancillas.begin(), seam_a_x_ancillas.end());
         all_seam_x.insert(all_seam_x.end(), seam_b_x_ancillas.begin(), seam_b_x_ancillas.end());
@@ -809,9 +874,12 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             circuit_.safe_append_u("M", all_z_pre, {});
             circuit_.safe_append_u("MX", all_x_pre, {});
 
-            for (size_t i = 0; i < patch_z_count; i++) {
-                const auto& q = qubits_[z_ancillas[i]];
-                circuit_.safe_append_u("DETECTOR", {drec(-(int32_t)(pre_total - i))}, {q.x, q.y, 0});
+            // merge_only: data is in X eigenstate, Z measurements are random → skip pre-round Z detectors
+            if (!merge_only) {
+                for (size_t i = 0; i < patch_z_count; i++) {
+                    const auto& q = qubits_[z_ancillas[i]];
+                    circuit_.safe_append_u("DETECTOR", {drec(-(int32_t)(pre_total - i))}, {q.x, q.y, 0});
+                }
             }
         }
 
@@ -827,7 +895,9 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     //   MX(ss_seam_a[0..ss-1])    offsets: -(2*ss - k)
     //   MX(ss_seam_b[0..ss-1])    offsets: -(ss - k)          [last in block]
     // When ss_count==0, ss_merge_total==merge_total and all formulas reduce to the original.
-    for (uint32_t r = 0; r < merge_rounds_; r++) {
+    const uint32_t effective_merge_rounds = merge_rounds_;
+
+    for (uint32_t r = 0; r < effective_merge_rounds; r++) {
         if (r < merge_rounds_ - 1) {
             circuit_.safe_append_u("TICK", {}, {});
         }
@@ -938,10 +1008,18 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             const size_t nm = normal_merge_x_count, ss = ss_count;
 
             // Patch Z: compare with previous round
-            // Skip r==0 for boundary-weight-changing ancillas (non-deterministic transition)
+            // Skip r==0 for boundary-weight-changing ancillas (non-deterministic transition).
+            // In split_only we start in the merged regime, so the first merge-round Z checks
+            // are deterministic against the data initialization and can stand alone.
             for (size_t i = 0; i < pz; i++) {
                 const auto& q = qubits_[z_ancillas[i]];
                 if (r == 0 && boundary_changing_z_set.count(z_ancillas[i])) continue;
+                if (r == 0 && start_merged) {
+                    int32_t curr = -(int32_t)(ss_merge_total - i);
+                    circuit_.safe_append_u("DETECTOR", {drec(curr)},
+                        {q.x, q.y, static_cast<double>(r + 1)});
+                    continue;
+                }
                 int32_t curr = -(int32_t)(ss_merge_total - i);
                 int32_t prev = (r == 0)
                     ? -(int32_t)(ss_merge_total + pre_total - i)
@@ -950,8 +1028,15 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                     {q.x, q.y, static_cast<double>(r + 1)});
             }
 
-            // Merge Z: no detector on round 0 (anti-commutes with seam X → random first outcome)
-            if (r >= 1) {
+            // Merge Z: on split_only round 0 these are deterministic against |0> data init.
+            if (r == 0 && start_merged) {
+                for (size_t i = 0; i < mz; i++) {
+                    const auto& q = qubits_[merge_z_ancillas[i]];
+                    int32_t curr = -(int32_t)(ss_merge_total - pz - i);
+                    circuit_.safe_append_u("DETECTOR", {drec(curr)},
+                        {q.x, q.y, static_cast<double>(r + 1)});
+                }
+            } else if (r >= 1) {
                 for (size_t i = 0; i < mz; i++) {
                     const auto& q = qubits_[merge_z_ancillas[i]];
                     int32_t curr = -(int32_t)(ss_merge_total - pz - i);
@@ -961,11 +1046,11 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                 }
             }
 
-            // Patch X: compare with previous round
-            // Skip r==0 for boundary-weight-changing ancillas (weight-4 pre vs weight-3 merge → non-det)
+            // Patch X: compare with previous round.
+            // In split_only round 0 these are random under |0> data initialization, so skip.
             for (size_t i = 0; i < px; i++) {
                 const auto& q = qubits_[x_ancillas[i]];
-                if (r == 0 && boundary_changing_x_set.count(x_ancillas[i])) continue;
+                if (r == 0 && (start_merged || boundary_changing_x_set.count(x_ancillas[i]))) continue;
                 int32_t curr = -(int32_t)(ss_merge_total - pz - mz - i);
                 int32_t prev = (r == 0)
                     ? -(int32_t)(ss_merge_total + pre_total - pz - i)
@@ -974,8 +1059,10 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                     {q.x, q.y, static_cast<double>(r + 1)});
             }
 
-            // Normal merge-X positions: 3-term transition (r==0) or 2-term steady-state (r>0)
+            // Normal merge-X positions: 3-term transition (r==0) or 2-term steady-state (r>0).
+            // In split_only round 0 these are random under |0> data initialization, so skip.
             for (size_t m = 0; m < nm; m++) {
+                if (r == 0 && start_merged) continue;
                 const auto& q = qubits_[normal_merge_x[m]];
                 int32_t curr = -(int32_t)(2 * ss + nm - m);
                 size_t j = normal_seam_indices[m];
@@ -998,9 +1085,17 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             const size_t merge_full = merge_h1 + merge_h2;
             const size_t pre_full   = pre_h1  + pre_h2;
 
-            // Patch Z: at offset -(merge_h2 - i) from end of half2
+            // Patch Z: at offset -(merge_h2 - i) from end of half2.
+            // In split_only round 0 these are deterministic against the data initialization.
             for (size_t i = 0; i < patch_z_count; i++) {
                 const auto& q = qubits_[z_ancillas[i]];
+                if (r == 0 && boundary_changing_z_set.count(z_ancillas[i])) continue;
+                if (r == 0 && start_merged) {
+                    int32_t curr = -(int32_t)(merge_h2 - i);
+                    circuit_.safe_append_u("DETECTOR", {drec(curr)},
+                        {q.x, q.y, static_cast<double>(r + 1)});
+                    continue;
+                }
                 int32_t curr = -(int32_t)(merge_h2 - i);
                 int32_t prev = (r == 0)
                     ? -(int32_t)(merge_h2 + merge_h1 + pre_total - i)
@@ -1009,8 +1104,15 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                     {q.x, q.y, static_cast<double>(r + 1)});
             }
 
-            // Merge Z (no detector on r==0, same anti-commutation reason as non-gauge path)
-            if (r >= 1) {
+            // Merge Z: same handling as non-gauge path.
+            if (r == 0 && start_merged) {
+                for (size_t i = 0; i < merge_z_count; i++) {
+                    const auto& q = qubits_[merge_z_ancillas[i]];
+                    int32_t curr = -(int32_t)(merge_h2 - patch_z_count - i);
+                    circuit_.safe_append_u("DETECTOR", {drec(curr)},
+                        {q.x, q.y, static_cast<double>(r + 1)});
+                }
+            } else if (r >= 1) {
                 for (size_t i = 0; i < merge_z_count; i++) {
                     const auto& q = qubits_[merge_z_ancillas[i]];
                     int32_t curr = -(int32_t)(merge_h2 - patch_z_count - i);
@@ -1020,9 +1122,10 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                 }
             }
 
-            // Patch X: at offset -(merge_h2 - pz - mz - zg - i) from end of half2
+            // Patch X: in split_only round 0 these are random under |0> data init, so skip.
             for (size_t i = 0; i < patch_x_count; i++) {
                 const auto& q = qubits_[x_ancillas[i]];
+                if (r == 0 && (start_merged || boundary_changing_x_set.count(x_ancillas[i]))) continue;
                 int32_t curr = -(int32_t)(patch_x_count + normal_merge_x_count - i);
                 int32_t prev = (r == 0)
                     ? -(int32_t)(merge_h2 + merge_h1 + pre_total - patch_z_count - patch_zg_count - i)
@@ -1066,7 +1169,8 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     }
 
     // ====== Final round: Post-merge (interior patches + seam, no merge) ======
-    {
+    // Skipped in merge_only mode (we tear down in X basis directly after merge rounds).
+    if (!merge_only) {
         std::vector<uint32_t> all_seam_x;
         all_seam_x.insert(all_seam_x.end(), seam_a_x_ancillas.begin(), seam_a_x_ancillas.end());
         all_seam_x.insert(all_seam_x.end(), seam_b_x_ancillas.begin(), seam_b_x_ancillas.end());
@@ -1081,7 +1185,7 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             if (!combined.empty()) circuit_.safe_append_u("CX", combined, {});
         };
 
-        uint32_t final_round = merge_rounds_ + 1;
+        uint32_t final_round = effective_merge_rounds + 1;
 
         {
             const size_t pz = patch_z_count, mz = merge_z_count;
@@ -1108,11 +1212,9 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             circuit_.safe_append_u("M", all_z_post, {});
             circuit_.safe_append_u("MX", all_x_post, {});
 
-            // Use correct last-merge-round measurement totals for has_gauges vs no-gauges.
-            // For has_gauges: z_anc in half2 is at -(post_total + merge_h2 - i) from end of post-round.
-            // For no-gauges: z_anc is at -(post_total + ss_merge_total - i).
-            // Skip boundary-weight-changing ancillas: their post-round measurement is weight-4 while
-            // the last merge measurement was weight-3, making the transition detector non-deterministic.
+            // Compare the post-split seam round against the last merge round.
+            // This applies to both merge_and_split and split_only, since split_only now
+            // begins in the merged regime instead of starting as two separate patches.
             for (size_t i = 0; i < patch_z_count; i++) {
                 const auto& q = qubits_[z_ancillas[i]];
                 if (boundary_changing_z_set.count(z_ancillas[i])) continue;
@@ -1156,7 +1258,13 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     }
 
     // ====== Final measurement of all data qubits ======
-    circuit_.safe_append_u("M", all_data, {});
+    // merge_only: measure in X basis (tests X-logical preservation)
+    // split_only / merge_and_split: measure in Z basis
+    if (merge_only) {
+        circuit_.safe_append_u("MX", all_data, {});
+    } else {
+        circuit_.safe_append_u("M", all_data, {});
+    }
 
     // Final data detectors: for each Z-stabilizer ancilla in the patches,
     // combine data measurements with the last ancilla measurement
@@ -1190,60 +1298,333 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     // was weight-3, making a cross-boundary detector non-deterministic.
     std::unordered_set<uint32_t> gauge_ancilla_set(
         z_gauge_ancillas.begin(), z_gauge_ancillas.end());
+    std::unordered_set<uint32_t> x_gauge_ancilla_set(
+        x_gauge_ancillas.begin(), x_gauge_ancillas.end());
     // Also exclude boundary-weight-changing Z ancillas from final data detectors
     gauge_ancilla_set.insert(boundary_changing_z_set.begin(), boundary_changing_z_set.end());
 
-    for (const auto& stab : patch_a_stabilizers_) {
-        if (stab.is_x_type) continue;
-        if (gauge_ancilla_set.count(stab.ancilla)) continue;
-        const auto& aq = qubits_[stab.ancilla];
+    if (merge_only) {
+        // merge_only: final MX(all_data). Build detectors from X stabilizers.
+        // The last X ancilla measurements are in the last merge round:
+        //   M(z_anc, merge_z_anc) then MX(x_anc, normal_merge_x)
+        // Total measurements before MX(all_data): ss_merge_total
+        // x_anc[i] from end of last merge round: (patch_x_count + normal_merge_x_count - i)
+        // From end of MX(all_data): all_data.size() + (patch_x_count + normal_merge_x_count - i)
+        const size_t px = patch_x_count, nm = normal_merge_x_count;
+        auto find_x_anc_offset = [&](uint32_t ancilla_idx) -> int32_t {
+            for (size_t k = 0; k < x_ancillas.size(); k++) {
+                if (x_ancillas[k] == ancilla_idx)
+                    return (int32_t)(all_data.size() + px + nm - k);
+            }
+            // Also look in normal_merge_x (merge X ancillas)
+            for (size_t k = 0; k < normal_merge_x.size(); k++) {
+                if (normal_merge_x[k] == ancilla_idx)
+                    return (int32_t)(all_data.size() + nm - k);
+            }
+            return -1;
+        };
+        for (const auto& stab : patch_a_stabilizers_) {
+            if (!stab.is_x_type) continue;
+            if (boundary_changing_x_set.count(stab.ancilla)) continue;
+            if (x_gauge_ancilla_set.count(stab.ancilla)) continue;
+            const auto& aq = qubits_[stab.ancilla];
+            std::vector<uint32_t> det_targets;
+            for (uint32_t d : stab.data_qubits) add_data_meas(det_targets, d);
+            int32_t off = find_x_anc_offset(stab.ancilla);
+            if (off >= 0) det_targets.push_back(drec(-off));
+            circuit_.safe_append_u("DETECTOR", det_targets, {aq.x, aq.y, static_cast<double>(data_round)});
+        }
+        for (const auto& stab : patch_b_stabilizers_) {
+            if (!stab.is_x_type) continue;
+            if (boundary_changing_x_set.count(stab.ancilla)) continue;
+            if (x_gauge_ancilla_set.count(stab.ancilla)) continue;
+            const auto& aq = qubits_[stab.ancilla];
+            std::vector<uint32_t> det_targets;
+            for (uint32_t d : stab.data_qubits) add_data_meas(det_targets, d);
+            int32_t off = find_x_anc_offset(stab.ancilla);
+            if (off >= 0) det_targets.push_back(drec(-off));
+            circuit_.safe_append_u("DETECTOR", det_targets, {aq.x, aq.y, static_cast<double>(data_round)});
+        }
+    } else {
+        // merge_and_split / split_only: final M(all_data). Detectors from Z stabilizers.
+        for (const auto& stab : patch_a_stabilizers_) {
+            if (stab.is_x_type) continue;
+            if (gauge_ancilla_set.count(stab.ancilla)) continue;
+            const auto& aq = qubits_[stab.ancilla];
 
-        std::vector<uint32_t> det_targets;
-        for (uint32_t d : stab.data_qubits) add_data_meas(det_targets, d);
-        int32_t off = find_z_anc_offset(stab.ancilla);
-        if (off >= 0) det_targets.push_back(drec(-off));
-        circuit_.safe_append_u("DETECTOR", det_targets, {aq.x, aq.y, static_cast<double>(data_round)});
-    }
+            std::vector<uint32_t> det_targets;
+            for (uint32_t d : stab.data_qubits) add_data_meas(det_targets, d);
+            int32_t off = find_z_anc_offset(stab.ancilla);
+            if (off >= 0) det_targets.push_back(drec(-off));
+            circuit_.safe_append_u("DETECTOR", det_targets, {aq.x, aq.y, static_cast<double>(data_round)});
+        }
 
-    for (const auto& stab : patch_b_stabilizers_) {
-        if (stab.is_x_type) continue;
-        if (gauge_ancilla_set.count(stab.ancilla)) continue;
-        const auto& aq = qubits_[stab.ancilla];
+        for (const auto& stab : patch_b_stabilizers_) {
+            if (stab.is_x_type) continue;
+            if (gauge_ancilla_set.count(stab.ancilla)) continue;
+            const auto& aq = qubits_[stab.ancilla];
 
-        std::vector<uint32_t> det_targets;
-        for (uint32_t d : stab.data_qubits) add_data_meas(det_targets, d);
-        int32_t off = find_z_anc_offset(stab.ancilla);
-        if (off >= 0) det_targets.push_back(drec(-off));
-        circuit_.safe_append_u("DETECTOR", det_targets, {aq.x, aq.y, static_cast<double>(data_round)});
+            std::vector<uint32_t> det_targets;
+            for (uint32_t d : stab.data_qubits) add_data_meas(det_targets, d);
+            int32_t off = find_z_anc_offset(stab.ancilla);
+            if (off >= 0) det_targets.push_back(drec(-off));
+            circuit_.safe_append_u("DETECTOR", det_targets, {aq.x, aq.y, static_cast<double>(data_round)});
+        }
     }
 
     // Logical observables
-    std::vector<uint32_t> obs_a_targets;
-    for (size_t k = 0; k < all_data.size(); k++) {
-        const auto& q = qubits_[all_data[k]];
-        if (q.patch == DPatchID::PATCH_A && std::abs(q.x - 0.5) < 0.1) {
-            obs_a_targets.push_back(drec(-(int32_t)(all_data.size() - k)));
+    std::unordered_map<uint32_t, std::vector<uint32_t>> merge_round_ancilla_to_data;
+    auto collect_pairs = [&](const std::vector<uint32_t>& pairs) {
+        for (size_t k = 0; k + 1 < pairs.size(); k += 2) {
+            uint32_t a = pairs[k];
+            uint32_t b = pairs[k + 1];
+            bool a_data = qubits_[a].type == DQubitType::DATA;
+            bool b_data = qubits_[b].type == DQubitType::DATA;
+            if (a_data == b_data) continue;
+            uint32_t anc = a_data ? b : a;
+            uint32_t dat = a_data ? a : b;
+            merge_round_ancilla_to_data[anc].push_back(dat);
         }
+    };
+    for (const auto& layer : {cx_layer1, cx_layer2, cx_layer3, cx_layer4,
+                              merge_cx1, merge_cx2, merge_cx3, merge_cx4,
+                              x_gauge_cx1, x_gauge_cx2, x_gauge_cx3, x_gauge_cx4,
+                              z_gauge_cx1, z_gauge_cx2, z_gauge_cx3, z_gauge_cx4}) {
+        collect_pairs(layer);
     }
-    if (!obs_a_targets.empty()) {
-        circuit_.safe_append_u("OBSERVABLE_INCLUDE", obs_a_targets, {0});
+    for (auto& [_, neighbors] : merge_round_ancilla_to_data) {
+        std::sort(neighbors.begin(), neighbors.end());
+        neighbors.erase(std::unique(neighbors.begin(), neighbors.end()), neighbors.end());
     }
 
-    double max_data_x = 0;
-    for (const auto& q : qubits_) {
-        if (q.type == DQubitType::DATA && q.patch == DPatchID::PATCH_B) {
-            max_data_x = std::max(max_data_x, q.x);
+    auto build_data_observable_targets = [&](const std::vector<uint32_t>& ancilla_family, auto include_start, auto include_goal, auto allow_data) -> std::vector<uint32_t> {
+        std::vector<uint32_t> qubit_to_data_pos(qubits_.size(), UINT32_MAX);
+        std::vector<uint32_t> active_data;
+        active_data.reserve(all_data.size());
+        for (size_t k = 0; k < all_data.size(); k++) {
+            if (removed_data_qubits_.count(all_data[k])) continue;
+            if (merge_excluded_data_qubits_.count(all_data[k])) continue;
+            if (!allow_data(qubits_[all_data[k]])) continue;
+            qubit_to_data_pos[all_data[k]] = static_cast<uint32_t>(k);
+            active_data.push_back(all_data[k]);
         }
-    }
-    std::vector<uint32_t> obs_b_targets;
-    for (size_t k = 0; k < all_data.size(); k++) {
-        const auto& q = qubits_[all_data[k]];
-        if (q.patch == DPatchID::PATCH_B && std::abs(q.x - max_data_x) < 0.1) {
-            obs_b_targets.push_back(drec(-(int32_t)(all_data.size() - k)));
+
+        std::vector<uint32_t> start_nodes;
+        std::vector<uint32_t> goal_nodes;
+        for (uint32_t qidx : active_data) {
+            const auto& q = qubits_[qidx];
+            if (include_start(q)) start_nodes.push_back(qidx);
+            if (include_goal(q)) goal_nodes.push_back(qidx);
         }
-    }
-    if (!obs_b_targets.empty()) {
-        circuit_.safe_append_u("OBSERVABLE_INCLUDE", obs_b_targets, {1});
+        if (start_nodes.empty() || goal_nodes.empty()) return {};
+
+        auto coord_less = [&](uint32_t a, uint32_t b) {
+            const auto& qa = qubits_[a];
+            const auto& qb = qubits_[b];
+            if (std::abs(qa.y - qb.y) > 0.1) return qa.y < qb.y;
+            return qa.x < qb.x;
+        };
+        std::sort(start_nodes.begin(), start_nodes.end(), coord_less);
+        std::sort(goal_nodes.begin(), goal_nodes.end(), coord_less);
+        std::unordered_set<uint32_t> goal_set(goal_nodes.begin(), goal_nodes.end());
+
+        std::unordered_map<uint32_t, std::vector<uint32_t>> graph;
+        graph.reserve(active_data.size());
+        for (uint32_t qidx : active_data) {
+            graph.emplace(qidx, std::vector<uint32_t>{});
+        }
+
+        for (uint32_t anc : ancilla_family) {
+            auto it = merge_round_ancilla_to_data.find(anc);
+            if (it == merge_round_ancilla_to_data.end()) continue;
+            const auto& touched = it->second;
+            std::vector<uint32_t> present;
+            present.reserve(touched.size());
+            for (uint32_t qidx : touched) {
+                if (qidx < qubit_to_data_pos.size() && qubit_to_data_pos[qidx] != UINT32_MAX) {
+                    present.push_back(qidx);
+                }
+            }
+            for (size_t i = 0; i < present.size(); i++) {
+                for (size_t j = i + 1; j < present.size(); j++) {
+                    graph[present[i]].push_back(present[j]);
+                    graph[present[j]].push_back(present[i]);
+                }
+            }
+        }
+        for (auto& [_, neighbors] : graph) {
+            std::sort(neighbors.begin(), neighbors.end(), coord_less);
+            neighbors.erase(std::unique(neighbors.begin(), neighbors.end()), neighbors.end());
+        }
+
+        std::queue<uint32_t> q;
+        std::unordered_map<uint32_t, uint32_t> parent;
+        parent.reserve(active_data.size());
+        for (uint32_t start : start_nodes) {
+            parent[start] = start;
+            q.push(start);
+        }
+
+        uint32_t found = UINT32_MAX;
+        while (!q.empty() && found == UINT32_MAX) {
+            uint32_t cur = q.front();
+            q.pop();
+            auto it = graph.find(cur);
+            if (it == graph.end()) continue;
+            for (uint32_t nxt : it->second) {
+                if (parent.count(nxt)) continue;
+                parent[nxt] = cur;
+                if (goal_set.count(nxt)) {
+                    found = nxt;
+                    break;
+                }
+                q.push(nxt);
+            }
+        }
+        if (found == UINT32_MAX) return {};
+
+        std::vector<uint32_t> path;
+        for (uint32_t cur = found;; cur = parent[cur]) {
+            path.push_back(cur);
+            if (parent[cur] == cur) break;
+        }
+        std::reverse(path.begin(), path.end());
+
+        std::vector<uint32_t> targets;
+        targets.reserve(path.size());
+        for (uint32_t qidx : path) {
+            uint32_t pos = qubit_to_data_pos[qidx];
+            if (pos == UINT32_MAX) continue;
+            targets.push_back(drec(-(int32_t)(all_data.size() - pos)));
+        }
+        return targets;
+    };
+
+    if (merge_only) {
+        std::vector<uint32_t> merged_targets;
+        if (merge_type_ == MergeType::ZZ_MERGE) {
+            std::map<double, std::vector<uint32_t>> row_qubits;
+            for (uint32_t qidx : all_data) {
+                if (removed_data_qubits_.count(qidx)) continue;
+                if (merge_excluded_data_qubits_.count(qidx)) continue;
+                row_qubits[qubits_[qidx].y].push_back(qidx);
+            }
+            for (auto& [_, row] : row_qubits) {
+                std::sort(row.begin(), row.end(), [&](uint32_t a, uint32_t b) {
+                    const auto& qa = qubits_[a];
+                    const auto& qb = qubits_[b];
+                    if (qa.patch != qb.patch) return qa.patch < qb.patch;
+                    return qa.x < qb.x;
+                });
+            }
+
+            for (const auto& [_, row] : row_qubits) {
+                if (row.size() != 2 * distance_) continue;
+                for (uint32_t qidx : row) {
+                    for (size_t k = 0; k < all_data.size(); k++) {
+                        if (all_data[k] == qidx) {
+                            merged_targets.push_back(drec(-(int32_t)(all_data.size() - k)));
+                            break;
+                        }
+                    }
+                }
+                if (!merged_targets.empty()) break;
+            }
+
+            if (merged_targets.empty()) {
+                double max_data_x = 0;
+                double max_data_y = 0;
+                for (const auto& q : qubits_) {
+                    if (q.type == DQubitType::DATA) {
+                        max_data_y = std::max(max_data_y, q.y);
+                        if (q.patch == DPatchID::PATCH_B) {
+                            max_data_x = std::max(max_data_x, q.x);
+                        }
+                    }
+                }
+                std::vector<uint32_t> x_family = x_ancillas;
+                x_family.insert(x_family.end(), normal_merge_x.begin(), normal_merge_x.end());
+                x_family.insert(x_family.end(), x_gauge_ancillas.begin(), x_gauge_ancillas.end());
+                merged_targets = build_data_observable_targets(
+                    x_family,
+                    [](const DQubitInfo& q) {
+                        return q.patch == DPatchID::PATCH_A && std::abs(q.y - 0.5) < 0.1;
+                    },
+                    [max_data_x](const DQubitInfo& q) {
+                        return q.patch == DPatchID::PATCH_B && std::abs(q.y - 0.5) < 0.1;
+                    },
+                    [](const DQubitInfo&) {
+                        return true;
+                    });
+                if (merged_targets.empty()) {
+                    merged_targets = build_data_observable_targets(
+                        x_family,
+                        [max_data_y](const DQubitInfo& q) {
+                            return q.patch == DPatchID::PATCH_A && std::abs(q.y - max_data_y) < 0.1;
+                        },
+                        [max_data_y](const DQubitInfo& q) {
+                            return q.patch == DPatchID::PATCH_B && std::abs(q.y - max_data_y) < 0.1;
+                        },
+                        [](const DQubitInfo&) {
+                            return true;
+                        });
+                }
+            }
+        } else {
+            double max_data_x = 0;
+            for (const auto& q : qubits_) {
+                if (q.type == DQubitType::DATA && q.patch == DPatchID::PATCH_B) {
+                    max_data_x = std::max(max_data_x, q.x);
+                }
+            }
+            std::vector<uint32_t> z_family = z_ancillas;
+            z_family.insert(z_family.end(), merge_z_ancillas.begin(), merge_z_ancillas.end());
+            z_family.insert(z_family.end(), z_gauge_ancillas.begin(), z_gauge_ancillas.end());
+            merged_targets = build_data_observable_targets(
+                z_family,
+                [](const DQubitInfo& q) {
+                    return q.patch == DPatchID::PATCH_A && std::abs(q.x - 0.5) < 0.1;
+                },
+                [max_data_x](const DQubitInfo& q) {
+                    return q.patch == DPatchID::PATCH_B && std::abs(q.x - max_data_x) < 0.1;
+                },
+                [](const DQubitInfo&) {
+                    return true;
+                });
+        }
+        if (!merged_targets.empty()) {
+            circuit_.safe_append_u("OBSERVABLE_INCLUDE", merged_targets, {0});
+        }
+    } else {
+        std::vector<uint32_t> obs_a_targets;
+        for (size_t k = 0; k < all_data.size(); k++) {
+            const auto& q = qubits_[all_data[k]];
+            bool include = (q.patch == DPatchID::PATCH_A && std::abs(q.x - 0.5) < 0.1);
+            if (include) {
+                obs_a_targets.push_back(drec(-(int32_t)(all_data.size() - k)));
+            }
+        }
+        if (!obs_a_targets.empty()) {
+            circuit_.safe_append_u("OBSERVABLE_INCLUDE", obs_a_targets, {0});
+        }
+
+        double max_data_x = 0;
+        for (const auto& q : qubits_) {
+            if (q.type == DQubitType::DATA && q.patch == DPatchID::PATCH_B) {
+                max_data_x = std::max(max_data_x, q.x);
+            }
+        }
+        std::vector<uint32_t> obs_b_targets;
+        for (size_t k = 0; k < all_data.size(); k++) {
+            const auto& q = qubits_[all_data[k]];
+            bool include = (q.patch == DPatchID::PATCH_B && std::abs(q.x - max_data_x) < 0.1);
+            if (include) {
+                obs_b_targets.push_back(drec(-(int32_t)(all_data.size() - k)));
+            }
+        }
+        if (!obs_b_targets.empty()) {
+            circuit_.safe_append_u("OBSERVABLE_INCLUDE", obs_b_targets, {1});
+        }
     }
 }
 
@@ -1280,11 +1661,13 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
     // exclude_merge_excluded=true drops merge_excluded_data_qubits_ (for merge rounds).
     // Returns empty string if the resulting polygon has no vertices.
     auto make_polygon = [this](const DStabilizer& stab, bool is_merge, bool include_removed = false, bool exclude_merge_excluded = false) -> std::string {
+        const bool swap_colors = (merge_type_ == MergeType::ZZ_MERGE);
+        const bool is_x_color = swap_colors ? !stab.is_x_type : stab.is_x_type;
         const char* color;
         if (is_merge) {
-            color = stab.is_x_type ? "0,0.7,0,0.3" : "1,0.5,0,0.3";
+            color = is_x_color ? "0,0.7,0,0.3" : "1,0.5,0,0.3";
         } else {
-            color = stab.is_x_type ? "0,0,1,0.25" : "1,0,0,0.25";
+            color = is_x_color ? "0,0,1,0.25" : "1,0,0,0.25";
         }
 
         double ax = qubits_[stab.ancilla].x;
@@ -1401,6 +1784,9 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
     // Boundary SS qubits suppress ancillas but do not create gauges, so halves=1.
     const int halves_per_merge = has_gauges_ ? 2 : 1;
     const int merge_half_groups = halves_per_merge * static_cast<int>(merge_rounds_);
+    const auto phase = config_.experiment_phase;
+    const bool merge_only = (phase == ExperimentPhase::MERGE_ONLY);
+    const bool split_only = (phase == ExperimentPhase::SPLIT_ONLY);
 
     std::ostringstream out;
     int reset_group = -1;
@@ -1414,7 +1800,11 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
         if (in_qubit_coords &&
             (l.size() < 12 || l.substr(0, 12) != "QUBIT_COORDS")) {
             in_qubit_coords = false;
-            out << patch_pragmas_full << seam_pragmas_full;
+            if (split_only) {
+                out << patch_pragmas << merge_pragmas << remote_cx_pragmas;
+            } else {
+                out << patch_pragmas_full << seam_pragmas_full;
+            }
         }
 
         // Detect start of a reset group
@@ -1422,12 +1812,26 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
                          (l.size() >= 3 && l[0] == 'R' && l[1] == 'X' && l[2] == ' ');
         if (is_reset && prev_was_tick) {
             reset_group++;
-            if (reset_group >= 2 && reset_group <= 1 + merge_half_groups) {
-                // Before any merge half-round: reduced-weight patch + merge + remote CX edges (no seam)
-                out << patch_pragmas << merge_pragmas << remote_cx_pragmas;
-            } else if (reset_group == 2 + merge_half_groups) {
-                // Before post-merge round: full-weight patch + seam (SS qubits active again)
-                out << patch_pragmas_full << seam_pragmas_full;
+            if (split_only) {
+                // Group 0 = data reset
+                // Group 1 = first merge half-round (already shown by initial pragmas)
+                // Groups 2 .. merge_half_groups = later merge half-rounds
+                // Group 1 + merge_half_groups = post-split seam round
+                if (reset_group >= 2 && reset_group <= merge_half_groups) {
+                    out << patch_pragmas << merge_pragmas << remote_cx_pragmas;
+                } else if (reset_group == 1 + merge_half_groups) {
+                    out << patch_pragmas_full << seam_pragmas_full;
+                }
+            } else {
+                // Group 0 = data reset
+                // Group 1 = pre-merge seam round (already shown by initial pragmas)
+                // Groups 2 .. 1 + merge_half_groups = merge half-rounds
+                // Group 2 + merge_half_groups = post-merge seam round
+                if (reset_group >= 2 && reset_group <= 1 + merge_half_groups) {
+                    out << patch_pragmas << merge_pragmas << remote_cx_pragmas;
+                } else if (!merge_only && reset_group == 2 + merge_half_groups) {
+                    out << patch_pragmas_full << seam_pragmas_full;
+                }
             }
         }
 

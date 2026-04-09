@@ -28,6 +28,8 @@ void print_usage(const char* program_name) {
     std::cout << "  -total_shots <N>            Override total shots (e.g. 10K)" << std::endl;
     std::cout << "  -superstabilizers <spec>    Override superstabilizers (e.g. \"(5.5,0.5)\" or \"none\")" << std::endl;
     std::cout << "  -merge_rounds <N>           Override number of merge rounds" << std::endl;
+    std::cout << "  -merge_type <type>          Override merge type: xx, zz, distributed_xx, distributed_zz" << std::endl;
+    std::cout << "  -experiment_phase <phase>   Override experiment phase: merge_only, split_only, merge_and_split" << std::endl;
     std::cout << "  -accurate_rcx               Enable accurate RCX error folding" << std::endl;
 }
 
@@ -102,6 +104,15 @@ void write_output_file(
         }
         outfile << std::endl;
         outfile << "  Distillation Backup Batches: " << config.distillation_backup_batches << std::endl;
+
+        // Experiment phase
+        {
+            const char* phase_str =
+                config.experiment_phase == bucket_sim::ExperimentPhase::MERGE_ONLY   ? "merge_only" :
+                config.experiment_phase == bucket_sim::ExperimentPhase::SPLIT_ONLY   ? "split_only" :
+                                                                                        "merge_and_split";
+            outfile << "  Experiment Phase: " << phase_str << std::endl;
+        }
 
         // Superstabilizers
         if (!config.superstabilizers.empty()) {
@@ -226,8 +237,10 @@ int main(int argc, char** argv) {
     std::optional<uint64_t> override_total_shots;
     std::optional<std::vector<std::pair<double,double>>> override_superstabilizers;
     std::optional<uint32_t> override_merge_rounds;
+    std::optional<bucket_sim::MergeType> override_merge_type;
     std::optional<uint32_t> override_code_distance;
     bool enable_accurate_rcx = false;
+    std::optional<bucket_sim::ExperimentPhase> override_experiment_phase;
 
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -245,10 +258,43 @@ int main(int argc, char** argv) {
             override_superstabilizers = bucket_sim::parse_superstabilizers(argv[++i]);
         } else if (arg == "-merge_rounds" && i + 1 < argc) {
             override_merge_rounds = static_cast<uint32_t>(std::stoul(argv[++i]));
+        } else if (arg == "-merge_type" && i + 1 < argc) {
+            std::string value = argv[++i];
+            if (value == "none") {
+                override_merge_type = bucket_sim::MergeType::NONE;
+            } else if (value == "xx" || value == "XX" || value == "xx_merge") {
+                override_merge_type = bucket_sim::MergeType::XX_MERGE;
+            } else if (value == "zz" || value == "ZZ" || value == "zz_merge" ||
+                       value == "distributed_zz" || value == "zz_distributed" || value == "DISTRIBUTED_ZZ") {
+                override_merge_type = bucket_sim::MergeType::ZZ_MERGE;
+            } else if (value == "distributed_xx" || value == "xx_distributed" || value == "DISTRIBUTED_XX") {
+                override_merge_type = bucket_sim::MergeType::XX_MERGE_DISTRIBUTED;
+            } else {
+                if (world_rank == 0) {
+                    std::cerr << "Unknown merge_type: " << value
+                              << ". Valid options: none, xx, zz, distributed_xx, distributed_zz" << std::endl;
+                }
+                MPI_Finalize();
+                return 1;
+            }
         } else if (arg == "-code_distance" && i + 1 < argc) {
             override_code_distance = static_cast<uint32_t>(std::stoul(argv[++i]));
         } else if (arg == "-accurate_rcx") {
             enable_accurate_rcx = true;
+        } else if (arg == "-experiment_phase" && i + 1 < argc) {
+            std::string phase_str = argv[++i];
+            if (phase_str == "merge_only") {
+                override_experiment_phase = bucket_sim::ExperimentPhase::MERGE_ONLY;
+            } else if (phase_str == "split_only") {
+                override_experiment_phase = bucket_sim::ExperimentPhase::SPLIT_ONLY;
+            } else if (phase_str == "merge_and_split" || phase_str == "full") {
+                override_experiment_phase = bucket_sim::ExperimentPhase::MERGE_AND_SPLIT;
+            } else {
+                if (world_rank == 0)
+                    std::cerr << "Unknown experiment_phase: " << phase_str << std::endl;
+                MPI_Finalize();
+                return 1;
+            }
         } else if (arg == "-h" || arg == "--help") {
             if (world_rank == 0) {
                 print_usage(argv[0]);
@@ -284,11 +330,17 @@ int main(int argc, char** argv) {
         if (override_merge_rounds.has_value()) {
             config.merge_rounds = override_merge_rounds.value();
         }
+        if (override_merge_type.has_value()) {
+            config.merge_type = override_merge_type.value();
+        }
         if (override_code_distance.has_value()) {
             config.code_distance = override_code_distance.value();
         }
         if (enable_accurate_rcx) {
             config.accurate_rcx = true;
+        }
+        if (override_experiment_phase.has_value()) {
+            config.experiment_phase = override_experiment_phase.value();
         }
 
         // Create simulator (this generates the circuit)

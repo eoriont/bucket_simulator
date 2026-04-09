@@ -56,7 +56,7 @@ SurfaceCodeSimulator::SurfaceCodeSimulator(const Config& config, int rank, int s
 
 void SurfaceCodeSimulator::initialize_circuit() {
     // Check if we're doing lattice surgery
-    if (config_.merge_type == MergeType::XX_MERGE_DISTRIBUTED) {
+    if (config_.distributed && config_.merge_type != MergeType::NONE) {
         initialize_distributed_lattice_surgery_circuit();
         return;
     }

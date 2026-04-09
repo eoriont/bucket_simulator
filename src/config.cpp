@@ -173,13 +173,14 @@ Config parse_config(const std::string& filename) {
                     config.merge_type = MergeType::NONE;
                 } else if (value == "xx" || value == "XX" || value == "xx_merge") {
                     config.merge_type = MergeType::XX_MERGE;
-                } else if (value == "zz" || value == "ZZ" || value == "zz_merge") {
+                } else if (value == "zz" || value == "ZZ" || value == "zz_merge" ||
+                           value == "distributed_zz" || value == "zz_distributed" || value == "DISTRIBUTED_ZZ") {
                     config.merge_type = MergeType::ZZ_MERGE;
                 } else if (value == "distributed_xx" || value == "xx_distributed" || value == "DISTRIBUTED_XX") {
                     config.merge_type = MergeType::XX_MERGE_DISTRIBUTED;
                 } else {
                     throw std::invalid_argument("Unknown merge type: " + value +
-                        ". Valid options: none, xx, zz, distributed_xx");
+                        ". Valid options: none, xx, zz, distributed_xx, distributed_zz");
                 }
             } else if (key == "merge_rounds") {
                 config.merge_rounds = std::stoul(value);
@@ -187,6 +188,17 @@ Config parse_config(const std::string& filename) {
                 config.split_after_merge = (value == "true" || value == "1");
             } else if (key == "superstabilizers") {
                 config.superstabilizers = parse_superstabilizers(value);
+            } else if (key == "experiment_phase") {
+                if (value == "merge_and_split" || value == "full") {
+                    config.experiment_phase = ExperimentPhase::MERGE_AND_SPLIT;
+                } else if (value == "merge_only") {
+                    config.experiment_phase = ExperimentPhase::MERGE_ONLY;
+                } else if (value == "split_only") {
+                    config.experiment_phase = ExperimentPhase::SPLIT_ONLY;
+                } else {
+                    throw std::invalid_argument("Unknown experiment_phase: " + value +
+                        ". Valid options: merge_and_split, merge_only, split_only");
+                }
             } else {
                 std::cerr << "Warning: Unknown config key '" << key
                          << "' at line " << line_number << std::endl;
