@@ -26,6 +26,7 @@ struct RankStats {
 
 // Result of a distillation calculation (paper Equations 3-6)
 struct DistillationResult {
+    DistillationProtocol protocol = DistillationProtocol::NONE;
     double output_fidelity;      // F_distill after k rounds
     double success_probability;  // P_s for the distillation attempt
     uint32_t raw_pairs_consumed; // Number of raw EPR pairs needed per output
@@ -35,8 +36,10 @@ struct DistillationResult {
 // Summary of computed noise parameters for a distributed circuit run
 struct NoiseSummary {
     // Remote CNOT noise
+    DistillationProtocol effective_distillation_protocol = DistillationProtocol::NONE;
     bool accurate_rcx_enabled  = false;
     bool distillation_feasible = false;
+    bool distillation_qubit_overhead_feasible = true;
     uint32_t distillation_backup_batches = 1;
     double raw_channel_error   = 0.0;
     double effective_channel_error = 0.0;
@@ -48,6 +51,9 @@ struct NoiseSummary {
     uint32_t raw_pairs_per_distilled = 0; // raw EPR pairs consumed per distilled pair
     uint32_t remote_cnots_per_cycle  = 0; // remote CX pairs in one merge round
     uint32_t epr_pairs_per_round     = 0; // raw_pairs_per_distilled * remote_cnots_per_cycle
+    uint32_t distillation_epr_slots_required = 0; // raw EPR slots across all remote CX and backup batches
+    uint32_t distillation_qubits_required = 0; // 2 qubits per raw EPR slot
+    uint32_t monolithic_equivalent_qubits = 0; // qubits needed to place the same LS experiment on one chip
 
     // Idling noise
     double distillation_time_ns = 0.0;  // t_dist in nanoseconds
@@ -59,6 +65,7 @@ struct NoiseSummary {
 };
 
 struct RemoteCnotNoiseModel {
+    DistillationProtocol effective_distillation_protocol = DistillationProtocol::NONE;
     double raw_channel_error = 0.0;
     double effective_channel_error = 0.0;
     double distilled_error = 0.0;
@@ -66,8 +73,14 @@ struct RemoteCnotNoiseModel {
     double distillation_success_probability = 1.0;
     double probability_all_distillation_fail = 0.0;
     double remote_cnot_error = 0.0;
+    double distillation_time = 0.0;
     bool distillation_feasible = false;
+    bool distillation_qubit_overhead_feasible = true;
     uint32_t distillation_backup_batches = 1;
+    uint32_t raw_pairs_per_distilled = 1;
+    uint32_t distillation_epr_slots_required = 0;
+    uint32_t distillation_qubits_required = 0;
+    uint32_t monolithic_equivalent_qubits = 0;
 };
 
 class SurfaceCodeSimulator {
@@ -85,6 +98,7 @@ private:
     std::string annotated_circuit_str_;  // Pragma-annotated stim text (if available)
 
     NoiseSummary noise_summary_;
+    uint32_t distributed_remote_cnots_per_cycle_override_ = 0;
 
     // Bucket mode statistics
     uint32_t num_sampled_buckets_;
@@ -105,13 +119,19 @@ private:
     uint32_t count_remote_cnots_in_cycle();
 
     // Distillation calculations (paper Equations 3-6)
-    DistillationResult compute_distillation(uint32_t rounds) const;
+    DistillationResult compute_distillation(DistillationProtocol protocol, uint32_t rounds) const;
+    RemoteCnotNoiseModel evaluate_remote_cnot_noise_model(DistillationProtocol protocol,
+                                                          uint32_t rounds,
+                                                          uint32_t num_remote_cnots) const;
+    DistillationProtocol select_radar_distillation_protocol(uint32_t rounds,
+                                                            uint32_t num_remote_cnots) const;
     static double compute_2to1_fidelity(double F1, double F2);
     static double compute_2to1_success_prob(double F1, double F2);
     static double compute_3to1_fidelity(double F1, double F2);
     static double compute_3to1_success_prob(double F1, double F2);
     double compute_raw_channel_error() const;
-    RemoteCnotNoiseModel compute_remote_cnot_noise_model() const;
+    RemoteCnotNoiseModel compute_remote_cnot_noise_model(uint32_t num_remote_cnots) const;
+    uint32_t compute_monolithic_equivalent_qubits() const;
 
     // Remote CNOT error (paper Equation 1)
     double compute_cnot_error_from_fidelity(double fidelity) const;

@@ -58,11 +58,11 @@ def plot(run_dir: Path):
     if not rows:
         sys.exit("Error: no parseable result files")
 
-    fig, axes = plt.subplots(2, 2, figsize=(12, 9), sharex=True, sharey=True)
-    axes = axes.flatten()
     cmap = plt.get_cmap("tab10")
+    saved_paths: list[Path] = []
 
-    for ax, mode in zip(axes, MODE_ORDER):
+    for mode in MODE_ORDER:
+        fig, ax = plt.subplots(figsize=(7.5, 5.5))
         mode_data = rows.get(mode, {})
         for idx, super_type in enumerate(SUPER_ORDER):
             pts = sorted(mode_data.get(super_type, []))
@@ -72,21 +72,22 @@ def plot(run_dir: Path):
             ys = [p[1] for p in pts]
             ax.plot(xs, ys, marker="o", linewidth=1.8, markersize=4, color=cmap(idx),
                     label=SUPER_LABELS.get(super_type, super_type))
-        ax.set_title(MODE_LABELS.get(mode, mode))
+
+        ax.set_title(f"{MODE_LABELS.get(mode, mode)}: ENR vs LER")
         ax.set_yscale("log")
         ax.grid(True, alpha=0.35)
-        ax.set_xlabel("Entanglement Rate (MHz)")
+        ax.set_xlabel("ENR (MHz)")
         ax.set_ylabel("Logical Error Rate")
+        ax.legend(framealpha=0.9)
+        fig.tight_layout()
 
-    handles, labels = axes[0].get_legend_handles_labels()
-    if handles:
-        fig.legend(handles, labels, loc="upper center", ncol=min(len(labels), 5), framealpha=0.9)
+        out_path = run_dir / f"{mode}_plot.png"
+        fig.savefig(out_path, dpi=150)
+        plt.close(fig)
+        saved_paths.append(out_path)
 
-    fig.suptitle("d=9 Superstabilizer Sweep by Merge Basis and Phase", fontsize=14)
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
-    out_path = run_dir / "plot.png"
-    fig.savefig(out_path, dpi=150)
-    print(f"Saved: {out_path}")
+    for path in saved_paths:
+        print(f"Saved: {path}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,29 @@
+# Base config for RCX regime sweep on a neutral-atom machine.
+# The Python sweep script overrides:
+#   - merge_type
+#   - experiment_phase
+#   - entanglement_rate
+#   - distillation_protocol
+#   - distillation_rounds
+#   - distillation_backup_batches
+
+code_distance 5
+merge_type distributed_xx
+merge_rounds 5
+distributed true
+
+physical_error 0.005
+measurement_error 0.002
+reset_error 0.002
+
+total_shots 100
+mode monte_carlo
+
+raw_epr_fidelity 1.0
+distillation_protocol none
+distillation_rounds 1
+distillation_backup_batches 1
+
+T1 119
+T2 12.6
+measurement_delay 500e-6

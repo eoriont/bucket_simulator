@@ -16,7 +16,11 @@
 #   -j, --parallel NUM     Simulations in parallel (default: 1)
 #   --dry-run              Print commands without executing
 #   --circuits-only        Dump circuits for all configs without running simulations
+#   --resume RUN_DIR       Resume an existing run directory
 #   --shots SHOTS          Override total_shots, e.g. 10K (default: use config value)
+#   --protocol NAME        Override distillation protocol
+#   --dist-rounds K        Override distillation rounds
+#   --backup-batches M     Override distillation backup batches
 #
 
 set -e
@@ -32,6 +36,10 @@ DRY_RUN=false
 CIRCUITS_ONLY=false
 SHOTS=""
 DISTANCE=9
+RESUME_RUN_DIR=""
+DISTILLATION_PROTOCOL=""
+DISTILLATION_ROUNDS=""
+DISTILLATION_BACKUP_BATCHES=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -39,7 +47,11 @@ while [[ $# -gt 0 ]]; do
         -j|--parallel)    PARALLEL_JOBS="$2"; shift 2 ;;
         --dry-run)        DRY_RUN=true; shift ;;
         --circuits-only)  CIRCUITS_ONLY=true; shift ;;
+        --resume)         RESUME_RUN_DIR="$2"; shift 2 ;;
         --shots)          SHOTS="$2"; shift 2 ;;
+        --protocol)       DISTILLATION_PROTOCOL="$2"; shift 2 ;;
+        --dist-rounds)    DISTILLATION_ROUNDS="$2"; shift 2 ;;
+        --backup-batches) DISTILLATION_BACKUP_BATCHES="$2"; shift 2 ;;
         -h|--help)        head -22 "$0" | tail -20; exit 0 ;;
         *) echo "Unknown option: $1"; exit 1 ;;
     esac
@@ -65,10 +77,7 @@ get_super_coords() {
 }
 
 get_merge_rounds() {
-    case "$1" in
-        middle) echo "1" ;;
-        *)      echo "$2" ;;
-    esac
+    echo "$2"
 }
 
 mode_merge_type() {
@@ -85,6 +94,24 @@ mode_phase() {
     esac
 }
 
+job_label() {
+    local mode="$1"
+    local name="$2"
+    local rate="$3"
+    local rate_mhz
+    rate_mhz=$(echo "scale=0; $rate / 1000000" | bc)
+    echo "${mode}_${name}_${rate_mhz}MHz_d${DISTANCE}"
+}
+
+job_is_done() {
+    local label="$1"
+    if [[ "$CIRCUITS_ONLY" == "true" ]]; then
+        [[ -f "$CIRCUITS_DIR/${label}.stim" ]]
+    else
+        [[ -f "$RESULTS_DIR/${label}_results.txt" ]]
+    fi
+}
+
 SUPERS=(border border2 middle nosuper twoside)
 MODES=(xx_merge zz_merge xx_split zz_split)
 RATES=(5000000 10000000 15000000 20000000 25000000 30000000 35000000 40000000 45000000 50000000)
@@ -99,8 +126,13 @@ if [[ ! -f "$BASE_CONFIG" ]]; then
     exit 1
 fi
 
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-RUN_DIR="$SCRIPT_DIR/runs/$TIMESTAMP"
+if [[ -n "$RESUME_RUN_DIR" ]]; then
+    RUN_DIR="$RESUME_RUN_DIR"
+    TIMESTAMP=$(basename "$RUN_DIR")
+else
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    RUN_DIR="$SCRIPT_DIR/runs/$TIMESTAMP"
+fi
 RESULTS_DIR="$RUN_DIR/results"
 CIRCUITS_DIR="$RUN_DIR/circuits"
 LOGS_DIR="$RUN_DIR/logs"
@@ -109,7 +141,7 @@ mkdir -p "$RESULTS_DIR" "$CIRCUITS_DIR" "$LOGS_DIR"
 TOTAL_CONFIGS=$(( ${#SUPERS[@]} * ${#MODES[@]} * ${#RATES[@]} ))
 TASKS_FILE="$RUN_DIR/tasks.txt"
 FAIL_FILE="$RUN_DIR/failed.txt"
-touch "$FAIL_FILE"
+: > "$FAIL_FILE"
 
 echo "=============================================="
 echo "Superstabilizer Phase/Basis Sweep"
@@ -122,10 +154,14 @@ echo "Modes:     ${MODES[*]}"
 echo "Supers:    ${SUPERS[*]}"
 echo "Rates:     ${RATES[*]}"
 echo "Shots:     ${SHOTS:-from config}"
+echo "Protocol:  ${DISTILLATION_PROTOCOL:-from config}"
+echo "Rounds k:  ${DISTILLATION_ROUNDS:-from config}"
+echo "Batches m: ${DISTILLATION_BACKUP_BATCHES:-from config}"
 echo "Circuits:  $CIRCUITS_ONLY"
 echo "MPI:       $NUM_PROCS processes"
 echo "Parallel:  $PARALLEL_JOBS"
 echo "Configs:   $TOTAL_CONFIGS"
+[[ -n "$RESUME_RUN_DIR" ]] && echo "Resume:    yes"
 echo "=============================================="
 
 cat > "$RUN_DIR/metadata.txt" <<EOF
@@ -137,6 +173,9 @@ Distance: $DISTANCE
 MPI Processes: $NUM_PROCS
 Parallel Jobs: $PARALLEL_JOBS
 Shots override: ${SHOTS:-none}
+Distillation protocol override: ${DISTILLATION_PROTOCOL:-none}
+Distillation rounds override: ${DISTILLATION_ROUNDS:-none}
+Distillation backup batches override: ${DISTILLATION_BACKUP_BATCHES:-none}
 Circuits only: $CIRCUITS_ONLY
 Modes: ${MODES[*]}
 Superstabilizer types: ${SUPERS[*]}
@@ -151,13 +190,13 @@ run_job() {
     local mode="$3"
     local name="$4"
     local rate="$5"
-    local rate_mhz
-    rate_mhz=$(echo "scale=0; $rate / 1000000" | bc)
-    local label="${mode}_${name}_${rate_mhz}MHz_d${DISTANCE}"
+    local label
+    label=$(job_label "$mode" "$name" "$rate")
     local result_file="$RESULTS_DIR/${label}_results.txt"
     local log_file="$LOGS_DIR/${label}.log"
     local circuit_file="$CIRCUITS_DIR/${label}.stim"
     local dump_dir="$CIRCUITS_DIR/.tmp_${label}"
+    local result_dir="$RESULTS_DIR/.tmp_${label}"
     local coords
     coords=$(get_super_coords "$name" "$DISTANCE")
     local mrounds
@@ -169,6 +208,14 @@ run_job() {
 
     local extra_args=()
     [[ -n "$SHOTS" ]] && extra_args+=(-total_shots "$SHOTS")
+    [[ -n "$DISTILLATION_PROTOCOL" ]] && extra_args+=(-distillation_protocol "$DISTILLATION_PROTOCOL")
+    [[ -n "$DISTILLATION_ROUNDS" ]] && extra_args+=(-distillation_rounds "$DISTILLATION_ROUNDS")
+    [[ -n "$DISTILLATION_BACKUP_BATCHES" ]] && extra_args+=(-distillation_backup_batches "$DISTILLATION_BACKUP_BATCHES")
+
+    if job_is_done "$label"; then
+        echo "[SKIP $idx/$total] $label (already complete)"
+        return 0
+    fi
 
     echo "[RUN $idx/$total] $label  (merge_type=$merge_type phase=$phase superstabilizers=\"$coords\" merge_rounds=$mrounds)"
     if [[ "$DRY_RUN" == "true" ]]; then
@@ -180,6 +227,9 @@ run_job() {
         echo "    -merge_rounds $mrounds \\"
         echo "    -entanglement_rate $rate \\"
         [[ -n "$SHOTS" ]] && echo "    -total_shots $SHOTS \\"
+        [[ -n "$DISTILLATION_PROTOCOL" ]] && echo "    -distillation_protocol $DISTILLATION_PROTOCOL \\"
+        [[ -n "$DISTILLATION_ROUNDS" ]] && echo "    -distillation_rounds $DISTILLATION_ROUNDS \\"
+        [[ -n "$DISTILLATION_BACKUP_BATCHES" ]] && echo "    -distillation_backup_batches $DISTILLATION_BACKUP_BATCHES \\"
         if [[ "$CIRCUITS_ONLY" == "true" ]]; then
             echo "    -dump-circuit \\"
             echo "    -output $CIRCUITS_DIR"
@@ -214,6 +264,9 @@ run_job() {
         return 0
     fi
 
+    rm -rf "$result_dir"
+    mkdir -p "$result_dir"
+
     local start_time
     start_time=$(date +%s)
     if mpirun -n "$NUM_PROCS" "$SIMULATOR" \
@@ -224,16 +277,18 @@ run_job() {
         -merge_rounds "$mrounds" \
         -entanglement_rate "$rate" \
         "${extra_args[@]}" \
-        -output "$RESULTS_DIR" >> "$log_file" 2>&1; then
+        -output "$result_dir" >> "$log_file" 2>&1; then
         local end_time
         end_time=$(date +%s)
         echo "[DONE $idx/$total] $label ($((end_time - start_time))s)"
-        local latest
-        latest=$(ls -t "$RESULTS_DIR"/results_*.txt 2>/dev/null | head -1)
-        if [[ -n "$latest" && "$latest" != "$result_file" ]]; then
-            mv "$latest" "$result_file"
+        local produced
+        produced=$(find "$result_dir" -maxdepth 1 -name 'results_*.txt' | head -1)
+        if [[ -n "$produced" ]]; then
+            mv "$produced" "$result_file"
         fi
+        rmdir "$result_dir" 2>/dev/null || true
     else
+        rmdir "$result_dir" 2>/dev/null || true
         echo "$label" >> "$FAIL_FILE"
         echo "[FAIL $idx/$total] $label — see $log_file"
         return 1
@@ -247,31 +302,42 @@ run_job_record() {
     run_job "$idx" "$total" "$mode" "$name" "$rate"
 }
 
-export -f run_job run_job_record get_super_coords get_merge_rounds mode_merge_type mode_phase
+export -f run_job run_job_record get_super_coords get_merge_rounds mode_merge_type mode_phase job_label job_is_done
 export RESULTS_DIR CIRCUITS_DIR LOGS_DIR SIMULATOR NUM_PROCS DRY_RUN CIRCUITS_ONLY SHOTS BASE_CONFIG DISTANCE FAIL_FILE
 
 echo ""
 echo "Running simulations..."
 START=$(date +%s)
 FAILED=0
-echo "Progress:  0/$TOTAL_CONFIGS complete"
+COMPLETED=0
 
 task_idx=0
 > "$TASKS_FILE"
 for mode in "${MODES[@]}"; do
     for name in "${SUPERS[@]}"; do
         for rate in "${RATES[@]}"; do
+            label=$(job_label "$mode" "$name" "$rate")
+            if job_is_done "$label"; then
+                COMPLETED=$((COMPLETED + 1))
+                continue
+            fi
             task_idx=$((task_idx + 1))
             printf '%s|%s|%s|%s|%s\n' "$task_idx" "$TOTAL_CONFIGS" "$mode" "$name" "$rate" >> "$TASKS_FILE"
         done
     done
 done
 
-if [[ "$DRY_RUN" == "true" || "$PARALLEL_JOBS" -le 1 ]]; then
+PENDING=$task_idx
+echo "Progress:  $COMPLETED/$TOTAL_CONFIGS complete"
+if [[ "$PENDING" -eq 0 ]]; then
+    echo "Nothing to do."
+fi
+
+if [[ "$PENDING" -gt 0 && ( "$DRY_RUN" == "true" || "$PARALLEL_JOBS" -le 1 ) ]]; then
     while IFS= read -r record; do
         run_job_record "$record" || true
     done < "$TASKS_FILE"
-else
+elif [[ "$PENDING" -gt 0 ]]; then
     echo "Launching up to $PARALLEL_JOBS MPI jobs in parallel..."
     xargs -P "$PARALLEL_JOBS" -I {} bash -lc 'run_job_record "$1"' _ {} < "$TASKS_FILE" || true
 fi

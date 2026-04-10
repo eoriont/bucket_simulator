@@ -8,6 +8,23 @@
 
 namespace bucket_sim {
 
+const char* distillation_protocol_to_string(DistillationProtocol protocol) {
+    switch (protocol) {
+        case DistillationProtocol::RADAR:
+            return "radar";
+        case DistillationProtocol::PUMPING_2TO1:
+            return "2to1_pumping";
+        case DistillationProtocol::PUMPING_3TO1:
+            return "3to1_pumping";
+        case DistillationProtocol::RECURRENCE_2TO1:
+            return "2to1_recurrence";
+        case DistillationProtocol::RECURRENCE_3TO1:
+            return "3to1_recurrence";
+        default:
+            return "none";
+    }
+}
+
 uint64_t parse_magnitude(const std::string& input) {
     std::unordered_map<char, uint64_t> magnitude_map = {
         {'K', 1000ULL},
@@ -133,6 +150,8 @@ Config parse_config(const std::string& filename) {
                 config.calib_shots_per_bucket = parse_magnitude(value);
             } else if (key == "distributed") {
                 config.distributed = (value == "true" || value == "1");
+            } else if (key == "monolithic_baseline") {
+                config.monolithic_baseline = (value == "true" || value == "1");
             } else if (key == "interconnect_error") {
                 config.interconnect_error = std::stod(value);
             } else if (key == "accurate_rcx") {
@@ -154,17 +173,19 @@ Config parse_config(const std::string& filename) {
             } else if (key == "distillation_protocol") {
                 if (value == "none") {
                     config.distillation_protocol = DistillationProtocol::NONE;
-                } else if (value == "pumping_2to1" || value == "2to1_pumping") {
+                } else if (value == "radar" || value == "auto") {
+                    config.distillation_protocol = DistillationProtocol::RADAR;
+                } else if (value == "pumping_2to1" || value == "2to1_pumping" || value == "2to1-pumping") {
                     config.distillation_protocol = DistillationProtocol::PUMPING_2TO1;
-                } else if (value == "pumping_3to1" || value == "3to1_pumping") {
+                } else if (value == "pumping_3to1" || value == "3to1_pumping" || value == "3to1-pumping") {
                     config.distillation_protocol = DistillationProtocol::PUMPING_3TO1;
-                } else if (value == "recurrence_2to1" || value == "2to1_recurrence") {
+                } else if (value == "recurrence_2to1" || value == "2to1_recurrence" || value == "2to1-recurrence") {
                     config.distillation_protocol = DistillationProtocol::RECURRENCE_2TO1;
-                } else if (value == "recurrence_3to1" || value == "3to1_recurrence") {
+                } else if (value == "recurrence_3to1" || value == "3to1_recurrence" || value == "3to1-recurrence") {
                     config.distillation_protocol = DistillationProtocol::RECURRENCE_3TO1;
                 } else {
                     throw std::invalid_argument("Unknown distillation protocol: " + value +
-                        ". Valid options: none, pumping_2to1, pumping_3to1, recurrence_2to1, recurrence_3to1");
+                        ". Valid options: none, radar, pumping_2to1, pumping_3to1, recurrence_2to1, recurrence_3to1");
                 }
             } else if (key == "distillation_rounds") {
                 config.distillation_rounds = std::stoul(value);

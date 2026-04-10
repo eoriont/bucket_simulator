@@ -30,6 +30,10 @@ void print_usage(const char* program_name) {
     std::cout << "  -merge_rounds <N>           Override number of merge rounds" << std::endl;
     std::cout << "  -merge_type <type>          Override merge type: xx, zz, distributed_xx, distributed_zz" << std::endl;
     std::cout << "  -experiment_phase <phase>   Override experiment phase: merge_only, split_only, merge_and_split" << std::endl;
+    std::cout << "  -monolithic_baseline        Distributed LS baseline: remote CX matches local p, idling disabled" << std::endl;
+    std::cout << "  -distillation_protocol <p>  Override protocol: none, radar, 2to1_pumping, 3to1_pumping, 2to1_recurrence, 3to1_recurrence" << std::endl;
+    std::cout << "  -distillation_rounds <k>    Override distillation rounds" << std::endl;
+    std::cout << "  -distillation_backup_batches <m>  Override parallel backup batches" << std::endl;
     std::cout << "  -accurate_rcx               Enable accurate RCX error folding" << std::endl;
 }
 
@@ -95,6 +99,7 @@ void write_output_file(
     }
     if (config.distributed) {
         outfile << "  Distributed QEC: Yes" << std::endl;
+        outfile << "  Monolithic Baseline: " << (config.monolithic_baseline ? "Yes" : "No") << std::endl;
         outfile << "  Accurate RCX: " << (config.accurate_rcx ? "Yes" : "No") << std::endl;
         outfile << "  Channel Depolarization Error: ";
         if (std::isnan(config.channel_depolarization_error)) {
@@ -127,15 +132,10 @@ void write_output_file(
 
         // Distillation / EPR
         outfile << "  Raw EPR Fidelity: " << config.raw_epr_fidelity << std::endl;
-        outfile << "  Distillation Protocol: ";
-        switch (config.distillation_protocol) {
-            case bucket_sim::DistillationProtocol::PUMPING_2TO1:   outfile << "2→1 Pumping"; break;
-            case bucket_sim::DistillationProtocol::PUMPING_3TO1:   outfile << "3→1 Pumping"; break;
-            case bucket_sim::DistillationProtocol::RECURRENCE_2TO1: outfile << "2→1 Recurrence"; break;
-            case bucket_sim::DistillationProtocol::RECURRENCE_3TO1: outfile << "3→1 Recurrence"; break;
-            default: outfile << "None"; break;
-        }
-        outfile << std::endl;
+        outfile << "  Distillation Protocol Requested: "
+                << bucket_sim::distillation_protocol_to_string(config.distillation_protocol) << std::endl;
+        outfile << "  Distillation Protocol Used: "
+                << bucket_sim::distillation_protocol_to_string(noise.effective_distillation_protocol) << std::endl;
         outfile << "  Distillation Rounds: " << config.distillation_rounds << std::endl;
         outfile << "  Entanglement Rate: " << (config.entanglement_rate / 1e6) << " MHz" << std::endl;
         outfile << "  T1 Coherence Time: " << (config.T1_coherence_time * 1e6) << " μs" << std::endl;
@@ -163,12 +163,17 @@ void write_output_file(
         outfile << "  Raw EPR Pairs per Distilled: " << noise.raw_pairs_per_distilled << std::endl;
         outfile << "  Remote CNOTs per Merge Round: " << noise.remote_cnots_per_cycle << std::endl;
         outfile << "  EPR Pairs Required per Round: " << noise.epr_pairs_per_round << std::endl;
+        outfile << "  Concurrent Distillation EPR Slots Required: " << noise.distillation_epr_slots_required << std::endl;
+        outfile << "  Distillation Qubits Required: " << noise.distillation_qubits_required << std::endl;
+        outfile << "  Monolithic Equivalent Qubits: " << noise.monolithic_equivalent_qubits << std::endl;
         outfile << "  Distillation Time: " << std::fixed << std::setprecision(1)
                 << noise.distillation_time_ns << " ns" << std::endl;
         outfile << "  Idling Time (max): " << std::fixed << std::setprecision(3)
                 << noise.idling_time_us << " μs" << std::endl;
         outfile << "  Timing Constraint Satisfied: "
                 << (noise.timing_constraint_satisfied ? "Yes" : "No (cycle extended)") << std::endl;
+        outfile << "  Distillation Qubit Overhead Feasible: "
+                << (noise.distillation_qubit_overhead_feasible ? "Yes" : "No (monolithic fits on one chip)") << std::endl;
         outfile << "  Pauli Channel (pX, pY, pZ): ("
                 << std::scientific << std::setprecision(4)
                 << noise.p_X << ", " << noise.p_Y << ", " << noise.p_Z << ")" << std::endl;
@@ -240,6 +245,10 @@ int main(int argc, char** argv) {
     std::optional<bucket_sim::MergeType> override_merge_type;
     std::optional<uint32_t> override_code_distance;
     bool enable_accurate_rcx = false;
+    bool enable_monolithic_baseline = false;
+    std::optional<bucket_sim::DistillationProtocol> override_distillation_protocol;
+    std::optional<uint32_t> override_distillation_rounds;
+    std::optional<uint32_t> override_distillation_backup_batches;
     std::optional<bucket_sim::ExperimentPhase> override_experiment_phase;
 
     for (int i = 1; i < argc; i++) {
@@ -281,6 +290,32 @@ int main(int argc, char** argv) {
             override_code_distance = static_cast<uint32_t>(std::stoul(argv[++i]));
         } else if (arg == "-accurate_rcx") {
             enable_accurate_rcx = true;
+        } else if (arg == "-monolithic_baseline") {
+            enable_monolithic_baseline = true;
+        } else if (arg == "-distillation_protocol" && i + 1 < argc) {
+            std::string value = argv[++i];
+            if (value == "none") {
+                override_distillation_protocol = bucket_sim::DistillationProtocol::NONE;
+            } else if (value == "radar" || value == "auto") {
+                override_distillation_protocol = bucket_sim::DistillationProtocol::RADAR;
+            } else if (value == "pumping_2to1" || value == "2to1_pumping" || value == "2to1-pumping") {
+                override_distillation_protocol = bucket_sim::DistillationProtocol::PUMPING_2TO1;
+            } else if (value == "pumping_3to1" || value == "3to1_pumping" || value == "3to1-pumping") {
+                override_distillation_protocol = bucket_sim::DistillationProtocol::PUMPING_3TO1;
+            } else if (value == "recurrence_2to1" || value == "2to1_recurrence" || value == "2to1-recurrence") {
+                override_distillation_protocol = bucket_sim::DistillationProtocol::RECURRENCE_2TO1;
+            } else if (value == "recurrence_3to1" || value == "3to1_recurrence" || value == "3to1-recurrence") {
+                override_distillation_protocol = bucket_sim::DistillationProtocol::RECURRENCE_3TO1;
+            } else {
+                if (world_rank == 0)
+                    std::cerr << "Unknown distillation_protocol: " << value << std::endl;
+                MPI_Finalize();
+                return 1;
+            }
+        } else if (arg == "-distillation_rounds" && i + 1 < argc) {
+            override_distillation_rounds = static_cast<uint32_t>(std::stoul(argv[++i]));
+        } else if (arg == "-distillation_backup_batches" && i + 1 < argc) {
+            override_distillation_backup_batches = static_cast<uint32_t>(std::stoul(argv[++i]));
         } else if (arg == "-experiment_phase" && i + 1 < argc) {
             std::string phase_str = argv[++i];
             if (phase_str == "merge_only") {
@@ -336,8 +371,20 @@ int main(int argc, char** argv) {
         if (override_code_distance.has_value()) {
             config.code_distance = override_code_distance.value();
         }
+        if (override_distillation_protocol.has_value()) {
+            config.distillation_protocol = override_distillation_protocol.value();
+        }
+        if (override_distillation_rounds.has_value()) {
+            config.distillation_rounds = override_distillation_rounds.value();
+        }
+        if (override_distillation_backup_batches.has_value()) {
+            config.distillation_backup_batches = override_distillation_backup_batches.value();
+        }
         if (enable_accurate_rcx) {
             config.accurate_rcx = true;
+        }
+        if (enable_monolithic_baseline) {
+            config.monolithic_baseline = true;
         }
         if (override_experiment_phase.has_value()) {
             config.experiment_phase = override_experiment_phase.value();

@@ -29,11 +29,14 @@ enum class ExperimentPhase {
 
 enum class DistillationProtocol {
     NONE,
+    RADAR,
     PUMPING_2TO1,      // 2→1 Pumping: linear resource cost O(b*k)
     PUMPING_3TO1,      // 3→1 Pumping: linear resource cost O(b*k)
     RECURRENCE_2TO1,   // 2→1 Recurrence: exponential resource cost O(2^k)
     RECURRENCE_3TO1    // 3→1 Recurrence: exponential resource cost O(3^k)
 };
+
+const char* distillation_protocol_to_string(DistillationProtocol protocol);
 
 struct Config {
     uint32_t code_distance;
@@ -56,6 +59,7 @@ struct Config {
 
     // Distributed QEC parameters
     bool distributed;  // false = monolithic (default), true = distributed
+    bool monolithic_baseline;  // distributed LS baseline: no idling, remote CX matches local CX error
     double interconnect_error;  // Additional error rate for boundary CNOTs
     bool accurate_rcx;  // Use accurate RCX transform on the effective channel error
     double channel_depolarization_error;  // Raw channel/EPR error before RCX-local-gate folding
@@ -98,6 +102,7 @@ struct Config {
           target_faults_per_bucket(0),
           calib_shots_per_bucket(500),
           distributed(false),
+          monolithic_baseline(false),
           interconnect_error(0.0),
           accurate_rcx(false),
           channel_depolarization_error(std::numeric_limits<double>::quiet_NaN()),

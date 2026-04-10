@@ -17,6 +17,44 @@ namespace bucket_sim {
 
 constexpr uint64_t BATCH_SIZE = 1000000; // Process 1M shots per batch
 
+namespace {
+
+uint32_t protocol_branching_factor(DistillationProtocol protocol) {
+    switch (protocol) {
+        case DistillationProtocol::PUMPING_3TO1:
+        case DistillationProtocol::RECURRENCE_3TO1:
+            return 3;
+        case DistillationProtocol::PUMPING_2TO1:
+        case DistillationProtocol::RECURRENCE_2TO1:
+            return 2;
+        default:
+            return 1;
+    }
+}
+
+bool is_recurrence_protocol(DistillationProtocol protocol) {
+    return protocol == DistillationProtocol::RECURRENCE_2TO1 ||
+           protocol == DistillationProtocol::RECURRENCE_3TO1;
+}
+
+bool is_pumping_protocol(DistillationProtocol protocol) {
+    return protocol == DistillationProtocol::PUMPING_2TO1 ||
+           protocol == DistillationProtocol::PUMPING_3TO1;
+}
+
+uint32_t saturated_pow_u32(uint32_t base, uint32_t exp) {
+    uint64_t acc = 1;
+    for (uint32_t i = 0; i < exp; i++) {
+        acc *= base;
+        if (acc > std::numeric_limits<uint32_t>::max()) {
+            return std::numeric_limits<uint32_t>::max();
+        }
+    }
+    return static_cast<uint32_t>(acc);
+}
+
+}  // namespace
+
 SurfaceCodeSimulator::SurfaceCodeSimulator(const Config& config, int rank, int size, bool skip_decoder)
     : config_(config),
       mpi_rank_(rank),
@@ -131,6 +169,7 @@ void SurfaceCodeSimulator::initialize_distributed_lattice_surgery_circuit() {
 
     DistributedLatticeSurgeryCircuit dls_circuit(config_);
     circuit_ = dls_circuit.generate();
+    distributed_remote_cnots_per_cycle_override_ = dls_circuit.remote_cnots_per_merge_round();
 
     // Seed annotated string with pragma polygons so inject_interconnect_noise
     // preserves them when rewriting the circuit text.
@@ -178,30 +217,34 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
         return;
     }
 
-    RemoteCnotNoiseModel remote_noise = compute_remote_cnot_noise_model();
-    double total_error = remote_noise.remote_cnot_error;
+    uint32_t num_remote_cnots = count_remote_cnots_in_cycle();
+    RemoteCnotNoiseModel remote_noise = compute_remote_cnot_noise_model(num_remote_cnots);
+    double total_remote_error = remote_noise.remote_cnot_error;
+    double remote_only_error = total_remote_error;
+
+    if (config_.monolithic_baseline) {
+        total_remote_error = config_.physical_error;
+        remote_only_error = 0.0;
+    }
 
     // Keep interconnect_error as an extra independent error source after the
     // effective-channel / accurate-RCX calculation so legacy configs remain explicit.
-    if (config_.interconnect_error > 0) {
+    if (!config_.monolithic_baseline && config_.interconnect_error > 0) {
         // p_total = 1 - (1-p_remote)(1-p_interconnect)
-        total_error = 1.0 - (1.0 - remote_noise.remote_cnot_error) * (1.0 - config_.interconnect_error);
+        total_remote_error = 1.0 - (1.0 - remote_noise.remote_cnot_error) * (1.0 - config_.interconnect_error);
+        remote_only_error = total_remote_error;
     }
 
     if (mpi_rank_ == 0) {
         std::cerr << "Remote CNOT noise model:" << std::endl;
+        std::cerr << "  Requested distillation protocol: "
+                  << distillation_protocol_to_string(config_.distillation_protocol) << std::endl;
+        std::cerr << "  Effective distillation protocol: "
+                  << distillation_protocol_to_string(remote_noise.effective_distillation_protocol) << std::endl;
+        std::cerr << "  Monolithic baseline: " << (config_.monolithic_baseline ? "enabled" : "disabled") << std::endl;
         std::cerr << "  Accurate RCX: " << (config_.accurate_rcx ? "enabled" : "disabled") << std::endl;
         std::cerr << "  Raw channel error: " << remote_noise.raw_channel_error << std::endl;
         std::cerr << "  Distillation feasible: " << (remote_noise.distillation_feasible ? "YES" : "NO") << std::endl;
-        std::cerr << "  Protocol: ";
-        switch (config_.distillation_protocol) {
-            case DistillationProtocol::PUMPING_2TO1: std::cerr << "2→1 Pumping"; break;
-            case DistillationProtocol::PUMPING_3TO1: std::cerr << "3→1 Pumping"; break;
-            case DistillationProtocol::RECURRENCE_2TO1: std::cerr << "2→1 Recurrence"; break;
-            case DistillationProtocol::RECURRENCE_3TO1: std::cerr << "3→1 Recurrence"; break;
-            default: std::cerr << "None"; break;
-        }
-        std::cerr << std::endl;
         std::cerr << "  Distillation rounds: " << config_.distillation_rounds << std::endl;
         std::cerr << "  Backup batches (m): " << remote_noise.distillation_backup_batches << std::endl;
         std::cerr << "  Raw EPR fidelity: " << config_.raw_epr_fidelity << std::endl;
@@ -211,13 +254,21 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
         std::cerr << "  Probability all backup batches fail: " << remote_noise.probability_all_distillation_fail << std::endl;
         std::cerr << "  Effective channel error: " << remote_noise.effective_channel_error << std::endl;
         std::cerr << "  Remote CNOT error: " << remote_noise.remote_cnot_error << std::endl;
+        std::cerr << "  Concurrent distillation EPR slots required: " << remote_noise.distillation_epr_slots_required << std::endl;
+        std::cerr << "  Distillation qubits required: " << remote_noise.distillation_qubits_required << std::endl;
+        std::cerr << "  Monolithic equivalent qubits: " << remote_noise.monolithic_equivalent_qubits << std::endl;
+        std::cerr << "  Distillation qubit overhead feasible: "
+                  << (remote_noise.distillation_qubit_overhead_feasible ? "YES" : "NO") << std::endl;
         std::cerr << "  Interconnect error add-on: " << config_.interconnect_error << std::endl;
-        std::cerr << "  Final injected remote CNOT error: " << total_error << std::endl;
+        std::cerr << "  Final remote CNOT error target: " << total_remote_error << std::endl;
+        std::cerr << "  Extra injected remote-only error: " << remote_only_error << std::endl;
     }
 
     // Populate noise summary (remote CNOT fields)
+    noise_summary_.effective_distillation_protocol = remote_noise.effective_distillation_protocol;
     noise_summary_.accurate_rcx_enabled     = config_.accurate_rcx;
     noise_summary_.distillation_feasible    = remote_noise.distillation_feasible;
+    noise_summary_.distillation_qubit_overhead_feasible = remote_noise.distillation_qubit_overhead_feasible;
     noise_summary_.distillation_backup_batches = remote_noise.distillation_backup_batches;
     noise_summary_.raw_channel_error        = remote_noise.raw_channel_error;
     noise_summary_.effective_channel_error  = remote_noise.effective_channel_error;
@@ -225,10 +276,13 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
     noise_summary_.distilled_error          = remote_noise.distilled_error;
     noise_summary_.distillation_success_probability = remote_noise.distillation_success_probability;
     noise_summary_.probability_all_distillation_fail = remote_noise.probability_all_distillation_fail;
-    noise_summary_.remote_cnot_error        = total_error;
-    noise_summary_.raw_pairs_per_distilled  = compute_distillation(config_.distillation_rounds).raw_pairs_consumed;
+    noise_summary_.remote_cnot_error        = total_remote_error;
+    noise_summary_.raw_pairs_per_distilled  = remote_noise.raw_pairs_per_distilled;
+    noise_summary_.distillation_epr_slots_required = remote_noise.distillation_epr_slots_required;
+    noise_summary_.distillation_qubits_required = remote_noise.distillation_qubits_required;
+    noise_summary_.monolithic_equivalent_qubits = remote_noise.monolithic_equivalent_qubits;
 
-    if (total_error <= 0) {
+    if (remote_only_error <= 0 && config_.physical_error <= 0) {
         return;  // No error to inject
     }
 
@@ -288,8 +342,8 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
             }
 
             // Additional DEPOLARIZE2(remote_error) on remote pairs only
-            if (!remote_pairs.empty()) {
-                oss << "DEPOLARIZE2(" << total_error << ")";
+            if (!remote_pairs.empty() && remote_only_error > 0) {
+                oss << "DEPOLARIZE2(" << remote_only_error << ")";
                 for (const auto& pair : remote_pairs) {
                     oss << " " << pair.first << " " << pair.second;
                 }
@@ -321,6 +375,9 @@ uint32_t SurfaceCodeSimulator::count_remote_cnots_in_cycle() {
     if (!config_.distributed) {
         return 0;
     }
+    if (distributed_remote_cnots_per_cycle_override_ > 0) {
+        return distributed_remote_cnots_per_cycle_override_;
+    }
 
     auto coords = circuit_.get_final_qubit_coords();
     double split_x = config_.code_distance;
@@ -345,8 +402,8 @@ uint32_t SurfaceCodeSimulator::count_remote_cnots_in_cycle() {
                             double ctrl_x = coords[ctrl][0];
                             double tgt_x = coords[tgt][0];
 
-                            bool crosses = (ctrl_x < split_x && tgt_x >= split_x) ||
-                                          (ctrl_x >= split_x && tgt_x < split_x);
+                            bool crosses = (ctrl_x <= split_x && tgt_x > split_x) ||
+                                          (ctrl_x > split_x && tgt_x <= split_x);
 
                             if (crosses) {
                                 remote_count++;
@@ -375,8 +432,8 @@ uint32_t SurfaceCodeSimulator::count_remote_cnots_in_cycle() {
                 if (coords.count(ctrl) && coords.count(tgt)) {
                     double ctrl_x = coords[ctrl][0];
                     double tgt_x = coords[tgt][0];
-                    bool crosses = (ctrl_x < split_x && tgt_x >= split_x) ||
-                                  (ctrl_x >= split_x && tgt_x < split_x);
+                    bool crosses = (ctrl_x <= split_x && tgt_x > split_x) ||
+                                  (ctrl_x > split_x && tgt_x <= split_x);
                     if (crosses) total_remote++;
                 }
             }
@@ -444,14 +501,16 @@ double SurfaceCodeSimulator::compute_3to1_success_prob(double F1, double F2) {
 }
 
 // Compute full distillation result for given number of rounds
-DistillationResult SurfaceCodeSimulator::compute_distillation(uint32_t rounds) const {
+DistillationResult SurfaceCodeSimulator::compute_distillation(DistillationProtocol protocol,
+                                                              uint32_t rounds) const {
     DistillationResult result;
+    result.protocol = protocol;
     result.output_fidelity = config_.raw_epr_fidelity;
     result.success_probability = 1.0;
     result.raw_pairs_consumed = 1;
     result.distillation_time = 0.0;
 
-    if (!config_.distributed || config_.distillation_protocol == DistillationProtocol::NONE || rounds == 0) {
+    if (!config_.distributed || protocol == DistillationProtocol::NONE || protocol == DistillationProtocol::RADAR || rounds == 0) {
         return result;
     }
 
@@ -464,7 +523,7 @@ DistillationResult SurfaceCodeSimulator::compute_distillation(uint32_t rounds) c
         double F_out, p_s;
         uint32_t pairs_this_round;
 
-        switch (config_.distillation_protocol) {
+        switch (protocol) {
             case DistillationProtocol::PUMPING_2TO1:
                 // Pumping: auxiliary pairs are always raw, target improves
                 F_out = compute_2to1_fidelity(F_raw, F_current);
@@ -504,9 +563,9 @@ DistillationResult SurfaceCodeSimulator::compute_distillation(uint32_t rounds) c
 
     // For pumping, total pairs is linear: b*k (where b=2 or 3)
     // For recurrence, total pairs is exponential: b^k
-    if (config_.distillation_protocol == DistillationProtocol::PUMPING_2TO1) {
+    if (protocol == DistillationProtocol::PUMPING_2TO1) {
         total_pairs = 2 * rounds;  // O(b*k) for pumping
-    } else if (config_.distillation_protocol == DistillationProtocol::PUMPING_3TO1) {
+    } else if (protocol == DistillationProtocol::PUMPING_3TO1) {
         total_pairs = 3 * rounds;
     }
     // Recurrence already computed as b^k above
@@ -545,32 +604,62 @@ double SurfaceCodeSimulator::compute_remote_cnot_error_from_effective_channel(do
     return std::max(0.0, p_remote);
 }
 
-RemoteCnotNoiseModel SurfaceCodeSimulator::compute_remote_cnot_noise_model() const {
+RemoteCnotNoiseModel SurfaceCodeSimulator::evaluate_remote_cnot_noise_model(DistillationProtocol protocol,
+                                                                            uint32_t rounds,
+                                                                            uint32_t num_remote_cnots) const {
     RemoteCnotNoiseModel model;
+    model.effective_distillation_protocol = protocol;
     model.raw_channel_error = compute_raw_channel_error();
     model.effective_channel_error = model.raw_channel_error;
     model.distillation_backup_batches = config_.distillation_backup_batches;
 
-    DistillationResult distill = compute_distillation(config_.distillation_rounds);
+    DistillationResult distill = compute_distillation(protocol, rounds);
     model.distilled_fidelity = distill.output_fidelity;
     model.distilled_error = 1.0 - distill.output_fidelity;
     model.distillation_success_probability = distill.success_probability;
+    model.raw_pairs_per_distilled = distill.raw_pairs_consumed;
+    model.distillation_time = compute_distillation_time(num_remote_cnots, distill);
 
     bool wants_distillation =
         config_.distributed &&
-        config_.distillation_protocol != DistillationProtocol::NONE &&
-        config_.distillation_rounds > 0;
-    bool timing_feasible = check_timing_constraint(distill.distillation_time);
-    model.distillation_feasible = wants_distillation && timing_feasible;
+        protocol != DistillationProtocol::NONE &&
+        rounds > 0;
+    model.distillation_feasible = wants_distillation && check_timing_constraint(model.distillation_time);
+    model.monolithic_equivalent_qubits = compute_monolithic_equivalent_qubits();
+    if (wants_distillation) {
+        uint32_t branching = protocol_branching_factor(protocol);
+        uint32_t pairs_per_chain = 1;
+        if (is_recurrence_protocol(protocol)) {
+            pairs_per_chain = saturated_pow_u32(branching, rounds);
+        } else if (is_pumping_protocol(protocol)) {
+            // Pumping is a constant-width chain: one target pair plus b-1 auxiliaries.
+            pairs_per_chain = branching;
+        }
 
-    if (model.distillation_feasible) {
+        uint64_t epr_slots = static_cast<uint64_t>(num_remote_cnots) *
+                             static_cast<uint64_t>(pairs_per_chain) *
+                             static_cast<uint64_t>(config_.distillation_backup_batches);
+        model.distillation_epr_slots_required = static_cast<uint32_t>(
+            std::min<uint64_t>(epr_slots, std::numeric_limits<uint32_t>::max()));
+        uint64_t distill_qubits = 2 * epr_slots;
+        model.distillation_qubits_required = static_cast<uint32_t>(
+            std::min<uint64_t>(distill_qubits, std::numeric_limits<uint32_t>::max()));
+    } else {
+        model.distillation_epr_slots_required = 0;
+        model.distillation_qubits_required = 0;
+    }
+    model.distillation_qubit_overhead_feasible =
+        !wants_distillation ||
+        model.distillation_qubits_required <= model.monolithic_equivalent_qubits;
+
+    if (wants_distillation) {
         model.probability_all_distillation_fail =
             std::pow(1.0 - distill.success_probability, static_cast<double>(config_.distillation_backup_batches));
         model.effective_channel_error =
             (1.0 - model.probability_all_distillation_fail) * model.distilled_error +
             model.probability_all_distillation_fail * model.raw_channel_error;
     } else {
-        model.probability_all_distillation_fail = 1.0;
+        model.probability_all_distillation_fail = 0.0;
         model.effective_channel_error = model.raw_channel_error;
     }
 
@@ -579,6 +668,81 @@ RemoteCnotNoiseModel SurfaceCodeSimulator::compute_remote_cnot_noise_model() con
         config_.physical_error,
         config_.accurate_rcx);
     return model;
+}
+
+uint32_t SurfaceCodeSimulator::compute_monolithic_equivalent_qubits() const {
+    Config mono_config = config_;
+    mono_config.distributed = false;
+    mono_config.monolithic_baseline = false;
+    if (mono_config.merge_type == MergeType::XX_MERGE_DISTRIBUTED) {
+        mono_config.merge_type = MergeType::XX_MERGE;
+    }
+
+    LatticeSurgeryCircuit monolithic(mono_config);
+    return static_cast<uint32_t>(monolithic.num_qubits());
+}
+
+DistillationProtocol SurfaceCodeSimulator::select_radar_distillation_protocol(uint32_t rounds,
+                                                                              uint32_t num_remote_cnots) const {
+    const DistillationProtocol candidates[] = {
+        DistillationProtocol::NONE,
+        DistillationProtocol::PUMPING_2TO1,
+        DistillationProtocol::PUMPING_3TO1,
+        DistillationProtocol::RECURRENCE_2TO1,
+        DistillationProtocol::RECURRENCE_3TO1,
+    };
+
+    DistillationProtocol best_protocol = DistillationProtocol::NONE;
+    double best_score = std::numeric_limits<double>::infinity();
+    bool best_timing_safe = false;
+    uint32_t best_pairs = std::numeric_limits<uint32_t>::max();
+    double best_time = std::numeric_limits<double>::infinity();
+
+    for (DistillationProtocol candidate : candidates) {
+        RemoteCnotNoiseModel model = evaluate_remote_cnot_noise_model(candidate, rounds, num_remote_cnots);
+        double t_idle = std::max(config_.measurement_delay, model.distillation_time);
+        double p_x = 0.0;
+        double p_z = 0.0;
+        if (config_.T1_coherence_time > 0) {
+            p_x = (1.0 - std::exp(-t_idle / config_.T1_coherence_time)) / 4.0;
+        }
+        if (config_.T2_coherence_time > 0) {
+            p_z = (1.0 - std::exp(-t_idle / config_.T2_coherence_time)) / 2.0 - p_x;
+            p_z = std::max(0.0, p_z);
+        }
+        double p_idle_total = 2.0 * p_x + p_z;
+        double score = model.remote_cnot_error + p_idle_total;
+        bool timing_safe = check_timing_constraint(model.distillation_time);
+
+        bool better = score < best_score - 1e-15;
+        if (!better && std::abs(score - best_score) <= 1e-15) {
+            if (timing_safe != best_timing_safe) {
+                better = timing_safe;
+            } else if (model.raw_pairs_per_distilled != best_pairs) {
+                better = model.raw_pairs_per_distilled < best_pairs;
+            } else if (std::abs(model.distillation_time - best_time) > 1e-18) {
+                better = model.distillation_time < best_time;
+            }
+        }
+
+        if (better) {
+            best_protocol = candidate;
+            best_score = score;
+            best_timing_safe = timing_safe;
+            best_pairs = model.raw_pairs_per_distilled;
+            best_time = model.distillation_time;
+        }
+    }
+
+    return best_protocol;
+}
+
+RemoteCnotNoiseModel SurfaceCodeSimulator::compute_remote_cnot_noise_model(uint32_t num_remote_cnots) const {
+    DistillationProtocol effective_protocol = config_.distillation_protocol;
+    if (effective_protocol == DistillationProtocol::RADAR) {
+        effective_protocol = select_radar_distillation_protocol(config_.distillation_rounds, num_remote_cnots);
+    }
+    return evaluate_remote_cnot_noise_model(effective_protocol, config_.distillation_rounds, num_remote_cnots);
 }
 
 // Compute time required for distillation
@@ -606,6 +770,22 @@ void SurfaceCodeSimulator::inject_entanglement_idling_noise() {
         return;
     }
 
+    if (config_.monolithic_baseline) {
+        noise_summary_.remote_cnots_per_cycle = count_remote_cnots_in_cycle();
+        noise_summary_.epr_pairs_per_round = 0;
+        noise_summary_.distillation_time_ns = 0.0;
+        noise_summary_.idling_time_us = 0.0;
+        noise_summary_.p_X = 0.0;
+        noise_summary_.p_Y = 0.0;
+        noise_summary_.p_Z = 0.0;
+        noise_summary_.timing_constraint_satisfied = true;
+
+        if (mpi_rank_ == 0) {
+            std::cerr << "Entanglement-limited idling: disabled by monolithic baseline" << std::endl;
+        }
+        return;
+    }
+
     // Count remote CNOTs per cycle
     uint32_t N_remote = count_remote_cnots_in_cycle();
 
@@ -614,8 +794,10 @@ void SurfaceCodeSimulator::inject_entanglement_idling_noise() {
     }
 
     // Compute distillation parameters
-    DistillationResult distill = compute_distillation(config_.distillation_rounds);
-    double t_dist = compute_distillation_time(N_remote, distill);
+    RemoteCnotNoiseModel remote_noise = compute_remote_cnot_noise_model(N_remote);
+    DistillationResult distill = compute_distillation(remote_noise.effective_distillation_protocol,
+                                                      config_.distillation_rounds);
+    double t_dist = remote_noise.distillation_time;
 
     // Paper Section III.B.2: tidle = max(tmeas, EPR waiting time)
     // For monolithic: tidle = tmeas
@@ -641,7 +823,7 @@ void SurfaceCodeSimulator::inject_entanglement_idling_noise() {
 
     // Populate noise summary (idling fields)
     noise_summary_.remote_cnots_per_cycle        = N_remote;
-    noise_summary_.epr_pairs_per_round           = N_remote * distill.raw_pairs_consumed;
+    noise_summary_.epr_pairs_per_round           = N_remote * remote_noise.raw_pairs_per_distilled;
     noise_summary_.distillation_time_ns          = t_dist * 1e9;
     noise_summary_.idling_time_us                = t_idle * 1e6;
     noise_summary_.p_X                           = p_X;

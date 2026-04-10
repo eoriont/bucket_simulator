@@ -76,6 +76,7 @@ private:
 
     // True when interior-SS gauge ancillas are present (splits merge rounds into half-rounds)
     bool has_gauges_ = false;
+    uint32_t remote_cnots_per_merge_round_ = 0;
 
     // Circuit
     stim::Circuit circuit_;
@@ -106,6 +107,7 @@ public:
     const std::vector<DStabilizer>& seam_a_stabs() const { return seam_a_stabilizers_; }
     const std::vector<DStabilizer>& seam_b_stabs() const { return seam_b_stabilizers_; }
     const std::vector<DStabilizer>& merge_stabs() const { return merge_stabilizers_; }
+    uint32_t remote_cnots_per_merge_round() const { return remote_cnots_per_merge_round_; }
 
     // Generate stim text with #!pragma POLYGON annotations for stabilizer coloring
     std::string annotated_stim_str() const;

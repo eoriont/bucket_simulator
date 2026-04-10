@@ -465,6 +465,8 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     //   seam_a_x_ancillas / seam_b_x_ancillas: seam X (pre/post-merge only)
     //   merge_z_ancillas / merge_x_ancillas: merge (merge rounds only)
 
+    remote_cnots_per_merge_round_ = 0;
+
     // Collect qubits by type and role
     std::vector<uint32_t> all_data;
     std::vector<uint32_t> patch_a_data;
@@ -746,6 +748,43 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     }
     bool has_gauges = !x_gauge_ancillas.empty() || !z_gauge_ancillas.empty();
     has_gauges_ = has_gauges;
+
+    auto remote_pairs_for_layer = [&](const std::vector<uint32_t>& layer) {
+        std::set<std::pair<uint32_t, uint32_t>> pairs;
+        for (size_t k = 0; k + 1 < layer.size(); k += 2) {
+            uint32_t a = layer[k];
+            uint32_t b = layer[k + 1];
+            bool a_on_b = qubits_[a].x > distance_;
+            bool b_on_b = qubits_[b].x > distance_;
+            if (a_on_b != b_on_b) {
+                pairs.insert({a, b});
+            }
+        }
+        return pairs;
+    };
+    if (!has_gauges) {
+        remote_cnots_per_merge_round_ =
+            remote_pairs_for_layer(norm_mcx1).size() +
+            remote_pairs_for_layer(norm_mcx2).size() +
+            remote_pairs_for_layer(norm_mcx3).size() +
+            remote_pairs_for_layer(norm_mcx4).size();
+    } else {
+        auto merged_layer_count = [&](const std::vector<uint32_t>& base,
+                                      const std::vector<uint32_t>& xg,
+                                      const std::vector<uint32_t>& zg) -> uint32_t {
+            auto pairs = remote_pairs_for_layer(base);
+            auto x_pairs = remote_pairs_for_layer(xg);
+            auto z_pairs = remote_pairs_for_layer(zg);
+            pairs.insert(x_pairs.begin(), x_pairs.end());
+            pairs.insert(z_pairs.begin(), z_pairs.end());
+            return static_cast<uint32_t>(pairs.size());
+        };
+        remote_cnots_per_merge_round_ =
+            merged_layer_count(norm_mcx1, x_gauge_cx1, z_gauge_cx1) +
+            merged_layer_count(norm_mcx2, x_gauge_cx2, z_gauge_cx2) +
+            merged_layer_count(norm_mcx3, x_gauge_cx3, z_gauge_cx3) +
+            merged_layer_count(norm_mcx4, x_gauge_cx4, z_gauge_cx4);
+    }
 
     // Boundary-weight-changing ancillas: patch ancillas (not gauge, not seam, not merge)
     // that neighbor a boundary SS qubit. Their stabilizer weight differs between pre/post

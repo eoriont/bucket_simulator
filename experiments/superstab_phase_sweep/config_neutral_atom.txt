@@ -1,0 +1,20 @@
+# Base config for superstabilizer phase/basis sweep on a neutral-atom machine
+# merge_type, experiment_phase, superstabilizers, entanglement_rate, and merge_rounds
+# are set per-run via CLI args in run.sh
+#
+# Timing/noise values below are a neutral-atom scaffold. Replace them with the
+# actual device parameters you want to study.
+
+physical_error 0.005
+measurement_error 0.002
+reset_error 0.002
+total_shots 100K
+mode monte_carlo
+target_faults_per_bucket 100
+calib_shots_per_bucket 500
+raw_epr_fidelity 1.0
+distillation_protocol none
+distillation_rounds 1
+T1 119
+T2 12.6
+measurement_delay 500e-6
