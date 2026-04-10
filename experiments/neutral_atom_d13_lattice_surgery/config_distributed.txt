@@ -1,0 +1,32 @@
+# Neutral-atom distributed lattice-surgery config for d=13 LER sweeps.
+# run.sh overrides:
+#   - merge_type
+#   - experiment_phase
+#   - entanglement_rate
+#
+# ENR sweep covers 50kHz–1.2MHz, spanning the regime transitions identified
+# by the rcx_regime_sweep experiment (transitions at ~121k, 178k, 261k, 383k,
+# 464k, 562k Hz for d=13).
+
+code_distance 13
+merge_type distributed_xx
+merge_rounds 13
+distributed true
+
+physical_error 0.005
+measurement_error 0.002
+reset_error 0.002
+
+total_shots 100K
+mode monte_carlo
+target_faults_per_bucket 100
+calib_shots_per_bucket 500
+
+raw_epr_fidelity 0.95
+distillation_protocol none
+distillation_rounds 1
+distillation_backup_batches 1
+
+T1 119
+T2 12.6
+measurement_delay 500e-6

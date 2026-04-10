@@ -1,0 +1,22 @@
+# Neutral-atom monolithic lattice-surgery config for d=13 baseline.
+# run.sh overrides:
+#   - merge_type
+#   - experiment_phase
+
+code_distance 13
+merge_type xx
+merge_rounds 13
+distributed false
+
+physical_error 0.005
+measurement_error 0.002
+reset_error 0.002
+
+total_shots 100K
+mode monte_carlo
+target_faults_per_bucket 100
+calib_shots_per_bucket 500
+
+T1 119
+T2 12.6
+measurement_delay 500e-6
