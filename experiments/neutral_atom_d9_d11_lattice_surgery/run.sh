@@ -1,13 +1,9 @@
 #!/bin/bash
 #
 # Neutral-atom d=9 and d=11 lattice-surgery LER sweep.
-# Runs:
-#   - Monolithic baseline for d=9 and d=11 (2 modes × 2 distances = 4 jobs)
-#   - Distributed: all feasible (protocol, k, m) combinations at each ENR
-#     for both distances (combos computed at runtime via compute_combos.py)
-#
-# Note: split modes are excluded — the split observable requires separate
-# investigation. Only xx_merge and zz_merge are run here.
+# Covers:
+#   - monolithic baseline (ENR-independent, once per mode and distance)
+#   - distributed: all feasible (protocol, k, m) combinations at each ENR point
 #
 # Usage:
 #   ./run.sh [options]
@@ -18,9 +14,9 @@
 #   --dry-run              Print commands without executing
 #   --circuits-only        Dump circuits instead of running simulations
 #   --resume RUN_DIR       Resume an existing run directory
-#   --shots SHOTS          Override total_shots, e.g. 500K or 1M
+#   --shots SHOTS          Override total_shots, e.g. 10K
 
-set -euo pipefail
+set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -34,81 +30,153 @@ SHOTS=""
 RESUME_RUN_DIR=""
 MAX_ROUNDS=5
 
-# Distances to sweep
 DISTANCES=(9 11)
-
-# Modes (split modes excluded — observable not validated)
 MODES=(xx_merge zz_merge)
 
-# ENR sweep points (Hz), bracketing all regime transitions for both d=9 and d=11
-# at F=0.99, p=0.001:
-#   ~75kHz  d=9 first transition (none → 2to1_pump)
-#  ~100kHz  d=11 first transition
-#  ~133kHz  both: → 3to1_pump
-#  ~178kHz  both: → 2to1_rec k=2
-#  ~316kHz  d=9:  → 2to1_rec k=3
-#  ~422kHz  both: → 3to1_rec k=2  (best achievable: eff=0.30%)
+# ENR sweep points (Hz), bracketing all regime transitions for d=9 and d=11
+# at F=0.99, p=0.001.
 RATES_HZ=(30000 80000 120000 160000 250000 400000 600000 1000000)
 
-# ---------------------------------------------------------------------------
-# Argument parsing
-# ---------------------------------------------------------------------------
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -n|--num-procs)  NUM_PROCS="$2";    shift 2 ;;
-        -j|--parallel)   PARALLEL_JOBS="$2"; shift 2 ;;
-        --dry-run)        DRY_RUN=true;       shift   ;;
-        --circuits-only)  CIRCUITS_ONLY=true; shift   ;;
-        --shots)          SHOTS="$2";         shift 2 ;;
+        -n|--num-procs)   NUM_PROCS="$2"; shift 2 ;;
+        -j|--parallel)    PARALLEL_JOBS="$2"; shift 2 ;;
+        --dry-run)        DRY_RUN=true; shift ;;
+        --circuits-only)  CIRCUITS_ONLY=true; shift ;;
         --resume)         RESUME_RUN_DIR="$2"; shift 2 ;;
-        *) echo "Unknown option: $1" >&2; exit 1 ;;
+        --shots)          SHOTS="$2"; shift 2 ;;
+        -h|--help)        head -25 "$0" | tail -23; exit 0 ;;
+        *) echo "Unknown option: $1"; exit 1 ;;
     esac
 done
 
-# ---------------------------------------------------------------------------
-# Run directory setup
-# ---------------------------------------------------------------------------
+config_path() {
+    local arch="$1"
+    local distance="$2"
+    echo "$SCRIPT_DIR/config_${arch}_d${distance}.txt"
+}
+
+enr_combos() {
+    local distance="$1"
+    local rate_hz="$2"
+    python3 "$SCRIPT_DIR/compute_combos.py" \
+        --config "$(config_path distributed "$distance")" \
+        --enr "$rate_hz" \
+        --max-rounds "$MAX_ROUNDS"
+}
+
+mode_merge_type() {
+    local arch="$1"
+    local mode="$2"
+    case "$arch:$mode" in
+        monolithic:xx_merge) echo "xx" ;;
+        monolithic:zz_merge) echo "zz" ;;
+        distributed:xx_merge) echo "distributed_xx" ;;
+        distributed:zz_merge) echo "distributed_zz" ;;
+    esac
+}
+
+mode_phase() {
+    case "$1" in
+        xx_merge|zz_merge) echo "merge_only" ;;
+    esac
+}
+
+rate_label() {
+    local rate_hz="$1"
+    if [[ "$rate_hz" -ge 1000 ]]; then
+        echo "$((rate_hz / 1000))kHz"
+    else
+        echo "${rate_hz}Hz"
+    fi
+}
+
+job_label() {
+    local arch="$1"
+    local mode="$2"
+    local distance="$3"
+    local rate_hz="$4"
+    local protocol="$5"
+    local rounds="$6"
+    local batches="$7"
+    if [[ "$arch" == "monolithic" ]]; then
+        echo "${arch}_${mode}_d${distance}"
+    elif [[ "$protocol" == "none" ]]; then
+        echo "${arch}_${mode}_none_$(rate_label "$rate_hz")_d${distance}"
+    else
+        echo "${arch}_${mode}_${protocol}_k${rounds}_m${batches}_$(rate_label "$rate_hz")_d${distance}"
+    fi
+}
+
+job_is_done() {
+    local label="$1"
+    if [[ "$CIRCUITS_ONLY" == "true" ]]; then
+        [[ -f "$CIRCUITS_DIR/${label}.stim" ]]
+    else
+        [[ -f "$RESULTS_DIR/${label}_results.txt" ]]
+    fi
+}
+
+if [[ ! -x "$SIMULATOR" ]]; then
+    echo "Error: simulator not found at $SIMULATOR"
+    echo "Build first: cd $PROJECT_ROOT/build && make"
+    exit 1
+fi
+
+for distance in "${DISTANCES[@]}"; do
+    if [[ ! -f "$(config_path monolithic "$distance")" || ! -f "$(config_path distributed "$distance")" ]]; then
+        echo "Error: expected base configs not found for d=$distance in $SCRIPT_DIR"
+        exit 1
+    fi
+done
+
 if [[ -n "$RESUME_RUN_DIR" ]]; then
     RUN_DIR="$RESUME_RUN_DIR"
-    echo "Resuming run: $RUN_DIR"
+    TIMESTAMP=$(basename "$RUN_DIR")
 else
-    RUN_ID="$(date +%Y%m%d_%H%M%S)"
-    RUN_DIR="$SCRIPT_DIR/runs/$RUN_ID"
-    mkdir -p "$RUN_DIR"/{results,logs,circuits}
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    RUN_DIR="$SCRIPT_DIR/runs/$TIMESTAMP"
 fi
 
 RESULTS_DIR="$RUN_DIR/results"
-LOG_DIR="$RUN_DIR/logs"
-CIRCUIT_DIR="$RUN_DIR/circuits"
-FAIL_FILE="$RUN_DIR/failed.txt"
+CIRCUITS_DIR="$RUN_DIR/circuits"
+LOGS_DIR="$RUN_DIR/logs"
+mkdir -p "$RESULTS_DIR" "$CIRCUITS_DIR" "$LOGS_DIR"
 
-# ---------------------------------------------------------------------------
-# Compute total jobs for metadata
-# ---------------------------------------------------------------------------
-total_jobs=0
-for DISTANCE in "${DISTANCES[@]}"; do
-    DIST_CONFIG="$SCRIPT_DIR/config_distributed_d${DISTANCE}.txt"
-    for mode in "${MODES[@]}"; do
-        # monolithic
-        total_jobs=$((total_jobs + 1))
-        # distributed
-        for enr in "${RATES_HZ[@]}"; do
-            combos=$(python3 "$SCRIPT_DIR/compute_combos.py" \
-                --config "$DIST_CONFIG" --enr "$enr" --max-rounds "$MAX_ROUNDS" 2>/dev/null)
-            for _ in $combos; do
-                total_jobs=$((total_jobs + 1))
-            done
-        done
+TOTAL_MONO=$(( ${#DISTANCES[@]} * ${#MODES[@]} ))
+TOTAL_DIST=0
+for distance in "${DISTANCES[@]}"; do
+    for rate_hz in "${RATES_HZ[@]}"; do
+        combos_str=$(enr_combos "$distance" "$rate_hz")
+        n_combos=$(echo "$combos_str" | wc -w)
+        TOTAL_DIST=$(( TOTAL_DIST + n_combos * ${#MODES[@]} ))
     done
 done
+TOTAL_CONFIGS=$(( TOTAL_MONO + TOTAL_DIST ))
 
-# ---------------------------------------------------------------------------
-# Write metadata
-# ---------------------------------------------------------------------------
-if [[ -z "$RESUME_RUN_DIR" ]]; then
-    cat > "$RUN_DIR/metadata.txt" <<EOF
+FAIL_FILE="$RUN_DIR/failed.txt"
+: > "$FAIL_FILE"
+
+echo "=================================================="
+echo "Neutral-Atom d=9/d=11 Lattice Surgery LER Sweep"
+echo "=================================================="
+echo "Run ID:    $TIMESTAMP"
+echo "Output:    $RUN_DIR"
+echo "Distances: ${DISTANCES[*]}"
+echo "Modes:     ${MODES[*]}"
+echo "Rates:     ${RATES_HZ[*]}"
+echo "Shots:     ${SHOTS:-from config}"
+echo "MaxRounds: $MAX_ROUNDS"
+echo "Circuits:  $CIRCUITS_ONLY"
+echo "MPI:       $NUM_PROCS processes"
+echo "Parallel:  $PARALLEL_JOBS"
+echo "Jobs:      $TOTAL_CONFIGS  (${TOTAL_MONO} monolithic + ${TOTAL_DIST} distributed)"
+[[ -n "$RESUME_RUN_DIR" ]] && echo "Resume:    yes"
+echo "=================================================="
+
+cat > "$RUN_DIR/metadata.txt" <<EOF
 Experiment: neutral_atom_d9_d11_lattice_surgery
-Run ID: $RUN_ID
+Run ID: $TIMESTAMP
 Started: $(date)
 Distances: ${DISTANCES[*]}
 MPI Processes: $NUM_PROCS
@@ -118,36 +186,98 @@ Max distillation rounds: $MAX_ROUNDS
 Circuits only: $CIRCUITS_ONLY
 Modes: ${MODES[*]}
 Distributed entanglement rates (Hz): ${RATES_HZ[*]}
-Total jobs: $total_jobs
+Total jobs: $TOTAL_CONFIGS
 Host: $(hostname)
 Simulator: $SIMULATOR
 EOF
-    echo "Run directory: $RUN_DIR"
-    echo "Total jobs: $total_jobs"
-fi
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-ACTIVE_JOBS=0
-
-# Build base simulator args
-sim_args() {
-    local config="$1" label="$2"
-    local args=(-config "$config" -output "$RUN_DIR/.tmp_out_${label}")
-    [[ -n "$SHOTS" ]]         && args+=(-shots "$SHOTS")
-    $CIRCUITS_ONLY             && args+=(--circuits-only -circuit-output "$CIRCUIT_DIR/${label}.stim")
-    ! $CIRCUITS_ONLY           && args+=(-circuit-output "$CIRCUIT_DIR/${label}.stim")
-    echo "${args[@]}"
-}
 
 run_job() {
-    local label="$1" config="$2"
-    local result_file="$RESULTS_DIR/${label}_results.txt"
-    local log_file="$LOG_DIR/${label}.log"
+    local idx="$1"
+    local total="$2"
+    local distance="$3"
+    local arch="$4"
+    local mode="$5"
+    local rate_hz="$6"
+    local protocol="${7:-}"
+    local rounds="${8:-}"
+    local batches="${9:-}"
+    local config_file
+    local label
+    local merge_type
+    local phase
+    local result_file
+    local log_file
+    local circuit_file
+    local dump_dir
+    local extra_args=()
 
-    # Skip if already done (resume mode)
-    if [[ -f "$result_file" ]]; then
+    config_file=$(config_path "$arch" "$distance")
+    label=$(job_label "$arch" "$mode" "$distance" "$rate_hz" "$protocol" "$rounds" "$batches")
+    merge_type=$(mode_merge_type "$arch" "$mode")
+    phase=$(mode_phase "$mode")
+    result_file="$RESULTS_DIR/${label}_results.txt"
+    log_file="$LOGS_DIR/${label}.log"
+    circuit_file="$CIRCUITS_DIR/${label}.stim"
+    dump_dir="$CIRCUITS_DIR/.tmp_${label}"
+
+    [[ -n "$SHOTS" ]] && extra_args+=(-total_shots "$SHOTS")
+    if [[ "$arch" == "distributed" ]]; then
+        extra_args+=(-entanglement_rate "$rate_hz")
+        extra_args+=(-distillation_protocol "$protocol")
+        extra_args+=(-distillation_rounds "$rounds")
+        extra_args+=(-distillation_backup_batches "$batches")
+    fi
+
+    if job_is_done "$label"; then
+        echo "[SKIP $idx/$total] $label"
+        return 0
+    fi
+
+    if [[ "$arch" == "monolithic" ]]; then
+        echo "[RUN $idx/$total] $label  (merge_type=$merge_type phase=$phase)"
+    else
+        echo "[RUN $idx/$total] $label  (merge_type=$merge_type phase=$phase enr=$(rate_label "$rate_hz"))"
+    fi
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo "  mpirun -n $NUM_PROCS $SIMULATOR \\"
+        echo "    -config $config_file \\"
+        echo "    -merge_type $merge_type \\"
+        echo "    -experiment_phase $phase \\"
+        if [[ "$arch" == "distributed" ]]; then
+            echo "    -entanglement_rate $rate_hz \\"
+            echo "    -distillation_protocol $protocol \\"
+            echo "    -distillation_rounds $rounds \\"
+            echo "    -distillation_backup_batches $batches \\"
+        fi
+        [[ -n "$SHOTS" ]] && echo "    -total_shots $SHOTS \\"
+        if [[ "$CIRCUITS_ONLY" == "true" ]]; then
+            echo "    -dump-circuit \\"
+            echo "    -output $CIRCUITS_DIR"
+        else
+            echo "    -output $RESULTS_DIR"
+        fi
+        return 0
+    fi
+
+    rm -rf "$dump_dir"
+    mkdir -p "$dump_dir"
+
+    mpirun -n 1 "$SIMULATOR" \
+        -config "$config_file" \
+        -merge_type "$merge_type" \
+        -experiment_phase "$phase" \
+        "${extra_args[@]}" \
+        -dump-circuit \
+        -output "$dump_dir" >> "$log_file" 2>&1
+
+    local dumped="$dump_dir/$(basename "$config_file" .txt).stim"
+    if [[ -f "$dumped" ]]; then
+        mv "$dumped" "$circuit_file"
+    fi
+    rmdir "$dump_dir" 2>/dev/null || true
+
+    if [[ "$CIRCUITS_ONLY" == "true" ]]; then
         return 0
     fi
 
@@ -155,166 +285,66 @@ run_job() {
     rm -rf "$tmp_out"
     mkdir -p "$tmp_out"
 
-    local args
-    args=$(sim_args "$config" "$label")
-
-    local cmd="mpirun -n $NUM_PROCS $SIMULATOR $args"
-    echo "[$(date +%H:%M:%S)] $label"
-
-    if $DRY_RUN; then
-        echo "  DRY-RUN: $cmd"
-        rmdir "$tmp_out" 2>/dev/null || true
-        return 0
-    fi
-
-    $cmd >> "$log_file" 2>&1 &
-    local pid=$!
-
-    # Wait and collect
-    wait "$pid"
-    local exit_code=$?
-
-    if [[ $exit_code -ne 0 ]]; then
-        echo "$label (exit $exit_code)" >> "$FAIL_FILE"
-        rmdir "$tmp_out" 2>/dev/null || true
-        return 0
-    fi
-
-    if $CIRCUITS_ONLY; then
-        rmdir "$tmp_out" 2>/dev/null || true
-        return 0
-    fi
+    mpirun -n "$NUM_PROCS" "$SIMULATOR" \
+        -config "$config_file" \
+        -merge_type "$merge_type" \
+        -experiment_phase "$phase" \
+        "${extra_args[@]}" \
+        -output "$tmp_out" >> "$log_file" 2>&1
 
     local outfile
-    outfile=$(ls "$tmp_out"/*.txt 2>/dev/null | head -1)
+    outfile=$(find "$tmp_out" -maxdepth 1 -name 'results_*.txt' | head -1)
     if [[ -n "$outfile" ]]; then
         mv "$outfile" "$result_file"
     else
-        echo "$label (no output)" >> "$FAIL_FILE"
+        echo "$label" >> "$FAIL_FILE"
+        echo "  Warning: no result file found for $label" >> "$log_file"
     fi
     rmdir "$tmp_out" 2>/dev/null || true
 }
 
 wait_for_slot() {
-    while [[ $(jobs -rp | wc -l) -ge $PARALLEL_JOBS ]]; do
+    while (( $(jobs -rp | wc -l) >= PARALLEL_JOBS )); do
         wait -n 2>/dev/null || true
     done
 }
 
-# ---------------------------------------------------------------------------
-# Write a temporary config with specific overrides applied
-# ---------------------------------------------------------------------------
-make_config() {
-    local base_config="$1"
-    local out_config="$2"
-    shift 2
-    # Copy base, then append overrides
-    cp "$base_config" "$out_config"
-    while [[ $# -ge 2 ]]; do
-        local key="$1" val="$2"
-        shift 2
-        # Remove existing line for this key (if any), then append
-        grep -v "^${key}\b" "$out_config" > "${out_config}.tmp" && mv "${out_config}.tmp" "$out_config"
-        echo "$key $val" >> "$out_config"
-    done
-}
+TASK_INDEX=0
 
-# ---------------------------------------------------------------------------
-# Main sweep
-# ---------------------------------------------------------------------------
-job_num=0
-for DISTANCE in "${DISTANCES[@]}"; do
-    MONO_CONFIG="$SCRIPT_DIR/config_monolithic_d${DISTANCE}.txt"
-    DIST_CONFIG="$SCRIPT_DIR/config_distributed_d${DISTANCE}.txt"
-
+for distance in "${DISTANCES[@]}"; do
     echo ""
     echo "========================================"
-    echo "  Distance d=$DISTANCE"
+    echo "Distance d=$distance"
     echo "========================================"
 
-    # --- Monolithic jobs ---
     for mode in "${MODES[@]}"; do
-        merge_type="${mode//_merge/}"  # xx or zz
-        label="monolithic_${mode}_d${DISTANCE}"
-        result_file="$RESULTS_DIR/${label}_results.txt"
-
-        if [[ -f "$result_file" ]]; then
-            echo "[skip] $label (already done)"
-            continue
-        fi
-
-        job_num=$((job_num + 1))
-        echo "[JOB $job_num/$total_jobs] $label"
-
-        # Write a per-job config with the correct merge_type
-        tmp_cfg="$RUN_DIR/.cfg_${label}.txt"
-        make_config "$MONO_CONFIG" "$tmp_cfg" \
-            merge_type "${merge_type}_merge"
-
+        TASK_INDEX=$((TASK_INDEX + 1))
         wait_for_slot
-        run_job "$label" "$tmp_cfg" &
+        run_job "$TASK_INDEX" "$TOTAL_CONFIGS" "$distance" monolithic "$mode" 0 &
     done
 
-    # --- Distributed jobs ---
-    for enr in "${RATES_HZ[@]}"; do
-        enr_khz=$((enr / 1000))
-
-        # Get feasible combos for this distance+ENR
-        combos=$(python3 "$SCRIPT_DIR/compute_combos.py" \
-            --config "$DIST_CONFIG" --enr "$enr" --max-rounds "$MAX_ROUNDS" 2>/dev/null)
-
-        for combo in $combos; do
+    for rate_hz in "${RATES_HZ[@]}"; do
+        combos_str=$(enr_combos "$distance" "$rate_hz")
+        for combo in $combos_str; do
             IFS=':' read -r protocol rounds batches <<< "$combo"
-
             for mode in "${MODES[@]}"; do
-                merge_type="${mode//_merge/}"
-
-                if [[ "$protocol" == "none" ]]; then
-                    label="distributed_${mode}_none_${enr_khz}kHz_d${DISTANCE}"
-                else
-                    label="distributed_${mode}_${protocol}_k${rounds}_m${batches}_${enr_khz}kHz_d${DISTANCE}"
-                fi
-
-                result_file="$RESULTS_DIR/${label}_results.txt"
-                if [[ -f "$result_file" ]]; then
-                    echo "[skip] $label (already done)"
-                    continue
-                fi
-
-                job_num=$((job_num + 1))
-                echo "[JOB $job_num/$total_jobs] $label"
-
-                tmp_cfg="$RUN_DIR/.cfg_${label}.txt"
-                make_config "$DIST_CONFIG" "$tmp_cfg" \
-                    merge_type "distributed_${merge_type}_merge" \
-                    entanglement_rate "$enr" \
-                    distillation_protocol "$protocol" \
-                    distillation_rounds "$rounds" \
-                    distillation_backup_batches "$batches"
-
+                TASK_INDEX=$((TASK_INDEX + 1))
                 wait_for_slot
-                run_job "$label" "$tmp_cfg" &
+                run_job "$TASK_INDEX" "$TOTAL_CONFIGS" "$distance" distributed "$mode" "$rate_hz" "$protocol" "$rounds" "$batches" &
             done
         done
     done
 done
 
-# Wait for all remaining jobs
 wait
 
-# Clean up temp config files
-rm -f "$RUN_DIR"/.cfg_*.txt
-
-# ---------------------------------------------------------------------------
-# Summary
-# ---------------------------------------------------------------------------
-result_count=$(ls "$RESULTS_DIR"/*.txt 2>/dev/null | wc -l)
+result_count=$(find "$RESULTS_DIR" -maxdepth 1 -name '*.txt' | wc -l)
 fail_count=$(wc -l < "$FAIL_FILE" 2>/dev/null || echo 0)
 
 echo ""
 echo "========================================"
 echo "Run complete: $RUN_DIR"
-echo "  Results: $result_count"
+echo "  Results: $result_count / $TOTAL_CONFIGS"
 echo "  Failed:  $fail_count"
-[[ $fail_count -gt 0 ]] && cat "$FAIL_FILE"
+[[ "$fail_count" -gt 0 ]] && echo "--- failures ---" && cat "$FAIL_FILE"
 echo "========================================"

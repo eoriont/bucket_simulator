@@ -5,8 +5,11 @@
 #   - entanglement_rate
 #   - distillation_protocol / distillation_rounds / distillation_backup_batches
 #
-# ENR sweep covers 30kHz–600kHz, bracketing all regime transitions for d=7
-# (transitions at ~56kHz, 89kHz, 126kHz, 178kHz).
+# ENR sweep covers 20kHz–500kHz, bracketing all regime transitions for d=7
+# with the updated neutral-atom parameters:
+#   ~56kHz  (none → 2to1_pumping k=1)
+#   ~83kHz  (→ 3to1_pumping k=1)
+#  ~121kHz  (→ 2to1_recurrence k=2)
 
 code_distance 7
 merge_type distributed_xx
@@ -17,7 +20,7 @@ physical_error 0.001
 measurement_error 0.001
 reset_error 0.001
 
-total_shots 100K
+total_shots 500K
 mode monte_carlo
 target_faults_per_bucket 100
 calib_shots_per_bucket 500

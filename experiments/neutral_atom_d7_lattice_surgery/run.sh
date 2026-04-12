@@ -39,10 +39,14 @@ MAX_ROUNDS=5
 
 # ENR sweep points (Hz), bracketing all regime transitions for d=7
 # at F=0.99, p=0.001:
-#   ~63kHz (none → 2to1_pumping k=1,  eff_err 1.20% → 0.68%)
-#  ~126kHz (→ 2to1_recurrence k=2,    eff_err 0.68% → 0.47%)
-RATES_HZ=(20000 50000 80000 110000 150000 200000 300000 500000 800000)
-MODES=(xx_merge zz_merge xx_split zz_split)
+#   ~56kHz  (none → 2to1_pumping k=1,       eff 1.20% → 0.68%)
+#   ~83kHz  (→ 3to1_pumping k=1,            eff 0.68% → 0.54%)
+#  ~121kHz  (→ 2to1_recurrence k=2,         eff 0.54% → 0.47%)
+#
+# Use extra density around the three transition windows and only a few
+# plateau points afterward.
+RATES_HZ=(20000 50000 70000 80000 90000 110000 130000 180000 300000 500000)
+MODES=(xx_merge zz_merge)
 
 while [[ $# -gt 0 ]]; do
     case $1 in

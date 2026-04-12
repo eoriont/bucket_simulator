@@ -10,7 +10,7 @@ physical_error 0.001
 measurement_error 0.001
 reset_error 0.001
 
-total_shots 500K
+total_shots 2M
 mode monte_carlo
 
 T1 119
