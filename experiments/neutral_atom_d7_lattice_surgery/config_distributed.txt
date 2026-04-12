@@ -1,0 +1,32 @@
+# Neutral-atom distributed lattice-surgery config for d=7 LER sweeps.
+# run.sh overrides:
+#   - merge_type
+#   - experiment_phase
+#   - entanglement_rate
+#   - distillation_protocol / distillation_rounds / distillation_backup_batches
+#
+# ENR sweep covers 30kHz–600kHz, bracketing all regime transitions for d=7
+# (transitions at ~56kHz, 89kHz, 126kHz, 178kHz).
+
+code_distance 7
+merge_type distributed_xx
+merge_rounds 13
+distributed true
+
+physical_error 0.001
+measurement_error 0.001
+reset_error 0.001
+
+total_shots 100K
+mode monte_carlo
+target_faults_per_bucket 100
+calib_shots_per_bucket 500
+
+raw_epr_fidelity 0.99
+distillation_protocol none
+distillation_rounds 1
+distillation_backup_batches 1
+
+T1 119
+T2 12.6
+measurement_delay 500e-6

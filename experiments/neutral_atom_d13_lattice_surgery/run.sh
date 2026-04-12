@@ -292,21 +292,26 @@ run_job() {
         return 0
     fi
 
+    local tmp_out="$RUN_DIR/.tmp_out_${label}"
+    rm -rf "$tmp_out"
+    mkdir -p "$tmp_out"
+
     mpirun -n "$NUM_PROCS" "$SIMULATOR" \
         -config "$config_file" \
         -merge_type "$merge_type" \
         -experiment_phase "$phase" \
         "${extra_args[@]}" \
-        -output "$RESULTS_DIR" >> "$log_file" 2>&1
+        -output "$tmp_out" >> "$log_file" 2>&1
 
-    local latest
-    latest=$(ls -t "$RESULTS_DIR"/results_*.txt 2>/dev/null | head -1)
-    if [[ -n "$latest" ]]; then
-        mv "$latest" "$result_file"
+    local outfile
+    outfile=$(ls "$tmp_out"/*.txt 2>/dev/null | head -1)
+    if [[ -n "$outfile" ]]; then
+        mv "$outfile" "$result_file"
     else
         echo "$label" >> "$FAIL_FILE"
         echo "  Warning: no result file found for $label" >> "$log_file"
     fi
+    rmdir "$tmp_out" 2>/dev/null || true
 }
 
 # ---------- main loop ------------------------------------------------------

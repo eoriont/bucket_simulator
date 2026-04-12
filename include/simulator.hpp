@@ -114,7 +114,8 @@ private:
     void initialize_lattice_surgery_circuit();
     void initialize_distributed_lattice_surgery_circuit();
     void initialize_decoder();
-    void inject_interconnect_noise();
+    void inject_local_noise();      // DEPOLARIZE2(physical_error) on all CX — monolithic + distributed
+    void inject_remote_noise();     // extra DEPOLARIZE2 on crossing CX + noise summary — distributed only
     void inject_entanglement_idling_noise();
     uint32_t count_remote_cnots_in_cycle();
 

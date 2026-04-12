@@ -1,11 +1,11 @@
-# Neutral-atom monolithic lattice-surgery base config for d=5 sweeps.
+# Neutral-atom monolithic lattice-surgery config for d=7 baseline.
 # run.sh overrides:
 #   - merge_type
 #   - experiment_phase
 
-code_distance 5
+code_distance 7
 merge_type xx
-merge_rounds 5
+merge_rounds 13
 distributed false
 
 physical_error 0.001
@@ -17,6 +17,6 @@ mode monte_carlo
 target_faults_per_bucket 100
 calib_shots_per_bucket 500
 
-T1 125e-6
-T2 200e-6
-measurement_delay 5e-6
+T1 119
+T2 12.6
+measurement_delay 500e-6

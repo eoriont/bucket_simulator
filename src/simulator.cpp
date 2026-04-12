@@ -116,7 +116,7 @@ void SurfaceCodeSimulator::initialize_circuit() {
     circuit_ = stim::generate_surface_code_circuit(params).circuit;
 
     // Inject interconnect noise if distributed
-    inject_interconnect_noise();
+    inject_remote_noise();
 
     // Inject entanglement-limited idling noise if distributed
     inject_entanglement_idling_noise();
@@ -149,6 +149,9 @@ void SurfaceCodeSimulator::initialize_lattice_surgery_circuit() {
     // Generate the circuit
     circuit_ = ls_circuit.generate();
 
+    // Inject physical noise on all CX gates
+    inject_local_noise();
+
     if (mpi_rank_ == 0) {
         std::cerr << "Lattice surgery circuit generated:" << std::endl;
         std::cerr << "  Total qubits: " << circuit_.count_qubits() << std::endl;
@@ -171,13 +174,13 @@ void SurfaceCodeSimulator::initialize_distributed_lattice_surgery_circuit() {
     circuit_ = dls_circuit.generate();
     distributed_remote_cnots_per_cycle_override_ = dls_circuit.remote_cnots_per_merge_round();
 
-    // Seed annotated string with pragma polygons so inject_interconnect_noise
-    // preserves them when rewriting the circuit text.
+    // Seed annotated string with pragma polygons so the noise injection
+    // functions preserve them when rewriting the circuit text.
     annotated_circuit_str_ = dls_circuit.annotated_stim_str();
 
-    // Inject interconnect noise (remote merge CNOTs get fidelity-derived error,
-    // local merge CNOTs get physical_error)
-    inject_interconnect_noise();
+    // Inject physical noise on all CX gates, then additional remote-CNOT error
+    inject_local_noise();
+    inject_remote_noise();
 
     // Inject entanglement-limited idling noise if configured
     inject_entanglement_idling_noise();
@@ -212,7 +215,54 @@ void SurfaceCodeSimulator::initialize_decoder() {
     }
 }
 
-void SurfaceCodeSimulator::inject_interconnect_noise() {
+// ---------------------------------------------------------------------------
+// inject_local_noise: DEPOLARIZE2(physical_error) on every CX in the circuit.
+// Called for both monolithic and distributed lattice surgery circuits.
+// ---------------------------------------------------------------------------
+void SurfaceCodeSimulator::inject_local_noise() {
+    if (config_.physical_error <= 0) {
+        return;
+    }
+
+    double local_error = config_.physical_error;
+
+    std::string circuit_str = annotated_circuit_str_.empty()
+        ? circuit_.str() : annotated_circuit_str_;
+    std::istringstream iss(circuit_str);
+    std::ostringstream oss;
+
+    std::string line;
+    while (std::getline(iss, line)) {
+        oss << line << "\n";
+        if (line.find("CX ") == 0 || line.find("CNOT ") == 0) {
+            std::istringstream line_stream(line);
+            std::string gate;
+            line_stream >> gate;
+            std::vector<std::pair<uint32_t, uint32_t>> pairs;
+            uint32_t ctrl, tgt;
+            while (line_stream >> ctrl >> tgt) {
+                pairs.push_back({ctrl, tgt});
+            }
+            if (!pairs.empty()) {
+                oss << "DEPOLARIZE2(" << local_error << ")";
+                for (const auto& p : pairs) {
+                    oss << " " << p.first << " " << p.second;
+                }
+                oss << "\n";
+            }
+        }
+    }
+
+    annotated_circuit_str_ = oss.str();
+    circuit_ = stim::Circuit(oss.str().c_str());
+}
+
+// ---------------------------------------------------------------------------
+// inject_remote_noise: additional DEPOLARIZE2 on CX pairs that cross the QPU
+// boundary, derived from the distillation noise model. Also populates the
+// noise summary. Called only for distributed circuits.
+// ---------------------------------------------------------------------------
+void SurfaceCodeSimulator::inject_remote_noise() {
     if (!config_.distributed) {
         return;
     }
@@ -227,10 +277,7 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
         remote_only_error = 0.0;
     }
 
-    // Keep interconnect_error as an extra independent error source after the
-    // effective-channel / accurate-RCX calculation so legacy configs remain explicit.
     if (!config_.monolithic_baseline && config_.interconnect_error > 0) {
-        // p_total = 1 - (1-p_remote)(1-p_interconnect)
         total_remote_error = 1.0 - (1.0 - remote_noise.remote_cnot_error) * (1.0 - config_.interconnect_error);
         remote_only_error = total_remote_error;
     }
@@ -264,7 +311,7 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
         std::cerr << "  Extra injected remote-only error: " << remote_only_error << std::endl;
     }
 
-    // Populate noise summary (remote CNOT fields)
+    // Populate noise summary
     noise_summary_.effective_distillation_protocol = remote_noise.effective_distillation_protocol;
     noise_summary_.accurate_rcx_enabled     = config_.accurate_rcx;
     noise_summary_.distillation_feasible    = remote_noise.distillation_feasible;
@@ -282,22 +329,13 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
     noise_summary_.distillation_qubits_required = remote_noise.distillation_qubits_required;
     noise_summary_.monolithic_equivalent_qubits = remote_noise.monolithic_equivalent_qubits;
 
-    if (remote_only_error <= 0 && config_.physical_error <= 0) {
-        return;  // No error to inject
+    if (remote_only_error <= 0) {
+        return;
     }
 
-    // Get qubit coordinate mapping
     auto coords = circuit_.get_final_qubit_coords();
-
-    // Determine split position (boundary between QPU A and QPU B)
-    // QPU A owns x <= split_x, QPU B owns x > split_x.
-    // Merge ancillas at x = split_x are on QPU A.
     double split_x = config_.code_distance;
 
-    // Local gate error for merge CNOTs that don't cross the boundary
-    double local_error = config_.physical_error;
-
-    // Use pragma-annotated string if available, otherwise raw circuit
     std::string circuit_str = annotated_circuit_str_.empty()
         ? circuit_.str() : annotated_circuit_str_;
     std::istringstream iss(circuit_str);
@@ -305,59 +343,33 @@ void SurfaceCodeSimulator::inject_interconnect_noise() {
 
     std::string line;
     while (std::getline(iss, line)) {
-        // Check if this line is a CX/CNOT instruction
+        oss << line << "\n";
         if (line.find("CX ") == 0 || line.find("CNOT ") == 0) {
-            // Parse qubit pairs from the line
             std::istringstream line_stream(line);
             std::string gate;
-            line_stream >> gate;  // Read CX or CNOT
-
-            std::vector<std::pair<uint32_t, uint32_t>> all_pairs;
+            line_stream >> gate;
             std::vector<std::pair<uint32_t, uint32_t>> remote_pairs;
             uint32_t ctrl, tgt;
             while (line_stream >> ctrl >> tgt) {
-                all_pairs.push_back({ctrl, tgt});
                 if (coords.count(ctrl) && coords.count(tgt)) {
                     double ctrl_x = coords[ctrl][0];
-                    double tgt_x = coords[tgt][0];
-
-                    // Remote: one qubit on QPU A (x <= split_x), other on QPU B (x > split_x)
-                    bool crosses = (ctrl_x <= split_x && tgt_x > split_x) ||
-                                  (ctrl_x > split_x && tgt_x <= split_x);
-                    if (crosses) {
-                        remote_pairs.push_back({ctrl, tgt});
-                    }
+                    double tgt_x  = coords[tgt][0];
+                    bool crosses  = (ctrl_x <= split_x && tgt_x > split_x) ||
+                                    (ctrl_x > split_x  && tgt_x <= split_x);
+                    if (crosses) remote_pairs.push_back({ctrl, tgt});
                 }
             }
-
-            oss << line << "\n";
-
-            // Baseline DEPOLARIZE2(physical_error) on ALL CX pairs
-            if (!all_pairs.empty() && local_error > 0) {
-                oss << "DEPOLARIZE2(" << local_error << ")";
-                for (const auto& pair : all_pairs) {
-                    oss << " " << pair.first << " " << pair.second;
-                }
-                oss << "\n";
-            }
-
-            // Additional DEPOLARIZE2(remote_error) on remote pairs only
-            if (!remote_pairs.empty() && remote_only_error > 0) {
+            if (!remote_pairs.empty()) {
                 oss << "DEPOLARIZE2(" << remote_only_error << ")";
-                for (const auto& pair : remote_pairs) {
-                    oss << " " << pair.first << " " << pair.second;
+                for (const auto& p : remote_pairs) {
+                    oss << " " << p.first << " " << p.second;
                 }
                 oss << "  # interconnect (" << remote_pairs.size() << " remote CX)\n";
             }
-        } else {
-            oss << line << "\n";
         }
     }
 
-    // Save annotated text (with comments) before parsing, since Stim strips comments
     annotated_circuit_str_ = oss.str();
-
-    // Parse modified circuit
     circuit_ = stim::Circuit(oss.str().c_str());
 }
 

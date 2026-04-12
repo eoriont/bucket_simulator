@@ -1,0 +1,18 @@
+# Neutral-atom monolithic lattice-surgery config — d=11 baseline.
+# run.sh overrides merge_type per mode.
+
+code_distance 11
+merge_type xx
+merge_rounds 21
+distributed false
+
+physical_error 0.001
+measurement_error 0.001
+reset_error 0.001
+
+total_shots 500K
+mode monte_carlo
+
+T1 119
+T2 12.6
+measurement_delay 500e-6

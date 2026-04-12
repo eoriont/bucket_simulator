@@ -1,17 +1,13 @@
 #!/bin/bash
 #
-# Neutral-atom d=5 lattice-surgery sweep.
+# Neutral-atom d=7 lattice-surgery LER sweep.
 # Covers:
-#   - monolithic baseline
-#   - distributed lattice surgery
-# Across:
-#   - xx_merge
-#   - zz_merge
-#   - xx_split
-#   - zz_split
+#   - monolithic baseline (ENR-independent, once per mode)
+#   - distributed: all feasible (protocol, k, m) combinations at each ENR point
 #
-# The distributed sweep spans entanglement generation rates from 1-100 kHz.
-# The monolithic baseline is ENR-independent, so it is run once per mode.
+# Feasible combos are computed at runtime via compute_combos.py using the RADar
+# math from rcx_regime_sweep/sweep_optimal_rcx.py — parameters come from the
+# distributed config file, so changing the config automatically changes the sweep.
 #
 # Usage:
 #   ./run.sh [options]
@@ -23,9 +19,6 @@
 #   --circuits-only        Dump circuits instead of running simulations
 #   --resume RUN_DIR       Resume an existing run directory
 #   --shots SHOTS          Override total_shots, e.g. 10K
-#   --protocol NAME        Override distillation protocol for distributed runs
-#   --dist-rounds K        Override distillation rounds for distributed runs
-#   --backup-batches M     Override distillation backup batches for distributed runs
 
 set -e
 
@@ -41,15 +34,15 @@ DRY_RUN=false
 CIRCUITS_ONLY=false
 SHOTS=""
 RESUME_RUN_DIR=""
-DISTILLATION_PROTOCOL=""
-DISTILLATION_ROUNDS=""
-DISTILLATION_BACKUP_BATCHES=""
-DISTANCE=5
+DISTANCE=7
+MAX_ROUNDS=5
 
-# 1-100 kHz sweep, spaced to cover the low-rate regime without exploding run count.
-RATES_HZ=(1000 2000 5000 10000 20000 50000 100000)
+# ENR sweep points (Hz), bracketing all regime transitions for d=7
+# at F=0.99, p=0.001:
+#   ~63kHz (none → 2to1_pumping k=1,  eff_err 1.20% → 0.68%)
+#  ~126kHz (→ 2to1_recurrence k=2,    eff_err 0.68% → 0.47%)
+RATES_HZ=(20000 50000 80000 110000 150000 200000 300000 500000 800000)
 MODES=(xx_merge zz_merge xx_split zz_split)
-ARCHS=(monolithic distributed)
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -59,13 +52,19 @@ while [[ $# -gt 0 ]]; do
         --circuits-only)  CIRCUITS_ONLY=true; shift ;;
         --resume)         RESUME_RUN_DIR="$2"; shift 2 ;;
         --shots)          SHOTS="$2"; shift 2 ;;
-        --protocol)       DISTILLATION_PROTOCOL="$2"; shift 2 ;;
-        --dist-rounds)    DISTILLATION_ROUNDS="$2"; shift 2 ;;
-        --backup-batches) DISTILLATION_BACKUP_BATCHES="$2"; shift 2 ;;
-        -h|--help)        head -33 "$0" | tail -31; exit 0 ;;
+        -h|--help)        head -27 "$0" | tail -25; exit 0 ;;
         *) echo "Unknown option: $1"; exit 1 ;;
     esac
 done
+
+# ---------- helpers --------------------------------------------------------
+
+enr_combos() {
+    python3 "$SCRIPT_DIR/compute_combos.py" \
+        --config "$DISTRIBUTED_CONFIG" \
+        --enr "$1" \
+        --max-rounds "$MAX_ROUNDS"
+}
 
 mode_merge_type() {
     local arch="$1"
@@ -98,10 +97,15 @@ job_label() {
     local arch="$1"
     local mode="$2"
     local rate_hz="$3"
+    local protocol="$4"
+    local rounds="$5"
+    local batches="$6"
     if [[ "$arch" == "monolithic" ]]; then
         echo "${arch}_${mode}_d${DISTANCE}"
+    elif [[ "$protocol" == "none" ]]; then
+        echo "${arch}_${mode}_none_$(rate_label "$rate_hz")_d${DISTANCE}"
     else
-        echo "${arch}_${mode}_$(rate_label "$rate_hz")_d${DISTANCE}"
+        echo "${arch}_${mode}_${protocol}_k${rounds}_m${batches}_$(rate_label "$rate_hz")_d${DISTANCE}"
     fi
 }
 
@@ -114,6 +118,8 @@ job_is_done() {
     fi
 }
 
+# ---------- pre-flight checks ----------------------------------------------
+
 if [[ ! -x "$SIMULATOR" ]]; then
     echo "Error: simulator not found at $SIMULATOR"
     echo "Build first: cd $PROJECT_ROOT/build && make"
@@ -124,6 +130,8 @@ if [[ ! -f "$MONOLITHIC_CONFIG" || ! -f "$DISTRIBUTED_CONFIG" ]]; then
     echo "Error: expected base configs not found in $SCRIPT_DIR"
     exit 1
 fi
+
+# ---------- run directory --------------------------------------------------
 
 if [[ -n "$RESUME_RUN_DIR" ]]; then
     RUN_DIR="$RESUME_RUN_DIR"
@@ -138,12 +146,20 @@ CIRCUITS_DIR="$RUN_DIR/circuits"
 LOGS_DIR="$RUN_DIR/logs"
 mkdir -p "$RESULTS_DIR" "$CIRCUITS_DIR" "$LOGS_DIR"
 
-TOTAL_CONFIGS=$(( ${#MODES[@]} + (${#MODES[@]} * ${#RATES_HZ[@]}) ))
+TOTAL_MONO=${#MODES[@]}
+TOTAL_DIST=0
+for rate_hz in "${RATES_HZ[@]}"; do
+    combos_str=$(enr_combos "$rate_hz")
+    n_combos=$(echo "$combos_str" | wc -w)
+    TOTAL_DIST=$(( TOTAL_DIST + n_combos * ${#MODES[@]} ))
+done
+TOTAL_CONFIGS=$(( TOTAL_MONO + TOTAL_DIST ))
+
 FAIL_FILE="$RUN_DIR/failed.txt"
 : > "$FAIL_FILE"
 
 echo "=============================================="
-echo "Neutral-Atom d=5 Lattice Surgery Sweep"
+echo "Neutral-Atom d=7 Lattice Surgery LER Sweep"
 echo "=============================================="
 echo "Run ID:    $TIMESTAMP"
 echo "Output:    $RUN_DIR"
@@ -151,18 +167,16 @@ echo "Distance:  $DISTANCE"
 echo "Modes:     ${MODES[*]}"
 echo "Rates:     ${RATES_HZ[*]}"
 echo "Shots:     ${SHOTS:-from config}"
-echo "Protocol:  ${DISTILLATION_PROTOCOL:-from distributed config}"
-echo "Rounds k:  ${DISTILLATION_ROUNDS:-from distributed config}"
-echo "Batches m: ${DISTILLATION_BACKUP_BATCHES:-from distributed config}"
+echo "MaxRounds: $MAX_ROUNDS"
 echo "Circuits:  $CIRCUITS_ONLY"
 echo "MPI:       $NUM_PROCS processes"
 echo "Parallel:  $PARALLEL_JOBS"
-echo "Configs:   $TOTAL_CONFIGS"
+echo "Jobs:      $TOTAL_CONFIGS  (${TOTAL_MONO} monolithic + ${TOTAL_DIST} distributed)"
 [[ -n "$RESUME_RUN_DIR" ]] && echo "Resume:    yes"
 echo "=============================================="
 
 cat > "$RUN_DIR/metadata.txt" <<EOF
-Experiment: neutral_atom_d5_lattice_surgery
+Experiment: neutral_atom_d7_lattice_surgery
 Run ID: $TIMESTAMP
 Started: $(date)
 Monolithic config: $MONOLITHIC_CONFIG
@@ -171,15 +185,16 @@ Distance: $DISTANCE
 MPI Processes: $NUM_PROCS
 Parallel Jobs: $PARALLEL_JOBS
 Shots override: ${SHOTS:-none}
-Distillation protocol override: ${DISTILLATION_PROTOCOL:-none}
-Distillation rounds override: ${DISTILLATION_ROUNDS:-none}
-Distillation backup batches override: ${DISTILLATION_BACKUP_BATCHES:-none}
+Max distillation rounds: $MAX_ROUNDS
 Circuits only: $CIRCUITS_ONLY
 Modes: ${MODES[*]}
 Distributed entanglement rates (Hz): ${RATES_HZ[*]}
+Total jobs: $TOTAL_CONFIGS
 Host: $(hostname)
 Simulator: $SIMULATOR
 EOF
+
+# ---------- run_job --------------------------------------------------------
 
 run_job() {
     local idx="$1"
@@ -187,6 +202,9 @@ run_job() {
     local arch="$3"
     local mode="$4"
     local rate_hz="$5"
+    local protocol="${6:-}"
+    local rounds="${7:-}"
+    local batches="${8:-}"
     local config_file
     local label
     local merge_type
@@ -203,7 +221,7 @@ run_job() {
         config_file="$DISTRIBUTED_CONFIG"
     fi
 
-    label=$(job_label "$arch" "$mode" "$rate_hz")
+    label=$(job_label "$arch" "$mode" "$rate_hz" "$protocol" "$rounds" "$batches")
     merge_type=$(mode_merge_type "$arch" "$mode")
     phase=$(mode_phase "$mode")
     result_file="$RESULTS_DIR/${label}_results.txt"
@@ -214,13 +232,13 @@ run_job() {
     [[ -n "$SHOTS" ]] && extra_args+=(-total_shots "$SHOTS")
     if [[ "$arch" == "distributed" ]]; then
         extra_args+=(-entanglement_rate "$rate_hz")
-        [[ -n "$DISTILLATION_PROTOCOL" ]] && extra_args+=(-distillation_protocol "$DISTILLATION_PROTOCOL")
-        [[ -n "$DISTILLATION_ROUNDS" ]] && extra_args+=(-distillation_rounds "$DISTILLATION_ROUNDS")
-        [[ -n "$DISTILLATION_BACKUP_BATCHES" ]] && extra_args+=(-distillation_backup_batches "$DISTILLATION_BACKUP_BATCHES")
+        extra_args+=(-distillation_protocol "$protocol")
+        extra_args+=(-distillation_rounds "$rounds")
+        extra_args+=(-distillation_backup_batches "$batches")
     fi
 
     if job_is_done "$label"; then
-        echo "[SKIP $idx/$total] $label (already complete)"
+        echo "[SKIP $idx/$total] $label"
         return 0
     fi
 
@@ -237,9 +255,9 @@ run_job() {
         echo "    -experiment_phase $phase \\"
         if [[ "$arch" == "distributed" ]]; then
             echo "    -entanglement_rate $rate_hz \\"
-            [[ -n "$DISTILLATION_PROTOCOL" ]] && echo "    -distillation_protocol $DISTILLATION_PROTOCOL \\"
-            [[ -n "$DISTILLATION_ROUNDS" ]] && echo "    -distillation_rounds $DISTILLATION_ROUNDS \\"
-            [[ -n "$DISTILLATION_BACKUP_BATCHES" ]] && echo "    -distillation_backup_batches $DISTILLATION_BACKUP_BATCHES \\"
+            echo "    -distillation_protocol $protocol \\"
+            echo "    -distillation_rounds $rounds \\"
+            echo "    -distillation_backup_batches $batches \\"
         fi
         [[ -n "$SHOTS" ]] && echo "    -total_shots $SHOTS \\"
         if [[ "$CIRCUITS_ONLY" == "true" ]]; then
@@ -272,36 +290,49 @@ run_job() {
         return 0
     fi
 
+    # Use a per-job temp output dir so the simulator's timestamped filename
+    # is unambiguous even when jobs run in parallel.
+    local tmp_out="$RUN_DIR/.tmp_out_${label}"
+    rm -rf "$tmp_out"
+    mkdir -p "$tmp_out"
+
     mpirun -n "$NUM_PROCS" "$SIMULATOR" \
         -config "$config_file" \
         -merge_type "$merge_type" \
         -experiment_phase "$phase" \
         "${extra_args[@]}" \
-        -output "$RESULTS_DIR" >> "$log_file" 2>&1
+        -output "$tmp_out" >> "$log_file" 2>&1
 
-    local latest
-    latest=$(ls -t "$RESULTS_DIR"/results_*.txt 2>/dev/null | head -1)
-    if [[ -n "$latest" ]]; then
-        mv "$latest" "$result_file"
+    local outfile
+    outfile=$(ls "$tmp_out"/*.txt 2>/dev/null | head -1)
+    if [[ -n "$outfile" ]]; then
+        mv "$outfile" "$result_file"
     else
         echo "$label" >> "$FAIL_FILE"
         echo "  Warning: no result file found for $label" >> "$log_file"
     fi
+    rmdir "$tmp_out" 2>/dev/null || true
 }
 
+# ---------- main loop ------------------------------------------------------
+
 TASK_INDEX=0
-TOTAL_JOBS=$TOTAL_CONFIGS
 
 for mode in "${MODES[@]}"; do
     TASK_INDEX=$((TASK_INDEX + 1))
-    run_job "$TASK_INDEX" "$TOTAL_JOBS" monolithic "$mode" 0
+    run_job "$TASK_INDEX" "$TOTAL_CONFIGS" monolithic "$mode" 0
 done
 
-for mode in "${MODES[@]}"; do
-    for rate_hz in "${RATES_HZ[@]}"; do
-        TASK_INDEX=$((TASK_INDEX + 1))
-        run_job "$TASK_INDEX" "$TOTAL_JOBS" distributed "$mode" "$rate_hz"
+for rate_hz in "${RATES_HZ[@]}"; do
+    combos_str=$(enr_combos "$rate_hz")
+    for combo in $combos_str; do
+        IFS=':' read -r protocol rounds batches <<< "$combo"
+        for mode in "${MODES[@]}"; do
+            TASK_INDEX=$((TASK_INDEX + 1))
+            run_job "$TASK_INDEX" "$TOTAL_CONFIGS" distributed "$mode" "$rate_hz" "$protocol" "$rounds" "$batches"
+        done
     done
 done
 
-echo "Prepared experiment in $RUN_DIR"
+echo ""
+echo "Done. Results in $RUN_DIR"

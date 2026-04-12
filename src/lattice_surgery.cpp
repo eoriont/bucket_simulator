@@ -655,6 +655,26 @@ void LatticeSurgeryCircuit::generate_general_circuit() {
 
     // ====== Final measurement of all data qubits ======
     circuit_.safe_append_u("M", data_qubits, {});
+
+    // ====== Logical observable ======
+    // Z logical of patch A = product of Z on the leftmost column of patch A (x ≈ 0.5).
+    // These data qubits are measured last (in the M data_qubits instruction above).
+    // Find data qubits at x = min_x + 0.5 (leftmost half-integer column).
+    double min_x = 1e9;
+    for (uint32_t qi : data_qubits) {
+        if (qubits_[qi].x < min_x) min_x = qubits_[qi].x;
+    }
+    std::vector<uint32_t> obs_records;
+    size_t N = data_qubits.size();
+    for (size_t i = 0; i < N; i++) {
+        if (std::abs(qubits_[data_qubits[i]].x - min_x) < 0.1) {
+            int32_t offset = -(int32_t)(N - i);
+            obs_records.push_back(rec(offset));
+        }
+    }
+    if (!obs_records.empty()) {
+        circuit_.safe_append_u("OBSERVABLE_INCLUDE", obs_records, {0});
+    }
 }
 
 void LatticeSurgeryCircuit::generate_d3_circuit() {

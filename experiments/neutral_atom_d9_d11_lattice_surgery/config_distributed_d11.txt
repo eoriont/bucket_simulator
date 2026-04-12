@@ -1,0 +1,31 @@
+# Neutral-atom distributed lattice-surgery config — d=11 ENR sweep.
+# run.sh overrides merge_type, entanglement_rate, distillation_protocol,
+# distillation_rounds, distillation_backup_batches per job.
+#
+# ENR sweep covers 30kHz–1MHz, bracketing all regime transitions for d=11
+# at F=0.99, p=0.001:
+#  ~100kHz  (none → 2to1_pumping k=1,         eff 1.20% → 0.68%)
+#  ~133kHz  (→ 3to1_pumping k=1,              eff 0.68% → 0.54%)
+#  ~178kHz  (→ 2to1_recurrence k=2,           eff 0.54% → 0.47%)
+#  ~422kHz  (→ 3to1_recurrence k=2,           eff 0.47% → 0.30%)
+
+code_distance 11
+merge_type distributed_xx
+merge_rounds 21
+distributed true
+
+physical_error 0.001
+measurement_error 0.001
+reset_error 0.001
+
+total_shots 500K
+mode monte_carlo
+
+raw_epr_fidelity 0.99
+distillation_protocol none
+distillation_rounds 1
+distillation_backup_batches 1
+
+T1 119
+T2 12.6
+measurement_delay 500e-6
