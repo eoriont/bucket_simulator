@@ -1,0 +1,56 @@
+{
+  "source": "simple_split_only",
+  "circuit_k": 2,
+  "distance_k": 2,
+  "circuit_distance": 5,
+  "approx_distance": 5,
+  "basis": "X",
+  "physical_error": 0.001,
+  "mode": "monolithic_baseline_with_measurement_delay",
+  "mpi_ranks": 2,
+  "batch_shots": 50,
+  "shots_per_point": 100,
+  "default_round_schedule": {
+    "pre_rounds": 2,
+    "merge_rounds": 5,
+    "post_rounds": 2
+  },
+  "sweep": {
+    "pre_rounds": [
+      2
+    ],
+    "merge_rounds": [
+      5
+    ],
+    "post_rounds": [
+      2
+    ]
+  },
+  "naming": {
+    "circuit_k_meaning": "TQEC spatial scale parameter with distance d = 2*circuit_k + 1",
+    "distillation_k_meaning": "Distillation depth; in code/config this is stored as distillation_rounds"
+  },
+  "results": [
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_split_only_x_k2_pre2_merge5_post2.monolithic.stim",
+      "shots": 100,
+      "batch_shots": 50,
+      "qubits": 127,
+      "detectors": 660,
+      "observables": 1,
+      "logical_failures": 0,
+      "logical_error_rate": 0.0,
+      "runtime_seconds": 0.002240896224975586,
+      "detector_validation": "passed",
+      "mpi": {
+        "enabled": true,
+        "ranks": 2,
+        "mpi4py_available": true,
+        "total_batches": 2
+      },
+      "pre_rounds": 2,
+      "merge_rounds": 5,
+      "post_rounds": 2
+    }
+  ]
+}

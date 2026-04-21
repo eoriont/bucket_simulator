@@ -1,0 +1,18 @@
+{
+  "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_split_x_k2_pre2_merge5_post2.monolithic.stim",
+  "shots": 10000000,
+  "batch_shots": 250000,
+  "qubits": 127,
+  "detectors": 660,
+  "observables": 1,
+  "logical_failures": 181,
+  "logical_error_rate": 1.81e-05,
+  "runtime_seconds": 9.58253288269043,
+  "detector_validation": "passed",
+  "mpi": {
+    "enabled": true,
+    "ranks": 8,
+    "mpi4py_available": true,
+    "total_batches": 40
+  }
+}

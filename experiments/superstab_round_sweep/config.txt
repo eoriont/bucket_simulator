@@ -1,0 +1,21 @@
+# Base config for superstabilizer round sweep.
+# merge_type, experiment_phase, superstabilizers, merge_rounds, and entanglement_rate
+# are set per-run via CLI args in run.sh.
+code_distance 9
+merge_type distributed_xx
+merge_rounds 9
+distributed true
+physical_error 0.001
+measurement_error 0.001
+reset_error 0.001
+total_shots 300K
+mode monte_carlo
+target_faults_per_bucket 100
+calib_shots_per_bucket 500
+raw_epr_fidelity 0.99
+distillation_protocol none
+distillation_rounds 1
+distillation_backup_batches 1
+T1 125e-6
+T2 200e-6
+measurement_delay 660e-9

@@ -1,0 +1,11 @@
+{
+  "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r10.monolithic.stim",
+  "shots": 5000000,
+  "qubits": 127,
+  "detectors": 1506,
+  "observables": 1,
+  "logical_failures": 0,
+  "logical_error_rate": 0.0,
+  "runtime_seconds": 52.58713507652283,
+  "detector_validation": "passed"
+}

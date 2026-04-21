@@ -27,7 +27,9 @@ void print_usage(const char* program_name) {
     std::cout << "  -entanglement_rate <Hz>     Override entanglement rate (e.g. 25e6)" << std::endl;
     std::cout << "  -total_shots <N>            Override total shots (e.g. 10K)" << std::endl;
     std::cout << "  -superstabilizers <spec>    Override superstabilizers (e.g. \"(5.5,0.5)\" or \"none\")" << std::endl;
+    std::cout << "  -pre_merge_rounds <N>       Override number of pre-merge rounds" << std::endl;
     std::cout << "  -merge_rounds <N>           Override number of merge rounds" << std::endl;
+    std::cout << "  -post_merge_rounds <N>      Override number of post-merge rounds" << std::endl;
     std::cout << "  -merge_type <type>          Override merge type: xx, zz, distributed_xx, distributed_zz" << std::endl;
     std::cout << "  -experiment_phase <phase>   Override experiment phase: merge_only, split_only, merge_and_split" << std::endl;
     std::cout << "  -monolithic_baseline        Distributed LS baseline: remote CX matches local p, idling disabled" << std::endl;
@@ -117,6 +119,15 @@ void write_output_file(
                 config.experiment_phase == bucket_sim::ExperimentPhase::SPLIT_ONLY   ? "split_only" :
                                                                                         "merge_and_split";
             outfile << "  Experiment Phase: " << phase_str << std::endl;
+            const uint32_t pre_rounds =
+                config.experiment_phase == bucket_sim::ExperimentPhase::SPLIT_ONLY ? 0 :
+                (config.pre_merge_rounds > 0 ? config.pre_merge_rounds : 1);
+            const uint32_t merge_rounds = config.merge_rounds > 0 ? config.merge_rounds : config.code_distance;
+            const uint32_t post_rounds =
+                config.experiment_phase == bucket_sim::ExperimentPhase::MERGE_ONLY ? 0 :
+                (config.post_merge_rounds > 0 ? config.post_merge_rounds : 1);
+            outfile << "  Round Schedule (pre, merge, post): ("
+                    << pre_rounds << ", " << merge_rounds << ", " << post_rounds << ")" << std::endl;
         }
 
         // Superstabilizers
@@ -241,7 +252,9 @@ int main(int argc, char** argv) {
     std::optional<double> override_entanglement_rate;
     std::optional<uint64_t> override_total_shots;
     std::optional<std::vector<std::pair<double,double>>> override_superstabilizers;
+    std::optional<uint32_t> override_pre_merge_rounds;
     std::optional<uint32_t> override_merge_rounds;
+    std::optional<uint32_t> override_post_merge_rounds;
     std::optional<bucket_sim::MergeType> override_merge_type;
     std::optional<uint32_t> override_code_distance;
     bool enable_accurate_rcx = false;
@@ -265,8 +278,12 @@ int main(int argc, char** argv) {
             override_total_shots = bucket_sim::parse_magnitude(argv[++i]);
         } else if (arg == "-superstabilizers" && i + 1 < argc) {
             override_superstabilizers = bucket_sim::parse_superstabilizers(argv[++i]);
+        } else if (arg == "-pre_merge_rounds" && i + 1 < argc) {
+            override_pre_merge_rounds = static_cast<uint32_t>(std::stoul(argv[++i]));
         } else if (arg == "-merge_rounds" && i + 1 < argc) {
             override_merge_rounds = static_cast<uint32_t>(std::stoul(argv[++i]));
+        } else if (arg == "-post_merge_rounds" && i + 1 < argc) {
+            override_post_merge_rounds = static_cast<uint32_t>(std::stoul(argv[++i]));
         } else if (arg == "-merge_type" && i + 1 < argc) {
             std::string value = argv[++i];
             if (value == "none") {
@@ -362,8 +379,14 @@ int main(int argc, char** argv) {
         if (override_superstabilizers.has_value()) {
             config.superstabilizers = override_superstabilizers.value();
         }
+        if (override_pre_merge_rounds.has_value()) {
+            config.pre_merge_rounds = override_pre_merge_rounds.value();
+        }
         if (override_merge_rounds.has_value()) {
             config.merge_rounds = override_merge_rounds.value();
+        }
+        if (override_post_merge_rounds.has_value()) {
+            config.post_merge_rounds = override_post_merge_rounds.value();
         }
         if (override_merge_type.has_value()) {
             config.merge_type = override_merge_type.value();

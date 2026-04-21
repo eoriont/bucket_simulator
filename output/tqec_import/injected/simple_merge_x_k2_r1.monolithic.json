@@ -1,0 +1,26 @@
+{
+  "split_axis": "y",
+  "split_value": 11.0,
+  "qubits": 127,
+  "detectors": 372,
+  "observables": 1,
+  "top_level_remote_pairs": 27,
+  "config": {
+    "physical_error": 0.001,
+    "interconnect_error": 0.0,
+    "accurate_rcx": false,
+    "channel_depolarization_error": null,
+    "raw_epr_fidelity": 0.99,
+    "distillation_protocol": "none",
+    "distillation_rounds": 1,
+    "distillation_backup_batches": 1,
+    "entanglement_rate": 100000000.0,
+    "measurement_delay": 6.6e-07,
+    "t1_coherence_time": 0.000125,
+    "t2_coherence_time": 0.0002,
+    "monolithic_baseline": true,
+    "split_axis": "auto",
+    "split_x": null
+  },
+  "sections": []
+}

@@ -1,0 +1,1245 @@
+{
+  "source": "simple_merge_only",
+  "basis": "X",
+  "physical_error": 0.001,
+  "measurement_delay": 6.6e-07,
+  "mpi_ranks": 8,
+  "batch_shots": 250000,
+  "shots_per_point": 100000,
+  "circuit_k": 2,
+  "rounds_per_phase": 6,
+  "deformation_modes": [
+    "none",
+    "lside",
+    "rside",
+    "twoside"
+  ],
+  "results": [
+    {
+      "deformation_mode": "none",
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k2_pre6_merge6_post0.stim",
+      "entanglement_rate_values": [
+        25000000.0,
+        50000000.0,
+        75000000.0,
+        100000000.0,
+        150000000.0,
+        200000000.0,
+        300000000.0,
+        500000000.0,
+        750000000.0,
+        1000000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 25000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr25000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr25000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr25000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 468,
+            "logical_error_rate": 0.00468,
+            "runtime_seconds": 0.12463712692260742,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 50000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 454,
+            "logical_error_rate": 0.00454,
+            "runtime_seconds": 0.11519217491149902,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 75000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr75000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr75000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr75000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 437,
+            "logical_error_rate": 0.00437,
+            "runtime_seconds": 0.09845709800720215,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 100000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 414,
+            "logical_error_rate": 0.00414,
+            "runtime_seconds": 0.10676789283752441,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 150000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr150000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr150000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr150000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 443,
+            "logical_error_rate": 0.00443,
+            "runtime_seconds": 0.10137796401977539,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 200000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr200000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr200000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr200000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 409,
+            "logical_error_rate": 0.00409,
+            "runtime_seconds": 0.09700131416320801,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 300000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr300000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr300000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr300000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 450,
+            "logical_error_rate": 0.0045,
+            "runtime_seconds": 0.10738801956176758,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 500000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr500000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr500000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr500000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 411,
+            "logical_error_rate": 0.00411,
+            "runtime_seconds": 0.10587716102600098,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 750000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr750000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr750000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr750000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 448,
+            "logical_error_rate": 0.00448,
+            "runtime_seconds": 0.0969550609588623,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 1000000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr1000000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr1000000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr1000000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 446,
+            "logical_error_rate": 0.00446,
+            "runtime_seconds": 0.09834504127502441,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        }
+      ],
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr1000000000.rawpairs.network_noisy.json"
+    },
+    {
+      "deformation_mode": "lside",
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k2_r6.lside.stim",
+      "entanglement_rate_values": [
+        25000000.0,
+        50000000.0,
+        75000000.0,
+        100000000.0,
+        150000000.0,
+        200000000.0,
+        300000000.0,
+        500000000.0,
+        750000000.0,
+        1000000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 25000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr25000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr25000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 48,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr25000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 978,
+            "observables": 1,
+            "logical_failures": 641,
+            "logical_error_rate": 0.00641,
+            "runtime_seconds": 0.16960787773132324,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 50000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr50000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr50000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 48,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr50000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 978,
+            "observables": 1,
+            "logical_failures": 665,
+            "logical_error_rate": 0.00665,
+            "runtime_seconds": 0.14541196823120117,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 75000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr75000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr75000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 48,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr75000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 978,
+            "observables": 1,
+            "logical_failures": 650,
+            "logical_error_rate": 0.0065,
+            "runtime_seconds": 0.13248395919799805,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 100000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr100000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr100000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 48,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr100000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 978,
+            "observables": 1,
+            "logical_failures": 681,
+            "logical_error_rate": 0.00681,
+            "runtime_seconds": 0.13338994979858398,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 150000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr150000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr150000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 48,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr150000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 978,
+            "observables": 1,
+            "logical_failures": 675,
+            "logical_error_rate": 0.00675,
+            "runtime_seconds": 0.12394309043884277,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 200000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr200000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr200000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 48,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr200000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 978,
+            "observables": 1,
+            "logical_failures": 659,
+            "logical_error_rate": 0.00659,
+            "runtime_seconds": 0.12352299690246582,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 300000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr300000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr300000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 48,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr300000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 978,
+            "observables": 1,
+            "logical_failures": 691,
+            "logical_error_rate": 0.00691,
+            "runtime_seconds": 0.12745881080627441,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 500000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr500000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr500000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 48,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr500000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 978,
+            "observables": 1,
+            "logical_failures": 671,
+            "logical_error_rate": 0.00671,
+            "runtime_seconds": 0.13825201988220215,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 750000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr750000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr750000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 48,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr750000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 978,
+            "observables": 1,
+            "logical_failures": 606,
+            "logical_error_rate": 0.00606,
+            "runtime_seconds": 0.13399505615234375,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 1000000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr1000000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr1000000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 48,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr1000000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 978,
+            "observables": 1,
+            "logical_failures": 689,
+            "logical_error_rate": 0.00689,
+            "runtime_seconds": 0.13333702087402344,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        }
+      ],
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.lside.enr1000000000.rawpairs.network_noisy.json"
+    },
+    {
+      "deformation_mode": "rside",
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k2_r6.rside.stim",
+      "entanglement_rate_values": [
+        25000000.0,
+        50000000.0,
+        75000000.0,
+        100000000.0,
+        150000000.0,
+        200000000.0,
+        300000000.0,
+        500000000.0,
+        750000000.0,
+        1000000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 25000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr25000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr25000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 64,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr25000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 970,
+            "observables": 1,
+            "logical_failures": 1026,
+            "logical_error_rate": 0.01026,
+            "runtime_seconds": 0.14273810386657715,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 50000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr50000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr50000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 64,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr50000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 970,
+            "observables": 1,
+            "logical_failures": 949,
+            "logical_error_rate": 0.00949,
+            "runtime_seconds": 0.1275160312652588,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 75000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr75000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr75000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 64,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr75000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 970,
+            "observables": 1,
+            "logical_failures": 949,
+            "logical_error_rate": 0.00949,
+            "runtime_seconds": 0.13455510139465332,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 100000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr100000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr100000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 64,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr100000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 970,
+            "observables": 1,
+            "logical_failures": 1002,
+            "logical_error_rate": 0.01002,
+            "runtime_seconds": 0.14895415306091309,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 150000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr150000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr150000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 64,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr150000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 970,
+            "observables": 1,
+            "logical_failures": 977,
+            "logical_error_rate": 0.00977,
+            "runtime_seconds": 0.13442111015319824,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 200000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr200000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr200000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 64,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr200000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 970,
+            "observables": 1,
+            "logical_failures": 982,
+            "logical_error_rate": 0.00982,
+            "runtime_seconds": 0.14075899124145508,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 300000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr300000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr300000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 64,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr300000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 970,
+            "observables": 1,
+            "logical_failures": 966,
+            "logical_error_rate": 0.00966,
+            "runtime_seconds": 0.1849069595336914,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 500000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr500000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr500000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 64,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr500000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 970,
+            "observables": 1,
+            "logical_failures": 977,
+            "logical_error_rate": 0.00977,
+            "runtime_seconds": 0.14346694946289062,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 750000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr750000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr750000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 64,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr750000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 970,
+            "observables": 1,
+            "logical_failures": 978,
+            "logical_error_rate": 0.00978,
+            "runtime_seconds": 0.1560981273651123,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 1000000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr1000000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr1000000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 64,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr1000000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 970,
+            "observables": 1,
+            "logical_failures": 981,
+            "logical_error_rate": 0.00981,
+            "runtime_seconds": 0.12908506393432617,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        }
+      ],
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.rside.enr1000000000.rawpairs.network_noisy.json"
+    },
+    {
+      "deformation_mode": "twoside",
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k2_r6.twoside.stim",
+      "entanglement_rate_values": [
+        25000000.0,
+        50000000.0,
+        75000000.0,
+        100000000.0,
+        150000000.0,
+        200000000.0,
+        300000000.0,
+        500000000.0,
+        750000000.0,
+        1000000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 25000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr25000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr25000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 40,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr25000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 946,
+            "observables": 1,
+            "logical_failures": 1242,
+            "logical_error_rate": 0.01242,
+            "runtime_seconds": 0.1486799716949463,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 50000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr50000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr50000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 40,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr50000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 946,
+            "observables": 1,
+            "logical_failures": 1248,
+            "logical_error_rate": 0.01248,
+            "runtime_seconds": 0.12296772003173828,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 75000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr75000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr75000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 40,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr75000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 946,
+            "observables": 1,
+            "logical_failures": 1297,
+            "logical_error_rate": 0.01297,
+            "runtime_seconds": 0.11877608299255371,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 100000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr100000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr100000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 40,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr100000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 946,
+            "observables": 1,
+            "logical_failures": 1299,
+            "logical_error_rate": 0.01299,
+            "runtime_seconds": 0.13135790824890137,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 150000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr150000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr150000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 40,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr150000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 946,
+            "observables": 1,
+            "logical_failures": 1178,
+            "logical_error_rate": 0.01178,
+            "runtime_seconds": 0.21802997589111328,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 200000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr200000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr200000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 40,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr200000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 946,
+            "observables": 1,
+            "logical_failures": 1290,
+            "logical_error_rate": 0.0129,
+            "runtime_seconds": 0.12844586372375488,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 300000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr300000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr300000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 40,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr300000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 946,
+            "observables": 1,
+            "logical_failures": 1289,
+            "logical_error_rate": 0.01289,
+            "runtime_seconds": 0.1249539852142334,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 500000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr500000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr500000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 40,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr500000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 946,
+            "observables": 1,
+            "logical_failures": 1320,
+            "logical_error_rate": 0.0132,
+            "runtime_seconds": 0.13655614852905273,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 750000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr750000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr750000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 40,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr750000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 946,
+            "observables": 1,
+            "logical_failures": 1301,
+            "logical_error_rate": 0.01301,
+            "runtime_seconds": 0.13470005989074707,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 1000000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr1000000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr1000000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 40,
+          "remaining_remote_cnots_per_section": [],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr1000000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 127,
+            "detectors": 946,
+            "observables": 1,
+            "logical_failures": 1250,
+            "logical_error_rate": 0.0125,
+            "runtime_seconds": 0.13613009452819824,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        }
+      ],
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_r6.twoside.enr1000000000.rawpairs.network_noisy.json"
+    }
+  ]
+}

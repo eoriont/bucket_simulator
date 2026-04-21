@@ -1,0 +1,5925 @@
+{
+  "source": "simple_merge_only",
+  "basis": "X",
+  "physical_error": 0.001,
+  "measurement_delay": 6.6e-07,
+  "mpi_ranks": 8,
+  "batch_shots": 250000,
+  "shots_per_point": 100000,
+  "circuit_k": 3,
+  "rounds_per_phase": 8,
+  "deformation_modes": [
+    "none",
+    "lside",
+    "rside",
+    "twoside"
+  ],
+  "results": [
+    {
+      "deformation_mode": "none",
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k3_pre8_merge8_post0.stim",
+      "entanglement_rate_values": [
+        5000000.0,
+        7500000.0,
+        10000000.0,
+        12500000.0,
+        15000000.0,
+        20000000.0,
+        25000000.0,
+        30000000.0,
+        40000000.0,
+        50000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 5000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr5000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr5000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 13,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 13
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr5000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2088,
+            "observables": 1,
+            "logical_failures": 487,
+            "logical_error_rate": 0.00487,
+            "runtime_seconds": 0.3613419532775879,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 7500000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr7500000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr7500000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 13,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 13
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr7500000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2088,
+            "observables": 1,
+            "logical_failures": 235,
+            "logical_error_rate": 0.00235,
+            "runtime_seconds": 0.27580785751342773,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 10000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr10000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr10000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 13,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 13
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr10000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2088,
+            "observables": 1,
+            "logical_failures": 157,
+            "logical_error_rate": 0.00157,
+            "runtime_seconds": 0.256760835647583,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 12500000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr12500000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr12500000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 13,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 13
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr12500000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2088,
+            "observables": 1,
+            "logical_failures": 118,
+            "logical_error_rate": 0.00118,
+            "runtime_seconds": 0.25000596046447754,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 15000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr15000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr15000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 13,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 13
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr15000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2088,
+            "observables": 1,
+            "logical_failures": 94,
+            "logical_error_rate": 0.00094,
+            "runtime_seconds": 0.25905799865722656,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 20000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr20000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr20000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 13,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 13
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr20000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2088,
+            "observables": 1,
+            "logical_failures": 85,
+            "logical_error_rate": 0.00085,
+            "runtime_seconds": 0.22881293296813965,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 25000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr25000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr25000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 13,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 13
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr25000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2088,
+            "observables": 1,
+            "logical_failures": 85,
+            "logical_error_rate": 0.00085,
+            "runtime_seconds": 0.23370790481567383,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 30000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr30000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr30000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 13,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 13
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr30000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2088,
+            "observables": 1,
+            "logical_failures": 72,
+            "logical_error_rate": 0.00072,
+            "runtime_seconds": 0.2299208641052246,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 40000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr40000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr40000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 13,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 13
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr40000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2088,
+            "observables": 1,
+            "logical_failures": 94,
+            "logical_error_rate": 0.00094,
+            "runtime_seconds": 0.24132299423217773,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 50000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr50000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr50000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 13,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 8,
+              "remote_cnots_per_body": 13
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr50000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2088,
+            "observables": 1,
+            "logical_failures": 88,
+            "logical_error_rate": 0.00088,
+            "runtime_seconds": 0.24207186698913574,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        }
+      ],
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.enr50000000.rawpairs.network_noisy.json"
+    },
+    {
+      "deformation_mode": "lside",
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k3_r8.lside.stim",
+      "entanglement_rate_values": [
+        5000000.0,
+        7500000.0,
+        10000000.0,
+        12500000.0,
+        15000000.0,
+        20000000.0,
+        25000000.0,
+        30000000.0,
+        40000000.0,
+        50000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 5000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr5000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr5000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 10,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr5000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2442,
+            "observables": 1,
+            "logical_failures": 598,
+            "logical_error_rate": 0.00598,
+            "runtime_seconds": 0.4680509567260742,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 7500000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr7500000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr7500000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 10,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr7500000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2442,
+            "observables": 1,
+            "logical_failures": 364,
+            "logical_error_rate": 0.00364,
+            "runtime_seconds": 0.44198179244995117,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 10000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr10000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr10000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 10,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr10000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2442,
+            "observables": 1,
+            "logical_failures": 280,
+            "logical_error_rate": 0.0028,
+            "runtime_seconds": 0.5275650024414062,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 12500000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr12500000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr12500000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 10,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr12500000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2442,
+            "observables": 1,
+            "logical_failures": 238,
+            "logical_error_rate": 0.00238,
+            "runtime_seconds": 0.49918413162231445,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 15000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr15000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr15000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 10,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr15000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2442,
+            "observables": 1,
+            "logical_failures": 205,
+            "logical_error_rate": 0.00205,
+            "runtime_seconds": 0.6546769142150879,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 20000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr20000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr20000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 10,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr20000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2442,
+            "observables": 1,
+            "logical_failures": 200,
+            "logical_error_rate": 0.002,
+            "runtime_seconds": 0.4039633274078369,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 25000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr25000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr25000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 10,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr25000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2442,
+            "observables": 1,
+            "logical_failures": 197,
+            "logical_error_rate": 0.00197,
+            "runtime_seconds": 0.40094780921936035,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 30000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr30000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr30000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 10,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr30000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2442,
+            "observables": 1,
+            "logical_failures": 204,
+            "logical_error_rate": 0.00204,
+            "runtime_seconds": 0.4057188034057617,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 40000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr40000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr40000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 10,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr40000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2442,
+            "observables": 1,
+            "logical_failures": 200,
+            "logical_error_rate": 0.002,
+            "runtime_seconds": 0.40211915969848633,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 50000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr50000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr50000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 10,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 10
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr50000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2442,
+            "observables": 1,
+            "logical_failures": 218,
+            "logical_error_rate": 0.00218,
+            "runtime_seconds": 0.40203118324279785,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        }
+      ],
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.lside.enr50000000.rawpairs.network_noisy.json"
+    },
+    {
+      "deformation_mode": "rside",
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k3_r8.rside.stim",
+      "entanglement_rate_values": [
+        5000000.0,
+        7500000.0,
+        10000000.0,
+        12500000.0,
+        15000000.0,
+        20000000.0,
+        25000000.0,
+        30000000.0,
+        40000000.0,
+        50000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 5000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr5000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr5000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 12,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr5000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2432,
+            "observables": 1,
+            "logical_failures": 951,
+            "logical_error_rate": 0.00951,
+            "runtime_seconds": 0.4956059455871582,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 7500000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr7500000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr7500000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 12,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr7500000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2432,
+            "observables": 1,
+            "logical_failures": 603,
+            "logical_error_rate": 0.00603,
+            "runtime_seconds": 0.4438300132751465,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 10000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr10000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr10000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 12,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr10000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2432,
+            "observables": 1,
+            "logical_failures": 444,
+            "logical_error_rate": 0.00444,
+            "runtime_seconds": 0.42674779891967773,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 12500000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr12500000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr12500000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 12,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr12500000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2432,
+            "observables": 1,
+            "logical_failures": 353,
+            "logical_error_rate": 0.00353,
+            "runtime_seconds": 0.41860103607177734,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 15000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr15000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr15000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 12,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr15000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2432,
+            "observables": 1,
+            "logical_failures": 306,
+            "logical_error_rate": 0.00306,
+            "runtime_seconds": 0.41806626319885254,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 20000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr20000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr20000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 12,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr20000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2432,
+            "observables": 1,
+            "logical_failures": 270,
+            "logical_error_rate": 0.0027,
+            "runtime_seconds": 0.41029930114746094,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 25000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr25000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr25000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 12,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr25000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2432,
+            "observables": 1,
+            "logical_failures": 287,
+            "logical_error_rate": 0.00287,
+            "runtime_seconds": 0.4065539836883545,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 30000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr30000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr30000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 12,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr30000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2432,
+            "observables": 1,
+            "logical_failures": 256,
+            "logical_error_rate": 0.00256,
+            "runtime_seconds": 0.42768096923828125,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 40000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr40000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr40000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 12,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr40000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2432,
+            "observables": 1,
+            "logical_failures": 247,
+            "logical_error_rate": 0.00247,
+            "runtime_seconds": 0.40892815589904785,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 50000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr50000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr50000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 12,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 12
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr50000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2432,
+            "observables": 1,
+            "logical_failures": 259,
+            "logical_error_rate": 0.00259,
+            "runtime_seconds": 0.40598297119140625,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        }
+      ],
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.rside.enr50000000.rawpairs.network_noisy.json"
+    },
+    {
+      "deformation_mode": "twoside",
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k3_r8.twoside.stim",
+      "entanglement_rate_values": [
+        5000000.0,
+        7500000.0,
+        10000000.0,
+        12500000.0,
+        15000000.0,
+        20000000.0,
+        25000000.0,
+        30000000.0,
+        40000000.0,
+        50000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 5000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr5000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr5000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr5000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2402,
+            "observables": 1,
+            "logical_failures": 861,
+            "logical_error_rate": 0.00861,
+            "runtime_seconds": 0.4494771957397461,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 7500000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr7500000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr7500000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr7500000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2402,
+            "observables": 1,
+            "logical_failures": 611,
+            "logical_error_rate": 0.00611,
+            "runtime_seconds": 0.4183070659637451,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 10000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr10000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr10000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr10000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2402,
+            "observables": 1,
+            "logical_failures": 505,
+            "logical_error_rate": 0.00505,
+            "runtime_seconds": 0.4105699062347412,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 12500000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr12500000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr12500000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr12500000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2402,
+            "observables": 1,
+            "logical_failures": 434,
+            "logical_error_rate": 0.00434,
+            "runtime_seconds": 0.41145920753479004,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 15000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr15000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr15000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr15000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2402,
+            "observables": 1,
+            "logical_failures": 410,
+            "logical_error_rate": 0.0041,
+            "runtime_seconds": 0.3922100067138672,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 20000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr20000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr20000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr20000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2402,
+            "observables": 1,
+            "logical_failures": 356,
+            "logical_error_rate": 0.00356,
+            "runtime_seconds": 0.4000730514526367,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 25000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr25000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr25000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr25000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2402,
+            "observables": 1,
+            "logical_failures": 351,
+            "logical_error_rate": 0.00351,
+            "runtime_seconds": 0.3944530487060547,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 30000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr30000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr30000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr30000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2402,
+            "observables": 1,
+            "logical_failures": 406,
+            "logical_error_rate": 0.00406,
+            "runtime_seconds": 0.39804697036743164,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 40000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr40000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr40000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr40000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2402,
+            "observables": 1,
+            "logical_failures": 384,
+            "logical_error_rate": 0.00384,
+            "runtime_seconds": 0.39124488830566406,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        },
+        {
+          "entanglement_rate": 50000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr50000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr50000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 19,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 20,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 21,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 22,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 23,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 24,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 25,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 26,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 27,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 28,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 29,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 30,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr50000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 250000,
+            "qubits": 233,
+            "detectors": 2402,
+            "observables": 1,
+            "logical_failures": 412,
+            "logical_error_rate": 0.00412,
+            "runtime_seconds": 0.49100494384765625,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 8,
+              "mpi4py_available": true,
+              "total_batches": 8
+            }
+          }
+        }
+      ],
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k3_r8.twoside.enr50000000.rawpairs.network_noisy.json"
+    }
+  ]
+}

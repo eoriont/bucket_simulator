@@ -135,11 +135,14 @@ void SurfaceCodeSimulator::initialize_circuit() {
 }
 
 void SurfaceCodeSimulator::initialize_lattice_surgery_circuit() {
+    const uint32_t pre_rounds = config_.pre_merge_rounds > 0 ? config_.pre_merge_rounds : 1;
+    const uint32_t merge_rounds = config_.merge_rounds > 0 ? config_.merge_rounds : config_.code_distance;
+    const uint32_t post_rounds = config_.post_merge_rounds > 0 ? config_.post_merge_rounds : 1;
     if (mpi_rank_ == 0) {
         std::cerr << "Initializing lattice surgery circuit:" << std::endl;
         std::cerr << "  Merge type: " << (config_.merge_type == MergeType::XX_MERGE ? "XX" : "ZZ") << std::endl;
         std::cerr << "  Code distance: " << config_.code_distance << std::endl;
-        std::cerr << "  Merge rounds: " << (config_.merge_rounds > 0 ? config_.merge_rounds : config_.code_distance) << std::endl;
+        std::cerr << "  Schedule (pre, merge, post): (" << pre_rounds << ", " << merge_rounds << ", " << post_rounds << ")" << std::endl;
         std::cerr << "  Distributed: " << (config_.distributed ? "yes" : "no") << std::endl;
     }
 
@@ -163,11 +166,17 @@ void SurfaceCodeSimulator::initialize_lattice_surgery_circuit() {
 }
 
 void SurfaceCodeSimulator::initialize_distributed_lattice_surgery_circuit() {
+    const auto phase = config_.experiment_phase;
+    const bool merge_only = (phase == ExperimentPhase::MERGE_ONLY);
+    const bool split_only = (phase == ExperimentPhase::SPLIT_ONLY);
+    const uint32_t pre_rounds = split_only ? 0 : (config_.pre_merge_rounds > 0 ? config_.pre_merge_rounds : 1);
+    const uint32_t merge_rounds = config_.merge_rounds > 0 ? config_.merge_rounds : config_.code_distance;
+    const uint32_t post_rounds = merge_only ? 0 : (config_.post_merge_rounds > 0 ? config_.post_merge_rounds : 1);
     if (mpi_rank_ == 0) {
         std::cerr << "Initializing DISTRIBUTED lattice surgery circuit:" << std::endl;
         std::cerr << "  Mode: Remote CNOTs only, no merge data qubits" << std::endl;
         std::cerr << "  Code distance: " << config_.code_distance << std::endl;
-        std::cerr << "  Merge rounds: " << (config_.merge_rounds > 0 ? config_.merge_rounds : config_.code_distance) << std::endl;
+        std::cerr << "  Schedule (pre, merge, post): (" << pre_rounds << ", " << merge_rounds << ", " << post_rounds << ")" << std::endl;
     }
 
     DistributedLatticeSurgeryCircuit dls_circuit(config_);

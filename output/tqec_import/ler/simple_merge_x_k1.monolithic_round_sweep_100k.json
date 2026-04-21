@@ -1,0 +1,69 @@
+{
+  "distance_k": 1,
+  "approx_distance": 3,
+  "physical_error": 0.001,
+  "mode": "monolithic_baseline",
+  "shots_per_point": 100000,
+  "results": [
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k1_r1.monolithic.stim",
+      "shots": 100000,
+      "qubits": 53,
+      "detectors": 128,
+      "observables": 1,
+      "logical_failures": 0,
+      "logical_error_rate": 0.0,
+      "runtime_seconds": 0.0362241268157959,
+      "detector_validation": "passed",
+      "syndrome_rounds": 1
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k1_r3.monolithic.stim",
+      "shots": 100000,
+      "qubits": 53,
+      "detectors": 216,
+      "observables": 1,
+      "logical_failures": 0,
+      "logical_error_rate": 0.0,
+      "runtime_seconds": 0.10937881469726562,
+      "detector_validation": "passed",
+      "syndrome_rounds": 3
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k1_r5.monolithic.stim",
+      "shots": 100000,
+      "qubits": 53,
+      "detectors": 304,
+      "observables": 1,
+      "logical_failures": 0,
+      "logical_error_rate": 0.0,
+      "runtime_seconds": 0.0982503890991211,
+      "detector_validation": "passed",
+      "syndrome_rounds": 5
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k1_r7.monolithic.stim",
+      "shots": 100000,
+      "qubits": 53,
+      "detectors": 392,
+      "observables": 1,
+      "logical_failures": 0,
+      "logical_error_rate": 0.0,
+      "runtime_seconds": 0.12735891342163086,
+      "detector_validation": "passed",
+      "syndrome_rounds": 7
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k1_r10.monolithic.stim",
+      "shots": 100000,
+      "qubits": 53,
+      "detectors": 524,
+      "observables": 1,
+      "logical_failures": 0,
+      "logical_error_rate": 0.0,
+      "runtime_seconds": 0.2634890079498291,
+      "detector_validation": "passed",
+      "syndrome_rounds": 10
+    }
+  ]
+}

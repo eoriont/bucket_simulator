@@ -1,0 +1,11 @@
+{
+  "stim_path": "output/tqec_import/injected/simple_merge_x_k1_r5.network_noisy.stim",
+  "shots": 10000,
+  "qubits": 53,
+  "detectors": 304,
+  "observables": 1,
+  "logical_failures": 54,
+  "logical_error_rate": 0.0054,
+  "runtime_seconds": 0.028583288192749023,
+  "detector_validation": "passed"
+}

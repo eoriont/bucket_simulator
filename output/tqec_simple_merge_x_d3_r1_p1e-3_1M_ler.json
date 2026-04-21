@@ -1,0 +1,11 @@
+{
+  "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_simple_merge_x_d3_r1_p1e-3.stim",
+  "shots": 1000000,
+  "qubits": 53,
+  "detectors": 128,
+  "observables": 1,
+  "logical_failures": 15887,
+  "logical_error_rate": 0.015887,
+  "runtime_seconds": 3.1478819847106934,
+  "detector_validation": "passed"
+}

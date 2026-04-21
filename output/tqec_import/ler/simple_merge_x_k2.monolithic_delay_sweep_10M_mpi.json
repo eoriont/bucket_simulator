@@ -1,0 +1,87 @@
+{
+  "distance_k": 2,
+  "approx_distance": 5,
+  "physical_error": 0.001,
+  "mode": "monolithic_baseline_with_measurement_delay",
+  "mpi_ranks": 8,
+  "batch_shots": 250000,
+  "shots_per_point": 10000000,
+  "results": [
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r3.monolithic.stim",
+      "shots": 10000000,
+      "batch_shots": 250000,
+      "qubits": 127,
+      "detectors": 624,
+      "observables": 1,
+      "logical_failures": 92,
+      "logical_error_rate": 9.2e-06,
+      "runtime_seconds": 8.91607117652893,
+      "detector_validation": "passed",
+      "mpi": {
+        "enabled": true,
+        "ranks": 8,
+        "mpi4py_available": true,
+        "total_batches": 40
+      },
+      "syndrome_rounds": 3
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r5.monolithic.stim",
+      "shots": 10000000,
+      "batch_shots": 250000,
+      "qubits": 127,
+      "detectors": 876,
+      "observables": 1,
+      "logical_failures": 196,
+      "logical_error_rate": 1.96e-05,
+      "runtime_seconds": 12.37411618232727,
+      "detector_validation": "passed",
+      "mpi": {
+        "enabled": true,
+        "ranks": 8,
+        "mpi4py_available": true,
+        "total_batches": 40
+      },
+      "syndrome_rounds": 5
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r7.monolithic.stim",
+      "shots": 10000000,
+      "batch_shots": 250000,
+      "qubits": 127,
+      "detectors": 1128,
+      "observables": 1,
+      "logical_failures": 260,
+      "logical_error_rate": 2.6e-05,
+      "runtime_seconds": 15.802788019180298,
+      "detector_validation": "passed",
+      "mpi": {
+        "enabled": true,
+        "ranks": 8,
+        "mpi4py_available": true,
+        "total_batches": 40
+      },
+      "syndrome_rounds": 7
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r10.monolithic.stim",
+      "shots": 10000000,
+      "batch_shots": 250000,
+      "qubits": 127,
+      "detectors": 1506,
+      "observables": 1,
+      "logical_failures": 352,
+      "logical_error_rate": 3.52e-05,
+      "runtime_seconds": 20.88310670852661,
+      "detector_validation": "passed",
+      "mpi": {
+        "enabled": true,
+        "ranks": 8,
+        "mpi4py_available": true,
+        "total_batches": 40
+      },
+      "syndrome_rounds": 10
+    }
+  ]
+}

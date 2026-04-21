@@ -1,0 +1,169 @@
+{
+  "distance_k": 2,
+  "approx_distance": 5,
+  "physical_error": 0.001,
+  "mpi_ranks": 8,
+  "batch_shots": 250000,
+  "network_noisy": {
+    "shots_per_point": 5000000,
+    "results": [
+      {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r3.network_noisy.stim",
+        "shots": 5000000,
+        "batch_shots": 250000,
+        "qubits": 127,
+        "detectors": 624,
+        "observables": 1,
+        "logical_failures": 804,
+        "logical_error_rate": 0.0001608,
+        "runtime_seconds": 4.877488136291504,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 8,
+          "mpi4py_available": true,
+          "total_batches": 24
+        },
+        "syndrome_rounds": 3
+      },
+      {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r5.network_noisy.stim",
+        "shots": 5000000,
+        "batch_shots": 250000,
+        "qubits": 127,
+        "detectors": 876,
+        "observables": 1,
+        "logical_failures": 1237,
+        "logical_error_rate": 0.0002474,
+        "runtime_seconds": 7.0770111083984375,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 8,
+          "mpi4py_available": true,
+          "total_batches": 24
+        },
+        "syndrome_rounds": 5
+      },
+      {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r7.network_noisy.stim",
+        "shots": 5000000,
+        "batch_shots": 250000,
+        "qubits": 127,
+        "detectors": 1128,
+        "observables": 1,
+        "logical_failures": 1765,
+        "logical_error_rate": 0.000353,
+        "runtime_seconds": 9.41663408279419,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 8,
+          "mpi4py_available": true,
+          "total_batches": 24
+        },
+        "syndrome_rounds": 7
+      },
+      {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r10.network_noisy.stim",
+        "shots": 5000000,
+        "batch_shots": 250000,
+        "qubits": 127,
+        "detectors": 1506,
+        "observables": 1,
+        "logical_failures": 2454,
+        "logical_error_rate": 0.0004908,
+        "runtime_seconds": 12.625767946243286,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 8,
+          "mpi4py_available": true,
+          "total_batches": 24
+        },
+        "syndrome_rounds": 10
+      }
+    ]
+  },
+  "monolithic_baseline": {
+    "shots_per_point": 10000000,
+    "results": [
+      {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r3.monolithic.stim",
+        "shots": 10000000,
+        "batch_shots": 250000,
+        "qubits": 127,
+        "detectors": 624,
+        "observables": 1,
+        "logical_failures": 0,
+        "logical_error_rate": 0.0,
+        "runtime_seconds": 8.962947130203247,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 8,
+          "mpi4py_available": true,
+          "total_batches": 40
+        },
+        "syndrome_rounds": 3
+      },
+      {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r5.monolithic.stim",
+        "shots": 10000000,
+        "batch_shots": 250000,
+        "qubits": 127,
+        "detectors": 876,
+        "observables": 1,
+        "logical_failures": 0,
+        "logical_error_rate": 0.0,
+        "runtime_seconds": 12.987908124923706,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 8,
+          "mpi4py_available": true,
+          "total_batches": 40
+        },
+        "syndrome_rounds": 5
+      },
+      {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r7.monolithic.stim",
+        "shots": 10000000,
+        "batch_shots": 250000,
+        "qubits": 127,
+        "detectors": 1128,
+        "observables": 1,
+        "logical_failures": 0,
+        "logical_error_rate": 0.0,
+        "runtime_seconds": 16.334930896759033,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 8,
+          "mpi4py_available": true,
+          "total_batches": 40
+        },
+        "syndrome_rounds": 7
+      },
+      {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_x_k2_r10.monolithic.stim",
+        "shots": 10000000,
+        "batch_shots": 250000,
+        "qubits": 127,
+        "detectors": 1506,
+        "observables": 1,
+        "logical_failures": 0,
+        "logical_error_rate": 0.0,
+        "runtime_seconds": 21.721513271331787,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 8,
+          "mpi4py_available": true,
+          "total_batches": 40
+        },
+        "syndrome_rounds": 10
+      }
+    ]
+  }
+}

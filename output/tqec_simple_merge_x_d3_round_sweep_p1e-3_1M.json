@@ -1,0 +1,104 @@
+{
+  "distance_k": 1,
+  "approx_distance": 3,
+  "physical_error": 0.001,
+  "shots_per_point": 1000000,
+  "results": [
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_simple_merge_x_d3_r1_p1e-3.stim",
+      "shots": 1000000,
+      "qubits": 53,
+      "detectors": 128,
+      "observables": 1,
+      "logical_failures": 15887,
+      "logical_error_rate": 0.015887,
+      "runtime_seconds": 3.1478819847106934,
+      "detector_validation": "passed",
+      "syndrome_rounds": 1
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_simple_merge_x_d3_r2_p1e-3.stim",
+      "shots": 1000000,
+      "qubits": 53,
+      "detectors": 172,
+      "observables": 1,
+      "logical_failures": 25425,
+      "logical_error_rate": 0.025425,
+      "runtime_seconds": 5.335505247116089,
+      "detector_validation": "passed",
+      "syndrome_rounds": 2
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_simple_merge_x_d3_r3_p1e-3.stim",
+      "shots": 1000000,
+      "qubits": 53,
+      "detectors": 216,
+      "observables": 1,
+      "logical_failures": 32325,
+      "logical_error_rate": 0.032325,
+      "runtime_seconds": 7.055756092071533,
+      "detector_validation": "passed",
+      "syndrome_rounds": 3
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_simple_merge_x_d3_r4_p1e-3.stim",
+      "shots": 1000000,
+      "qubits": 53,
+      "detectors": 260,
+      "observables": 1,
+      "logical_failures": 39527,
+      "logical_error_rate": 0.039527,
+      "runtime_seconds": 8.30066204071045,
+      "detector_validation": "passed",
+      "syndrome_rounds": 4
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_simple_merge_x_d3_r5_p1e-3.stim",
+      "shots": 1000000,
+      "qubits": 53,
+      "detectors": 304,
+      "observables": 1,
+      "logical_failures": 45934,
+      "logical_error_rate": 0.045934,
+      "runtime_seconds": 9.197895050048828,
+      "detector_validation": "passed",
+      "syndrome_rounds": 5
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_simple_merge_x_d3_r6_p1e-3.stim",
+      "shots": 1000000,
+      "qubits": 53,
+      "detectors": 348,
+      "observables": 1,
+      "logical_failures": 52200,
+      "logical_error_rate": 0.0522,
+      "runtime_seconds": 11.309514999389648,
+      "detector_validation": "passed",
+      "syndrome_rounds": 6
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_simple_merge_x_d3_r8_p1e-3.stim",
+      "shots": 1000000,
+      "qubits": 53,
+      "detectors": 436,
+      "observables": 1,
+      "logical_failures": 65814,
+      "logical_error_rate": 0.065814,
+      "runtime_seconds": 14.390228033065796,
+      "detector_validation": "passed",
+      "syndrome_rounds": 8
+    },
+    {
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_simple_merge_x_d3_r10_p1e-3.stim",
+      "shots": 1000000,
+      "qubits": 53,
+      "detectors": 524,
+      "observables": 1,
+      "logical_failures": 77074,
+      "logical_error_rate": 0.077074,
+      "runtime_seconds": 17.548150062561035,
+      "detector_validation": "passed",
+      "syndrome_rounds": 10
+    }
+  ]
+}

@@ -203,8 +203,12 @@ Config parse_config(const std::string& filename) {
                     throw std::invalid_argument("Unknown merge type: " + value +
                         ". Valid options: none, xx, zz, distributed_xx, distributed_zz");
                 }
+            } else if (key == "pre_merge_rounds") {
+                config.pre_merge_rounds = std::stoul(value);
             } else if (key == "merge_rounds") {
                 config.merge_rounds = std::stoul(value);
+            } else if (key == "post_merge_rounds") {
+                config.post_merge_rounds = std::stoul(value);
             } else if (key == "split_after_merge") {
                 config.split_after_merge = (value == "true" || value == "1");
             } else if (key == "superstabilizers") {

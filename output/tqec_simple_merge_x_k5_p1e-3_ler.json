@@ -1,0 +1,11 @@
+{
+  "stim_path": "output/tqec_simple_merge_x_k5_p1e-3.stim",
+  "shots": 100000,
+  "qubits": 541,
+  "detectors": 6720,
+  "observables": 1,
+  "logical_failures": 3,
+  "logical_error_rate": 3e-05,
+  "runtime_seconds": 12.709885120391846,
+  "detector_validation": "passed"
+}

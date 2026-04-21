@@ -17,6 +17,7 @@ experiments/*/runs/
 *.swp
 *.swo
 *~
+.venv-tqec/
 
 # OS files
 .DS_Store

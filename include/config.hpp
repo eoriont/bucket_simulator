@@ -80,7 +80,9 @@ struct Config {
 
     // Lattice surgery parameters
     MergeType merge_type;             // Type of merge operation
+    uint32_t pre_merge_rounds;        // Number of stabilizer rounds before merge/split (0 = legacy default)
     uint32_t merge_rounds;            // Number of stabilizer rounds during merge
+    uint32_t post_merge_rounds;       // Number of stabilizer rounds after merge/split (0 = legacy default)
     std::vector<std::pair<double,double>> superstabilizers; // data qubit (x,y) positions to disable (XX_MERGE_DISTRIBUTED only)
     bool split_after_merge;           // Whether to split patches after merge
     ExperimentPhase experiment_phase; // Which phase(s) of lattice surgery to simulate
@@ -114,8 +116,10 @@ struct Config {
           raw_epr_fidelity(0.99),      // Default: 99% raw fidelity (paper Section VI)
           distillation_protocol(DistillationProtocol::NONE),
           distillation_rounds(1),      // Default: 1 round
+          pre_merge_rounds(0),         // 0 = use legacy single pre-round when applicable
           merge_type(MergeType::NONE),
           merge_rounds(0),             // 0 = use code_distance rounds
+          post_merge_rounds(0),        // 0 = use legacy single post-round when applicable
           split_after_merge(false),
           experiment_phase(ExperimentPhase::MERGE_AND_SPLIT) {}
 };

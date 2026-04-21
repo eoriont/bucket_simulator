@@ -2,9 +2,9 @@
 #
 # Superstabilizer sweep experiment
 #
-# Sweeps all 5 superstabilizer types across entanglement rates 5–50 MHz.
+# Sweeps all 5 superstabilizer types across a low-ENR-focused window.
 # Uses a single base config; superstabilizers, entanglement_rate, and
-# merge_rounds are passed as CLI overrides.
+# round schedule are passed as CLI overrides.
 #
 # Usage:
 #   ./run.sh [options]
@@ -14,6 +14,8 @@
 #   -j, --parallel NUM     Simulations in parallel (default: 1)
 #   -d, --distances D,...  Comma-separated distances to sweep, e.g. 5,7,9 (default: use config value)
 #   -p, --phase PHASE      Experiment phase: merge_and_split, merge_only, split_only (default: merge_and_split)
+#   --pre-rounds N         Override pre-merge rounds (default: 2 when applicable)
+#   --post-rounds N        Override post-merge rounds (default: 2 when applicable)
 #   --dry-run              Print commands without executing
 #   --shots SHOTS          Override total_shots, e.g. 10K (default: use config value)
 #
@@ -32,6 +34,8 @@ DRY_RUN=false
 SHOTS=""
 DISTANCES=()
 PHASE="merge_and_split"
+PRE_ROUNDS=2
+POST_ROUNDS=2
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -46,6 +50,8 @@ while [[ $# -gt 0 ]]; do
             esac
             shift 2
             ;;
+        --pre-rounds)     PRE_ROUNDS="$2"; shift 2 ;;
+        --post-rounds)    POST_ROUNDS="$2"; shift 2 ;;
         --dry-run)        DRY_RUN=true; shift ;;
         --shots)          SHOTS="$2"; shift 2 ;;
         -h|--help)        head -20 "$0" | tail -18; exit 0 ;;
@@ -77,16 +83,15 @@ get_super_coords() {
 
 # Args: <type> <distance>
 get_merge_rounds() {
-    case "$1" in
-        middle) echo "1" ;;
-        *)      echo "$2" ;;
-    esac
+    echo "$2"
 }
 
 SUPERS=(border border2 middle nosuper twoside)
 
-# Entanglement rates in Hz (5 MHz to 50 MHz)
-RATES=(5000000 10000000 15000000 20000000 25000000 30000000 35000000 40000000 45000000 50000000)
+# Entanglement rates in Hz.
+# Existing sweep results flatten above ~20 MHz, so default more densely samples
+# the 2–20 MHz transition window while retaining a few high-rate anchors.
+RATES=(2000000 3000000 4000000 5000000 7000000 10000000 15000000 20000000 30000000 50000000)
 
 # ── Validation ────────────────────────────────────────────────────────────────
 if [[ ! -x "$SIMULATOR" ]]; then
@@ -121,6 +126,7 @@ echo "Rates:     ${RATES[*]}"
 echo "Distances: ${DISTANCES[*]:-from config}"
 echo "Shots:     ${SHOTS:-from config}"
 echo "Phase:     $PHASE"
+echo "Schedule:  pre=${PRE_ROUNDS}, merge=d, post=${POST_ROUNDS}"
 echo "MPI:       $NUM_PROCS processes"
 echo "Parallel:  $PARALLEL_JOBS"
 echo "Configs:   $TOTAL_CONFIGS"
@@ -136,6 +142,7 @@ Parallel Jobs: $PARALLEL_JOBS
 Distances: ${DISTANCES[*]:-from config}
 Shots override: ${SHOTS:-none}
 Experiment phase: $PHASE
+Round schedule: pre=${PRE_ROUNDS}, merge=d, post=${POST_ROUNDS}
 Superstabilizer types: ${SUPERS[*]}
 Entanglement rates (Hz): ${RATES[*]}
 Host: $(hostname)
@@ -163,13 +170,24 @@ run_job() {
     [[ -n "$dist" ]] && extra_args+=(-code_distance "$dist")
     [[ -n "$SHOTS" ]] && extra_args+=(-total_shots "$SHOTS")
 
-    echo "[RUN] $label  (superstabilizers=\"$coords\" merge_rounds=$mrounds)"
+    local pre_rounds="$PRE_ROUNDS"
+    local post_rounds="$POST_ROUNDS"
+    if [[ "$PHASE" == "split_only" ]]; then
+        pre_rounds=0
+    fi
+    if [[ "$PHASE" == "merge_only" ]]; then
+        post_rounds=0
+    fi
+
+    echo "[RUN] $label  (superstabilizers=\"$coords\" schedule=${pre_rounds}/${mrounds}/${post_rounds})"
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "  mpirun -n $NUM_PROCS $SIMULATOR \\"
         echo "    -config $BASE_CONFIG \\"
         echo "    -experiment_phase $PHASE \\"
         echo "    -superstabilizers \"$coords\" \\"
+        echo "    -pre_merge_rounds $pre_rounds \\"
         echo "    -merge_rounds $mrounds \\"
+        echo "    -post_merge_rounds $post_rounds \\"
         echo "    -entanglement_rate $rate \\"
         [[ -n "$dist" ]] && echo "    -code_distance $dist \\"
         [[ -n "$SHOTS" ]] && echo "    -total_shots $SHOTS \\"
@@ -182,7 +200,9 @@ run_job() {
             -config "$BASE_CONFIG" \
             -experiment_phase "$PHASE" \
             -superstabilizers "$coords" \
+            -pre_merge_rounds "$pre_rounds" \
             -merge_rounds "$mrounds" \
+            -post_merge_rounds "$post_rounds" \
             -entanglement_rate "$rate" \
             "${extra_args[@]}" \
             -dump-circuit \
@@ -199,7 +219,9 @@ run_job() {
             -config "$BASE_CONFIG" \
             -experiment_phase "$PHASE" \
             -superstabilizers "$coords" \
+            -pre_merge_rounds "$pre_rounds" \
             -merge_rounds "$mrounds" \
+            -post_merge_rounds "$post_rounds" \
             -entanglement_rate "$rate" \
             "${extra_args[@]}" \
             -output "$RESULTS_DIR" >> "$log_file" 2>&1; then

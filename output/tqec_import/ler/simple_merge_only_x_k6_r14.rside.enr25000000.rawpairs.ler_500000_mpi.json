@@ -1,0 +1,18 @@
+{
+  "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k6_r14.rside.enr25000000.rawpairs.network_noisy.stim",
+  "shots": 500000,
+  "batch_shots": 250000,
+  "qubits": 743,
+  "detectors": 13586,
+  "observables": 1,
+  "logical_failures": 12,
+  "logical_error_rate": 2.4e-05,
+  "runtime_seconds": 21.133544921875,
+  "detector_validation": "passed",
+  "mpi": {
+    "enabled": true,
+    "ranks": 10,
+    "mpi4py_available": true,
+    "total_batches": 10
+  }
+}

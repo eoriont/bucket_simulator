@@ -862,6 +862,8 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
     const bool merge_only = (phase == ExperimentPhase::MERGE_ONLY);
     const bool split_only = (phase == ExperimentPhase::SPLIT_ONLY);
     const bool start_merged = split_only;
+    const uint32_t effective_pre_rounds = start_merged ? 0 : (config_.pre_merge_rounds > 0 ? config_.pre_merge_rounds : 1);
+    const uint32_t effective_post_rounds = merge_only ? 0 : (config_.post_merge_rounds > 0 ? config_.post_merge_rounds : 1);
 
     // ====== Initial reset of all data qubits ======
     // merge_only: init in X eigenstate (|+>) to test X-logical preservation
@@ -873,52 +875,205 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         circuit_.safe_append_u("R", all_data, {});
     }
 
-    // ====== Round 0: Pre-merge round (interior patches + seam, no merge) ======
+    // ====== Pre-merge rounds (interior patches + seam, no merge) ======
     // Skipped in split_only mode, which starts from the merged configuration.
-    if (!start_merged) {
-        std::vector<uint32_t> all_seam_x;
-        all_seam_x.insert(all_seam_x.end(), seam_a_x_ancillas.begin(), seam_a_x_ancillas.end());
-        all_seam_x.insert(all_seam_x.end(), seam_b_x_ancillas.begin(), seam_b_x_ancillas.end());
+    std::vector<uint32_t> all_seam_x;
+    all_seam_x.insert(all_seam_x.end(), seam_a_x_ancillas.begin(), seam_a_x_ancillas.end());
+    all_seam_x.insert(all_seam_x.end(), seam_b_x_ancillas.begin(), seam_b_x_ancillas.end());
 
-        auto emit_pre_layer = [&](const std::vector<uint32_t>& int_cx,
-                                   const std::vector<uint32_t>& seam_cx_layer,
-                                   const std::vector<uint32_t>& gauge_cx) {
-            std::vector<uint32_t> combined = int_cx;
-            combined.insert(combined.end(), seam_cx_layer.begin(), seam_cx_layer.end());
-            combined.insert(combined.end(), gauge_cx.begin(), gauge_cx.end());
-            circuit_.safe_append_u("TICK", {}, {});
-            if (!combined.empty()) circuit_.safe_append_u("CX", combined, {});
+    auto collect_x_support = [&](uint32_t ancilla_idx, bool pre_round) {
+        std::vector<uint32_t> support;
+        const auto& aq = qubits_[ancilla_idx];
+        const std::pair<double, double> dirs[4] = {
+            {0.5, -0.5}, {0.5, 0.5}, {-0.5, -0.5}, {-0.5, 0.5}
         };
+        for (auto [dx, dy] : dirs) {
+            int32_t data_idx = pre_round
+                ? find_data_at_pre(aq.x, aq.y, dx, dy, aq.patch)
+                : find_data_at(aq.x, aq.y, dx, dy, aq.patch);
+            if (data_idx >= 0) {
+                support.push_back(static_cast<uint32_t>(data_idx));
+            }
+        }
+        std::sort(support.begin(), support.end());
+        return support;
+    };
+    auto xor_support = [&](std::vector<uint32_t> acc, const std::vector<uint32_t>& next) {
+        std::vector<uint32_t> out;
+        size_t i = 0, j = 0;
+        while (i < acc.size() || j < next.size()) {
+            if (j >= next.size() || (i < acc.size() && acc[i] < next[j])) {
+                out.push_back(acc[i++]);
+            } else if (i >= acc.size() || next[j] < acc[i]) {
+                out.push_back(next[j++]);
+            } else {
+                i++;
+                j++;
+            }
+        }
+        return out;
+    };
+    auto intersects = [](const std::vector<uint32_t>& a, const std::vector<uint32_t>& b) {
+        size_t i = 0, j = 0;
+        while (i < a.size() && j < b.size()) {
+            if (a[i] == b[j]) return true;
+            if (a[i] < b[j]) i++;
+            else j++;
+        }
+        return false;
+    };
+    auto contains_removed_neighbor = [&](uint32_t ancilla_idx) {
+        const auto& aq = qubits_[ancilla_idx];
+        const std::pair<double, double> dirs[4] = {
+            {0.5, -0.5}, {0.5, 0.5}, {-0.5, -0.5}, {-0.5, 0.5}
+        };
+        for (auto [dx, dy] : dirs) {
+            double tx = aq.x + dx;
+            double ty = aq.y + dy;
+            for (uint32_t ridx : removed_data_qubits_) {
+                const auto& rq = qubits_[ridx];
+                if (std::abs(rq.x - tx) < 0.1 && std::abs(rq.y - ty) < 0.1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    auto x_meas_offset_in_pre_or_post = [&](uint32_t ancilla_idx) -> int32_t {
+        for (size_t i = 0; i < x_ancillas.size(); i++) {
+            if (x_ancillas[i] == ancilla_idx) {
+                return static_cast<int32_t>(pre_total - patch_z_count - patch_zg_count - i);
+            }
+        }
+        for (size_t i = 0; i < patch_x_gauge.size(); i++) {
+            if (patch_x_gauge[i] == ancilla_idx) {
+                return static_cast<int32_t>(pre_total - patch_z_count - patch_zg_count - patch_x_count - i);
+            }
+        }
+        for (size_t i = 0; i < all_seam_x.size(); i++) {
+            if (all_seam_x[i] == ancilla_idx) {
+                return static_cast<int32_t>(all_seam_x.size() - i);
+            }
+        }
+        return -1;
+    };
+    auto x_gauge_meas_offset_in_merge_h1 = [&](uint32_t ancilla_idx) -> int32_t {
+        for (size_t i = 0; i < x_gauge_ancillas.size(); i++) {
+            if (x_gauge_ancillas[i] == ancilla_idx) {
+                return static_cast<int32_t>(merge_h2 + xg_count - i);
+            }
+        }
+        return -1;
+    };
+    std::vector<uint32_t> x_gauge_entry_transition_pre_ancillas;
 
-        {
-            // In pre/post rounds, SS data qubits are active, so patch gauge ancillas
-            // behave as normal full-weight stabilizers — include them without splitting.
-            std::vector<uint32_t> all_z_pre = z_ancillas;
-            all_z_pre.insert(all_z_pre.end(), patch_z_gauge.begin(), patch_z_gauge.end());
+    auto emit_pre_layer = [&](const std::vector<uint32_t>& int_cx,
+                               const std::vector<uint32_t>& seam_cx_layer,
+                               const std::vector<uint32_t>& gauge_cx) {
+        std::vector<uint32_t> combined = int_cx;
+        combined.insert(combined.end(), seam_cx_layer.begin(), seam_cx_layer.end());
+        combined.insert(combined.end(), gauge_cx.begin(), gauge_cx.end());
+        circuit_.safe_append_u("TICK", {}, {});
+        if (!combined.empty()) circuit_.safe_append_u("CX", combined, {});
+    };
 
-            std::vector<uint32_t> all_x_pre = x_ancillas;
-            all_x_pre.insert(all_x_pre.end(), patch_x_gauge.begin(), patch_x_gauge.end());
-            all_x_pre.insert(all_x_pre.end(), all_seam_x.begin(), all_seam_x.end());
+    // In pre/post rounds, SS data qubits are active, so patch gauge ancillas
+    // behave as normal full-weight stabilizers — include them without splitting.
+    std::vector<uint32_t> all_z_pre = z_ancillas;
+    all_z_pre.insert(all_z_pre.end(), patch_z_gauge.begin(), patch_z_gauge.end());
 
-            circuit_.safe_append_u("TICK", {}, {});
-            circuit_.safe_append_u("R", all_z_pre, {});
-            circuit_.safe_append_u("RX", all_x_pre, {});
+    std::vector<uint32_t> all_x_pre = x_ancillas;
+    all_x_pre.insert(all_x_pre.end(), patch_x_gauge.begin(), patch_x_gauge.end());
+    all_x_pre.insert(all_x_pre.end(), all_seam_x.begin(), all_seam_x.end());
 
-            emit_pre_layer(pre_cx_layer1, pre_seam_cx1, {});
-            emit_pre_layer(pre_cx_layer2, pre_seam_cx2, {});
-            emit_pre_layer(pre_cx_layer3, pre_seam_cx3, {});
-            emit_pre_layer(pre_cx_layer4, pre_seam_cx4, {});
+    if (has_gauges && !x_gauge_ancillas.empty()) {
+        std::vector<uint32_t> merge_support_xor;
+        for (uint32_t anc : x_gauge_ancillas) {
+            merge_support_xor = xor_support(std::move(merge_support_xor), collect_x_support(anc, false));
+        }
+        std::vector<uint32_t> pre_candidates;
+        for (uint32_t anc : all_x_pre) {
+            auto support = collect_x_support(anc, true);
+            if (support.empty()) continue;
+            if (intersects(support, merge_support_xor) || contains_removed_neighbor(anc)) {
+                pre_candidates.push_back(anc);
+            }
+        }
+        const size_t max_subset = std::min<size_t>(4, pre_candidates.size());
+        for (size_t subset_size = 1; subset_size <= max_subset && x_gauge_entry_transition_pre_ancillas.empty(); subset_size++) {
+            std::vector<size_t> picks(subset_size);
+            std::iota(picks.begin(), picks.end(), 0);
+            while (true) {
+                std::vector<uint32_t> support_xor;
+                std::vector<uint32_t> ancs;
+                for (size_t pick : picks) {
+                    uint32_t anc = pre_candidates[pick];
+                    ancs.push_back(anc);
+                    support_xor = xor_support(std::move(support_xor), collect_x_support(anc, true));
+                }
+                if (support_xor == merge_support_xor) {
+                    x_gauge_entry_transition_pre_ancillas = std::move(ancs);
+                    break;
+                }
+                size_t pos = subset_size;
+                while (pos > 0) {
+                    pos--;
+                    if (picks[pos] != pre_candidates.size() - subset_size + pos) {
+                        picks[pos]++;
+                        for (size_t k = pos + 1; k < subset_size; k++) {
+                            picks[k] = picks[k - 1] + 1;
+                        }
+                        break;
+                    }
+                }
+                if (pos == 0 && picks[0] == pre_candidates.size() - subset_size) {
+                    break;
+                }
+            }
+        }
+    }
 
-            circuit_.safe_append_u("TICK", {}, {});
-            circuit_.safe_append_u("M", all_z_pre, {});
-            circuit_.safe_append_u("MX", all_x_pre, {});
+    for (uint32_t pre_round = 0; pre_round < effective_pre_rounds; pre_round++) {
+        circuit_.safe_append_u("TICK", {}, {});
+        circuit_.safe_append_u("R", all_z_pre, {});
+        circuit_.safe_append_u("RX", all_x_pre, {});
 
-            // merge_only: data is in X eigenstate, Z measurements are random → skip pre-round Z detectors
+        emit_pre_layer(pre_cx_layer1, pre_seam_cx1, {});
+        emit_pre_layer(pre_cx_layer2, pre_seam_cx2, {});
+        emit_pre_layer(pre_cx_layer3, pre_seam_cx3, {});
+        emit_pre_layer(pre_cx_layer4, pre_seam_cx4, {});
+
+        circuit_.safe_append_u("TICK", {}, {});
+        circuit_.safe_append_u("M", all_z_pre, {});
+        circuit_.safe_append_u("MX", all_x_pre, {});
+
+        if (pre_round == 0) {
+            // merge_only starts in |+>, so the first full-weight Z checks are random.
             if (!merge_only) {
                 for (size_t i = 0; i < patch_z_count; i++) {
                     const auto& q = qubits_[z_ancillas[i]];
                     circuit_.safe_append_u("DETECTOR", {drec(-(int32_t)(pre_total - i))}, {q.x, q.y, 0});
                 }
+            }
+        } else {
+            // Additional pre-rounds compare against the immediately previous pre-round.
+            for (size_t i = 0; i < patch_z_count; i++) {
+                const auto& q = qubits_[z_ancillas[i]];
+                int32_t curr = -(int32_t)(pre_total - i);
+                int32_t prev = -(int32_t)(2 * pre_total - i);
+                circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)}, {q.x, q.y, static_cast<double>(pre_round)});
+            }
+            for (size_t i = 0; i < patch_x_count; i++) {
+                const auto& q = qubits_[x_ancillas[i]];
+                int32_t curr = -(int32_t)(pre_total - patch_z_count - patch_zg_count - i);
+                int32_t prev = -(int32_t)(2 * pre_total - patch_z_count - patch_zg_count - i);
+                circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)}, {q.x, q.y, static_cast<double>(pre_round)});
+            }
+            for (size_t i = 0; i < all_seam_x.size(); i++) {
+                const auto& q = qubits_[all_seam_x[i]];
+                int32_t curr = -(int32_t)(all_seam_x.size() - i);
+                int32_t prev = -(int32_t)(pre_total + all_seam_x.size() - i);
+                circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)}, {q.x, q.y, static_cast<double>(pre_round)});
             }
         }
 
@@ -1179,7 +1334,25 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             // x_gauge[i] in previous half1: go back another merge_h2 + merge_h1 (prev round).
             // r==0 gauge detectors omitted: first merge half compares weight-3 against
             // the weight-4 pre-round measurement — non-deterministic across the boundary.
-            if (!x_gauge_ancillas.empty() && r > 0) {
+            if (!x_gauge_ancillas.empty() && r == 0 && !start_merged && !x_gauge_entry_transition_pre_ancillas.empty()) {
+                std::vector<uint32_t> tgts;
+                for (uint32_t anc : x_gauge_entry_transition_pre_ancillas) {
+                    int32_t prev = x_meas_offset_in_pre_or_post(anc);
+                    if (prev >= 0) {
+                        tgts.push_back(drec(-(int32_t)(merge_h2 + merge_h1 + prev)));
+                    }
+                }
+                for (uint32_t anc : x_gauge_ancillas) {
+                    int32_t curr = x_gauge_meas_offset_in_merge_h1(anc);
+                    if (curr >= 0) {
+                        tgts.push_back(drec(-curr));
+                    }
+                }
+                if (!tgts.empty()) {
+                    const auto& q = qubits_[x_gauge_ancillas[0]];
+                    circuit_.safe_append_u("DETECTOR", tgts, {q.x, q.y, static_cast<double>(r + 1)});
+                }
+            } else if (!x_gauge_ancillas.empty() && r > 0) {
                 std::vector<uint32_t> tgts;
                 for (size_t i = 0; i < xg_count; i++) {
                     int32_t curr = -(int32_t)(merge_h2 + xg_count - i);
@@ -1207,13 +1380,8 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
         circuit_.safe_append_u("TICK", {}, {});
     }
 
-    // ====== Final round: Post-merge (interior patches + seam, no merge) ======
-    // Skipped in merge_only mode (we tear down in X basis directly after merge rounds).
-    if (!merge_only) {
-        std::vector<uint32_t> all_seam_x;
-        all_seam_x.insert(all_seam_x.end(), seam_a_x_ancillas.begin(), seam_a_x_ancillas.end());
-        all_seam_x.insert(all_seam_x.end(), seam_b_x_ancillas.begin(), seam_b_x_ancillas.end());
-
+    // ====== Post-merge rounds (interior patches + seam, no merge) ======
+    for (uint32_t post_round = 0; post_round < effective_post_rounds; post_round++) {
         auto emit_post_layer = [&](const std::vector<uint32_t>& int_cx,
                                     const std::vector<uint32_t>& seam_cx_layer,
                                     const std::vector<uint32_t>& gauge_cx) {
@@ -1224,34 +1392,28 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
             if (!combined.empty()) circuit_.safe_append_u("CX", combined, {});
         };
 
-        uint32_t final_round = effective_merge_rounds + 1;
+        const size_t pz = patch_z_count, mz = merge_z_count;
+        const size_t nm = normal_merge_x_count, ss = ss_count;
+        const uint32_t round_coord = effective_merge_rounds + 1 + post_round;
 
-        {
-            const size_t pz = patch_z_count, mz = merge_z_count;
-            const size_t nm = normal_merge_x_count, ss = ss_count;
+        std::vector<uint32_t> all_z_post = all_z_pre;
+        std::vector<uint32_t> all_x_post = all_x_pre;
 
-            // Same as pre-round: patch gauge ancillas are full-weight here.
-            std::vector<uint32_t> all_z_post = z_ancillas;
-            all_z_post.insert(all_z_post.end(), patch_z_gauge.begin(), patch_z_gauge.end());
+        circuit_.safe_append_u("TICK", {}, {});
+        circuit_.safe_append_u("R", all_z_post, {});
+        circuit_.safe_append_u("RX", all_x_post, {});
 
-            std::vector<uint32_t> all_x_post = x_ancillas;
-            all_x_post.insert(all_x_post.end(), patch_x_gauge.begin(), patch_x_gauge.end());
-            all_x_post.insert(all_x_post.end(), all_seam_x.begin(), all_seam_x.end());
+        emit_post_layer(pre_cx_layer1, pre_seam_cx1, {});
+        emit_post_layer(pre_cx_layer2, pre_seam_cx2, {});
+        emit_post_layer(pre_cx_layer3, pre_seam_cx3, {});
+        emit_post_layer(pre_cx_layer4, pre_seam_cx4, {});
 
-            circuit_.safe_append_u("TICK", {}, {});
-            circuit_.safe_append_u("R", all_z_post, {});
-            circuit_.safe_append_u("RX", all_x_post, {});
+        circuit_.safe_append_u("TICK", {}, {});
+        circuit_.safe_append_u("M", all_z_post, {});
+        circuit_.safe_append_u("MX", all_x_post, {});
 
-            emit_post_layer(pre_cx_layer1, pre_seam_cx1, {});
-            emit_post_layer(pre_cx_layer2, pre_seam_cx2, {});
-            emit_post_layer(pre_cx_layer3, pre_seam_cx3, {});
-            emit_post_layer(pre_cx_layer4, pre_seam_cx4, {});
-
-            circuit_.safe_append_u("TICK", {}, {});
-            circuit_.safe_append_u("M", all_z_post, {});
-            circuit_.safe_append_u("MX", all_x_post, {});
-
-            // Compare the post-split seam round against the last merge round.
+        if (post_round == 0) {
+            // Compare the first post-split seam round against the last merge round.
             // This applies to both merge_and_split and split_only, since split_only now
             // begins in the merged regime instead of starting as two separate patches.
             for (size_t i = 0; i < patch_z_count; i++) {
@@ -1262,7 +1424,7 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                     ? -(int32_t)(post_total + merge_h2 - i)
                     : -(int32_t)(post_total + ss_merge_total - i);
                 circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
-                    {q.x, q.y, static_cast<double>(final_round)});
+                    {q.x, q.y, static_cast<double>(round_coord)});
             }
             for (size_t i = 0; i < patch_x_count; i++) {
                 const auto& q = qubits_[x_ancillas[i]];
@@ -1274,7 +1436,7 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                     ? -(int32_t)(post_total + patch_x_count + normal_merge_x_count - i)
                     : -(int32_t)(post_total + ss_merge_total - pz - mz - i);
                 circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
-                    {q.x, q.y, static_cast<double>(final_round)});
+                    {q.x, q.y, static_cast<double>(round_coord)});
             }
             for (size_t m = 0; m < nm; m++) {
                 size_t j = normal_seam_indices[m];
@@ -1284,13 +1446,54 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
                 int32_t prev_nmx = -(int32_t)(post_total + 2 * ss + nm - m);
                 circuit_.safe_append_u("DETECTOR",
                     {drec(curr_a), drec(curr_b), drec(prev_nmx)},
-                    {q.x, q.y, static_cast<double>(final_round)});
+                    {q.x, q.y, static_cast<double>(round_coord)});
+            }
+            if (has_gauges && !x_gauge_ancillas.empty() && !x_gauge_entry_transition_pre_ancillas.empty()) {
+                std::vector<uint32_t> tgts;
+                for (uint32_t anc : x_gauge_entry_transition_pre_ancillas) {
+                    int32_t curr = x_meas_offset_in_pre_or_post(anc);
+                    if (curr >= 0) {
+                        tgts.push_back(drec(-curr));
+                    }
+                }
+                for (uint32_t anc : x_gauge_ancillas) {
+                    int32_t prev = x_gauge_meas_offset_in_merge_h1(anc);
+                    if (prev >= 0) {
+                        tgts.push_back(drec(-(int32_t)(post_total + prev)));
+                    }
+                }
+                if (!tgts.empty()) {
+                    const auto& q = qubits_[x_gauge_ancillas[0]];
+                    circuit_.safe_append_u("DETECTOR", tgts, {q.x, q.y, static_cast<double>(round_coord)});
+                }
             }
 
             // Orphan seam positions (merge-X suppressed at this y): no valid post-merge
             // detector. The seam X stabilizer anti-commutes with the adjacent merge-round
             // Z stabilizer because the excluded data qubit removes one of the two qubit
             // overlaps that normally cancel — leaving a net anti-commutation. Skipped.
+        } else {
+            for (size_t i = 0; i < patch_z_count; i++) {
+                const auto& q = qubits_[z_ancillas[i]];
+                int32_t curr = -(int32_t)(post_total - i);
+                int32_t prev = -(int32_t)(2 * post_total - i);
+                circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
+                    {q.x, q.y, static_cast<double>(round_coord)});
+            }
+            for (size_t i = 0; i < patch_x_count; i++) {
+                const auto& q = qubits_[x_ancillas[i]];
+                int32_t curr = -(int32_t)(post_total - patch_z_count - patch_zg_count - i);
+                int32_t prev = -(int32_t)(2 * post_total - patch_z_count - patch_zg_count - i);
+                circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
+                    {q.x, q.y, static_cast<double>(round_coord)});
+            }
+            for (size_t i = 0; i < all_seam_x.size(); i++) {
+                const auto& q = qubits_[all_seam_x[i]];
+                int32_t curr = -(int32_t)(all_seam_x.size() - i);
+                int32_t prev = -(int32_t)(post_total + all_seam_x.size() - i);
+                circuit_.safe_append_u("DETECTOR", {drec(curr), drec(prev)},
+                    {q.x, q.y, static_cast<double>(round_coord)});
+            }
         }
 
         circuit_.safe_append_u("TICK", {}, {});
@@ -1307,7 +1510,7 @@ void DistributedLatticeSurgeryCircuit::generate_general_circuit() {
 
     // Final data detectors: for each Z-stabilizer ancilla in the patches,
     // combine data measurements with the last ancilla measurement
-    uint32_t data_round = merge_rounds_ + 2;
+    uint32_t data_round = effective_merge_rounds + effective_post_rounds + 1;
 
     // Helper: find Z ancilla measurement offset from end of post-round.
     // Searches z_ancillas first, then patch_z_gauge (appended after z_ancillas in M()).
@@ -1814,18 +2017,18 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
     //
     // When superstabilizers are present (has_gauges), each merge round is split into
     // two half-rounds, so halves_per_merge=2; otherwise halves_per_merge=1.
-    //   Group 0                               = data reset (no pragmas)
-    //   Group 1                               = pre-merge round (initial pragmas already shown)
-    //   Groups 2 .. 1 + halves*merge_rounds   = merge rounds (patch + merge pragmas)
-    //   Group  2 + halves*merge_rounds         = post-merge round (patch + seam pragmas)
-    // halves_per_merge matches the circuit: 2 only when gauge ancillas are present
-    // (interior SS qubits split each merge round into two half-rounds).
-    // Boundary SS qubits suppress ancillas but do not create gauges, so halves=1.
+    // Reset groups are:
+    //   Group 0 = data reset (no pragmas)
+    //   pre_groups          full-weight patch + seam rounds
+    //   merge_half_groups   reduced-weight merge half-rounds
+    //   post_groups         full-weight patch + seam rounds
     const int halves_per_merge = has_gauges_ ? 2 : 1;
     const int merge_half_groups = halves_per_merge * static_cast<int>(merge_rounds_);
     const auto phase = config_.experiment_phase;
     const bool merge_only = (phase == ExperimentPhase::MERGE_ONLY);
     const bool split_only = (phase == ExperimentPhase::SPLIT_ONLY);
+    const int pre_groups = split_only ? 0 : static_cast<int>(config_.pre_merge_rounds > 0 ? config_.pre_merge_rounds : 1);
+    const int post_groups = merge_only ? 0 : static_cast<int>(config_.post_merge_rounds > 0 ? config_.post_merge_rounds : 1);
 
     std::ostringstream out;
     int reset_group = -1;
@@ -1841,7 +2044,7 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
             in_qubit_coords = false;
             if (split_only) {
                 out << patch_pragmas << merge_pragmas << remote_cx_pragmas;
-            } else {
+            } else if (pre_groups > 0) {
                 out << patch_pragmas_full << seam_pragmas_full;
             }
         }
@@ -1852,23 +2055,27 @@ std::string DistributedLatticeSurgeryCircuit::annotated_stim_str() const {
         if (is_reset && prev_was_tick) {
             reset_group++;
             if (split_only) {
-                // Group 0 = data reset
-                // Group 1 = first merge half-round (already shown by initial pragmas)
-                // Groups 2 .. merge_half_groups = later merge half-rounds
-                // Group 1 + merge_half_groups = post-split seam round
-                if (reset_group >= 2 && reset_group <= merge_half_groups) {
+                const int merge_start = 1;
+                const int merge_end = merge_start + merge_half_groups - 1;
+                const int post_start = merge_end + 1;
+                if (reset_group >= merge_start + 1 && reset_group <= merge_end) {
                     out << patch_pragmas << merge_pragmas << remote_cx_pragmas;
-                } else if (reset_group == 1 + merge_half_groups) {
+                } else if (post_groups > 0 &&
+                           reset_group >= post_start &&
+                           reset_group < post_start + post_groups) {
                     out << patch_pragmas_full << seam_pragmas_full;
                 }
             } else {
-                // Group 0 = data reset
-                // Group 1 = pre-merge seam round (already shown by initial pragmas)
-                // Groups 2 .. 1 + merge_half_groups = merge half-rounds
-                // Group 2 + merge_half_groups = post-merge seam round
-                if (reset_group >= 2 && reset_group <= 1 + merge_half_groups) {
+                const int merge_start = 1 + pre_groups;
+                const int merge_end = merge_start + merge_half_groups - 1;
+                const int post_start = merge_end + 1;
+                if (pre_groups > 0 && reset_group >= 2 && reset_group <= pre_groups) {
+                    out << patch_pragmas_full << seam_pragmas_full;
+                } else if (reset_group >= merge_start && reset_group <= merge_end) {
                     out << patch_pragmas << merge_pragmas << remote_cx_pragmas;
-                } else if (!merge_only && reset_group == 2 + merge_half_groups) {
+                } else if (post_groups > 0 &&
+                           reset_group >= post_start &&
+                           reset_group < post_start + post_groups) {
                     out << patch_pragmas_full << seam_pragmas_full;
                 }
             }

@@ -1,0 +1,24 @@
+code_distance 3
+rounds 5
+merge_type distributed_xx
+merge_rounds 5
+distributed true
+experiment_phase merge_and_split
+
+physical_error 0.001
+measurement_error 0.001
+reset_error 0.001
+
+raw_epr_fidelity 0.99
+distillation_protocol pumping_2to1
+distillation_rounds 2
+distillation_backup_batches 2
+accurate_rcx true
+
+entanglement_rate 100e6
+T1 125e-6
+T2 200e-6
+measurement_delay 660e-9
+
+total_shots 1
+mode monte_carlo

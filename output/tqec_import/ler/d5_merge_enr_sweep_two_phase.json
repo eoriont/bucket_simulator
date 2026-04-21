@@ -1,0 +1,420 @@
+{
+  "source": "simple_merge_only",
+  "basis": "X",
+  "physical_error": 0.001,
+  "measurement_delay": 6.6e-07,
+  "mpi_ranks": 2,
+  "batch_shots": 2500,
+  "shots_per_point": 5000,
+  "naming": {
+    "circuit_k_meaning": "TQEC spatial scale parameter with distance d = 2*circuit_k + 1",
+    "distillation_rounds_meaning": "Distillation depth swept as an independent variable"
+  },
+  "sweep": {
+    "entanglement_rate_values": [
+      25000000.0,
+      50000000.0,
+      100000000.0
+    ],
+    "m_values": [
+      1
+    ],
+    "distillation_rounds_values": [
+      1
+    ],
+    "protocols": [
+      "none",
+      "pumping_2to1",
+      "recurrence_2to1"
+    ],
+    "candidate_circuit_k_values": [
+      2
+    ],
+    "rounds_per_phase": 6
+  },
+  "results": [
+    {
+      "source": "simple_merge_only",
+      "basis": "X",
+      "protocol": "none",
+      "m": 1,
+      "distillation_rounds": 1,
+      "entanglement_rate": 25000000.0,
+      "measurement_delay": 6.6e-07,
+      "candidate_circuit_k_values": [
+        2
+      ],
+      "status": "ok",
+      "circuit_k": 2,
+      "distance_k": 2,
+      "circuit_distance": 5,
+      "round_schedule": {
+        "pre_rounds": 6,
+        "merge_rounds": 6,
+        "post_rounds": 0
+      },
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr25000000.m1.none.dr1.network_noisy.json",
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr25000000.m1.none.dr1.network_noisy.stim",
+      "timing_summary": {
+        "top_level_remote_pairs": 18,
+        "max_idling_time_us": 0.66,
+        "max_remote_cnot_error": 0.013954063959009999,
+        "timing_constraint_satisfied": true,
+        "effective_distillation_protocols": [
+          "none",
+          "none"
+        ]
+      },
+      "ler_result": {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr25000000.m1.none.dr1.network_noisy.stim",
+        "shots": 5000,
+        "batch_shots": 2500,
+        "qubits": 127,
+        "detectors": 858,
+        "observables": 1,
+        "logical_failures": 15,
+        "logical_error_rate": 0.003,
+        "runtime_seconds": 0.043374061584472656,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 2,
+          "mpi4py_available": true,
+          "total_batches": 2
+        }
+      }
+    },
+    {
+      "source": "simple_merge_only",
+      "basis": "X",
+      "protocol": "none",
+      "m": 1,
+      "distillation_rounds": 1,
+      "entanglement_rate": 50000000.0,
+      "measurement_delay": 6.6e-07,
+      "candidate_circuit_k_values": [
+        2
+      ],
+      "status": "ok",
+      "circuit_k": 2,
+      "distance_k": 2,
+      "circuit_distance": 5,
+      "round_schedule": {
+        "pre_rounds": 6,
+        "merge_rounds": 6,
+        "post_rounds": 0
+      },
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.m1.none.dr1.network_noisy.json",
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.m1.none.dr1.network_noisy.stim",
+      "timing_summary": {
+        "top_level_remote_pairs": 18,
+        "max_idling_time_us": 0.66,
+        "max_remote_cnot_error": 0.013954063959009999,
+        "timing_constraint_satisfied": true,
+        "effective_distillation_protocols": [
+          "none",
+          "none"
+        ]
+      },
+      "ler_result": {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.m1.none.dr1.network_noisy.stim",
+        "shots": 5000,
+        "batch_shots": 2500,
+        "qubits": 127,
+        "detectors": 858,
+        "observables": 1,
+        "logical_failures": 20,
+        "logical_error_rate": 0.004,
+        "runtime_seconds": 0.0402069091796875,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 2,
+          "mpi4py_available": true,
+          "total_batches": 2
+        }
+      }
+    },
+    {
+      "source": "simple_merge_only",
+      "basis": "X",
+      "protocol": "none",
+      "m": 1,
+      "distillation_rounds": 1,
+      "entanglement_rate": 100000000.0,
+      "measurement_delay": 6.6e-07,
+      "candidate_circuit_k_values": [
+        2
+      ],
+      "status": "ok",
+      "circuit_k": 2,
+      "distance_k": 2,
+      "circuit_distance": 5,
+      "round_schedule": {
+        "pre_rounds": 6,
+        "merge_rounds": 6,
+        "post_rounds": 0
+      },
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.m1.none.dr1.network_noisy.json",
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.m1.none.dr1.network_noisy.stim",
+      "timing_summary": {
+        "top_level_remote_pairs": 18,
+        "max_idling_time_us": 0.66,
+        "max_remote_cnot_error": 0.013954063959009999,
+        "timing_constraint_satisfied": true,
+        "effective_distillation_protocols": [
+          "none",
+          "none"
+        ]
+      },
+      "ler_result": {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.m1.none.dr1.network_noisy.stim",
+        "shots": 5000,
+        "batch_shots": 2500,
+        "qubits": 127,
+        "detectors": 858,
+        "observables": 1,
+        "logical_failures": 19,
+        "logical_error_rate": 0.0038,
+        "runtime_seconds": 0.04029488563537598,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 2,
+          "mpi4py_available": true,
+          "total_batches": 2
+        }
+      }
+    },
+    {
+      "source": "simple_merge_only",
+      "basis": "X",
+      "protocol": "pumping_2to1",
+      "m": 1,
+      "distillation_rounds": 1,
+      "entanglement_rate": 25000000.0,
+      "measurement_delay": 6.6e-07,
+      "candidate_circuit_k_values": [
+        2
+      ],
+      "status": "no_feasible_circuit_k"
+    },
+    {
+      "source": "simple_merge_only",
+      "basis": "X",
+      "protocol": "pumping_2to1",
+      "m": 1,
+      "distillation_rounds": 1,
+      "entanglement_rate": 50000000.0,
+      "measurement_delay": 6.6e-07,
+      "candidate_circuit_k_values": [
+        2
+      ],
+      "status": "ok",
+      "circuit_k": 2,
+      "distance_k": 2,
+      "circuit_distance": 5,
+      "round_schedule": {
+        "pre_rounds": 6,
+        "merge_rounds": 6,
+        "post_rounds": 0
+      },
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.m1.pumping_2to1.dr1.network_noisy.json",
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.m1.pumping_2to1.dr1.network_noisy.stim",
+      "timing_summary": {
+        "top_level_remote_pairs": 18,
+        "max_idling_time_us": 0.66,
+        "max_remote_cnot_error": 0.008788500380434883,
+        "timing_constraint_satisfied": true,
+        "effective_distillation_protocols": [
+          "pumping_2to1",
+          "pumping_2to1"
+        ]
+      },
+      "ler_result": {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.m1.pumping_2to1.dr1.network_noisy.stim",
+        "shots": 5000,
+        "batch_shots": 2500,
+        "qubits": 127,
+        "detectors": 858,
+        "observables": 1,
+        "logical_failures": 15,
+        "logical_error_rate": 0.003,
+        "runtime_seconds": 0.04062509536743164,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 2,
+          "mpi4py_available": true,
+          "total_batches": 2
+        }
+      }
+    },
+    {
+      "source": "simple_merge_only",
+      "basis": "X",
+      "protocol": "pumping_2to1",
+      "m": 1,
+      "distillation_rounds": 1,
+      "entanglement_rate": 100000000.0,
+      "measurement_delay": 6.6e-07,
+      "candidate_circuit_k_values": [
+        2
+      ],
+      "status": "ok",
+      "circuit_k": 2,
+      "distance_k": 2,
+      "circuit_distance": 5,
+      "round_schedule": {
+        "pre_rounds": 6,
+        "merge_rounds": 6,
+        "post_rounds": 0
+      },
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.m1.pumping_2to1.dr1.network_noisy.json",
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.m1.pumping_2to1.dr1.network_noisy.stim",
+      "timing_summary": {
+        "top_level_remote_pairs": 18,
+        "max_idling_time_us": 0.66,
+        "max_remote_cnot_error": 0.008788500380434883,
+        "timing_constraint_satisfied": true,
+        "effective_distillation_protocols": [
+          "pumping_2to1",
+          "pumping_2to1"
+        ]
+      },
+      "ler_result": {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.m1.pumping_2to1.dr1.network_noisy.stim",
+        "shots": 5000,
+        "batch_shots": 2500,
+        "qubits": 127,
+        "detectors": 858,
+        "observables": 1,
+        "logical_failures": 14,
+        "logical_error_rate": 0.0028,
+        "runtime_seconds": 0.04029202461242676,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 2,
+          "mpi4py_available": true,
+          "total_batches": 2
+        }
+      }
+    },
+    {
+      "source": "simple_merge_only",
+      "basis": "X",
+      "protocol": "recurrence_2to1",
+      "m": 1,
+      "distillation_rounds": 1,
+      "entanglement_rate": 25000000.0,
+      "measurement_delay": 6.6e-07,
+      "candidate_circuit_k_values": [
+        2
+      ],
+      "status": "no_feasible_circuit_k"
+    },
+    {
+      "source": "simple_merge_only",
+      "basis": "X",
+      "protocol": "recurrence_2to1",
+      "m": 1,
+      "distillation_rounds": 1,
+      "entanglement_rate": 50000000.0,
+      "measurement_delay": 6.6e-07,
+      "candidate_circuit_k_values": [
+        2
+      ],
+      "status": "ok",
+      "circuit_k": 2,
+      "distance_k": 2,
+      "circuit_distance": 5,
+      "round_schedule": {
+        "pre_rounds": 6,
+        "merge_rounds": 6,
+        "post_rounds": 0
+      },
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.m1.recurrence_2to1.dr1.network_noisy.json",
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.m1.recurrence_2to1.dr1.network_noisy.stim",
+      "timing_summary": {
+        "top_level_remote_pairs": 18,
+        "max_idling_time_us": 0.66,
+        "max_remote_cnot_error": 0.008788500380434883,
+        "timing_constraint_satisfied": true,
+        "effective_distillation_protocols": [
+          "recurrence_2to1",
+          "recurrence_2to1"
+        ]
+      },
+      "ler_result": {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr50000000.m1.recurrence_2to1.dr1.network_noisy.stim",
+        "shots": 5000,
+        "batch_shots": 2500,
+        "qubits": 127,
+        "detectors": 858,
+        "observables": 1,
+        "logical_failures": 13,
+        "logical_error_rate": 0.0026,
+        "runtime_seconds": 0.04033088684082031,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 2,
+          "mpi4py_available": true,
+          "total_batches": 2
+        }
+      }
+    },
+    {
+      "source": "simple_merge_only",
+      "basis": "X",
+      "protocol": "recurrence_2to1",
+      "m": 1,
+      "distillation_rounds": 1,
+      "entanglement_rate": 100000000.0,
+      "measurement_delay": 6.6e-07,
+      "candidate_circuit_k_values": [
+        2
+      ],
+      "status": "ok",
+      "circuit_k": 2,
+      "distance_k": 2,
+      "circuit_distance": 5,
+      "round_schedule": {
+        "pre_rounds": 6,
+        "merge_rounds": 6,
+        "post_rounds": 0
+      },
+      "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.m1.recurrence_2to1.dr1.network_noisy.json",
+      "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.m1.recurrence_2to1.dr1.network_noisy.stim",
+      "timing_summary": {
+        "top_level_remote_pairs": 18,
+        "max_idling_time_us": 0.66,
+        "max_remote_cnot_error": 0.008788500380434883,
+        "timing_constraint_satisfied": true,
+        "effective_distillation_protocols": [
+          "recurrence_2to1",
+          "recurrence_2to1"
+        ]
+      },
+      "ler_result": {
+        "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.enr100000000.m1.recurrence_2to1.dr1.network_noisy.stim",
+        "shots": 5000,
+        "batch_shots": 2500,
+        "qubits": 127,
+        "detectors": 858,
+        "observables": 1,
+        "logical_failures": 25,
+        "logical_error_rate": 0.005,
+        "runtime_seconds": 0.039994001388549805,
+        "detector_validation": "passed",
+        "mpi": {
+          "enabled": true,
+          "ranks": 2,
+          "mpi4py_available": true,
+          "total_batches": 2
+        }
+      }
+    }
+  ]
+}
