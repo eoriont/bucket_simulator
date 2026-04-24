@@ -1,0 +1,199 @@
+{
+  "source": "simple_merge_only",
+  "basis": "X",
+  "physical_error": 0.001,
+  "measurement_delay": 6.6e-07,
+  "mpi_ranks": 2,
+  "batch_shots": 2000,
+  "shots_per_point": 2000,
+  "circuit_k": 2,
+  "rounds_per_phase": 6,
+  "variants": [
+    "none",
+    "ss_mid=5,11"
+  ],
+  "results": [
+    {
+      "variant": "none",
+      "export_args": [],
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k2_pre6_merge6_post0.none.stim",
+      "entanglement_rate_values": [
+        100000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 100000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr100000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr100000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr100000000.rawpairs.network_noisy.stim",
+            "shots": 2000,
+            "batch_shots": 2000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 14,
+            "logical_error_rate": 0.007,
+            "runtime_seconds": 0.03513789176940918,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 2,
+              "mpi4py_available": true,
+              "total_batches": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "variant": "ss_mid",
+      "export_args": [
+        "--remove-data",
+        "(5,11)"
+      ],
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.stim",
+      "entanglement_rate_values": [
+        100000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 100000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr100000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr100000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 9
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": true,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr100000000.rawpairs.network_noisy.stim",
+            "shots": 2000,
+            "batch_shots": 2000,
+            "qubits": 127,
+            "detectors": 812,
+            "observables": 1,
+            "logical_failures": 0,
+            "logical_error_rate": 0.0,
+            "runtime_seconds": 0.06577515602111816,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 2,
+              "mpi4py_available": true,
+              "total_batches": 2
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

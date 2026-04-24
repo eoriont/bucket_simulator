@@ -13,10 +13,17 @@ sys.path.insert(0, str(PROJECT_ROOT / "python" / "tqec_import"))
 TQEC_PYTHON = PROJECT_ROOT / ".venv-tqec" / "bin" / "python"
 
 from distributed_noise import NoiseConfig, inject_network_noise
-from sweep_enr_raw_pairs import compute_required_epr_pairs_per_round
+from sweep_enr_raw_pairs import compute_required_epr_pairs_per_round, normalize_deformation_mode, resolve_max_concurrent_jobs
 
 
 class TqecRawPairsSweepTest(unittest.TestCase):
+    def test_baseline_alias_and_auto_concurrency_helpers(self) -> None:
+        self.assertEqual(normalize_deformation_mode("nosuper"), "none")
+        self.assertEqual(normalize_deformation_mode("none"), "none")
+        self.assertEqual(normalize_deformation_mode("lside"), "lside")
+        self.assertGreaterEqual(resolve_max_concurrent_jobs(0, 8), 1)
+        self.assertEqual(resolve_max_concurrent_jobs(3, 8), 3)
+
     def test_required_epr_pairs_track_border_deformation(self) -> None:
         export_script = PROJECT_ROOT / "python" / "tqec_import" / "export_stim.py"
         retime_script = PROJECT_ROOT / "python" / "tqec_import" / "retime_simple_merge.py"

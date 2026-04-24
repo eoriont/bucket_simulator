@@ -1,0 +1,41 @@
+{
+  "variants": [
+    {
+      "label": "none",
+      "export_args": []
+    },
+    {
+      "label": "lside",
+      "export_args": [
+        "--mode",
+        "lside"
+      ]
+    },
+    {
+      "label": "rside",
+      "export_args": [
+        "--mode",
+        "rside"
+      ]
+    },
+    {
+      "label": "twoside",
+      "export_args": [
+        "--mode",
+        "twoside"
+      ]
+    }
+  ],
+  "schedule": {
+    "pre_rounds": 6,
+    "merge_rounds": 6,
+    "post_rounds": 0
+  },
+  "naming": {
+    "circuit_k_meaning": "TQEC spatial scale parameter with distance d = 2*circuit_k + 1",
+    "deformation_baseline_aliases": [
+      "none",
+      "nosuper"
+    ]
+  }
+}

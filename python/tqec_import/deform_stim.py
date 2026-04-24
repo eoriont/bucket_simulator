@@ -6,6 +6,7 @@ from pathlib import Path
 
 import stim
 
+from rewrite_interior_gauges import rewrite_merge_repeat_for_interior_gauges, supports_interior_gauge_rewrite
 from stim_annotations import annotate_with_polygons
 from stim_layout import deformation_coordinates_for_mode, seam_border_coordinate
 from stim_deformation import apply_code_deformation, parse_coordinate_list
@@ -56,13 +57,23 @@ def main() -> None:
         removed = [seam_border_coordinate(circuit, args.remove_seam_border)]
     else:
         removed = deformation_coordinates_for_mode(circuit, args.mode)
-    result = apply_code_deformation(circuit, removed)
+    if args.remove_data is not None and supports_interior_gauge_rewrite(circuit, removed):
+        rewritten, summary = rewrite_merge_repeat_for_interior_gauges(circuit, removed)
+        removed_data = len(summary.removed_data_qubits)
+        suppressed_ancillas = len(summary.gauge_x_ancillas) + len(summary.gauge_z_ancillas)
+        final_circuit = rewritten
+    else:
+        result = apply_code_deformation(circuit, removed)
+        removed_data = len(result.removed_data_qubits)
+        suppressed_ancillas = len(result.suppressed_ancillas)
+        final_circuit = result.circuit
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(annotate_with_polygons(result.circuit), encoding="utf-8")
+    args.out.write_text(annotate_with_polygons(final_circuit), encoding="utf-8")
     print(
         f"Wrote {args.out} "
-        f"(removed_data={len(result.removed_data_qubits)}, suppressed_ancillas={len(result.suppressed_ancillas)}, "
-        f"qubits={result.circuit.num_qubits}, detectors={result.circuit.num_detectors})"
+        f"(removed_data={removed_data}, suppressed_ancillas={suppressed_ancillas}, "
+        f"qubits={final_circuit.num_qubits}, detectors={final_circuit.num_detectors}, "
+        f"observables={final_circuit.num_observables})"
     )
 
 

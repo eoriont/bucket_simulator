@@ -13,6 +13,7 @@ from tqec.utils.position import Position3D
 from tqec.utils.scale import LinearFunction
 
 from paths import GENERATED_ROOT
+from rewrite_interior_gauges import rewrite_merge_repeat_for_interior_gauges, supports_interior_gauge_rewrite
 from stim_annotations import annotate_with_polygons
 from stim_layout import deformation_coordinates_for_mode, seam_border_coordinate
 from stim_deformation import apply_code_deformation, parse_coordinate_list
@@ -195,7 +196,11 @@ def compile_and_write(
         manhattan_radius=manhattan_radius,
     )
     if remove_data:
-        circuit = apply_code_deformation(circuit, parse_coordinate_list(remove_data)).circuit
+        removed_coords = parse_coordinate_list(remove_data)
+        if supports_interior_gauge_rewrite(circuit, removed_coords):
+            circuit, _summary = rewrite_merge_repeat_for_interior_gauges(circuit, removed_coords)
+        else:
+            circuit = apply_code_deformation(circuit, removed_coords).circuit
     elif remove_seam_border:
         circuit = apply_code_deformation(circuit, [seam_border_coordinate(circuit, remove_seam_border)]).circuit
     elif deformation_mode:

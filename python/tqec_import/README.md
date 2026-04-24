@@ -8,6 +8,11 @@ Generated files are organized under `output/tqec_import/`:
 - `output/tqec_import/injected/`
 - `output/tqec_import/ler/`
 
+Sweep-style experiment runs now also create isolated per-run folders under
+`output/tqec_import/<experiment_name>/<run_name>_<timestamp>/` with separate
+`circuits/clean/`, `circuits/noisy/`, `timing/`, `results/`, and `params/`
+subdirectories.
+
 ## What Works Today
 
 - Export a verified logical CNOT lattice-surgery circuit from `tqec.gallery.cnot`.
@@ -165,19 +170,37 @@ merge and then sweep entanglement rate, pass `--circuit-k-values 2 --rounds-per-
 ## Raw-Pairs ENR Sweep With Border Deformations
 
 This sweep keeps distillation off (`protocol=none`) and compares the border
-deformation modes `none`, `lside`, `rside`, and `twoside`. It also records the
-remaining remote-CNOT count as the required raw EPR pairs per round.
+deformation modes `none`/`nosuper`, `lside`, `rside`, and `twoside`. It also
+records the remaining remote-CNOT count as the required raw EPR pairs per round.
 
 ```bash
 .venv-tqec/bin/python python/tqec_import/sweep_enr_raw_pairs.py \
-  --circuit-k 2 \
-  --rounds-per-phase 6 \
-  --deformation-modes none,lside,rside,twoside \
+  --circuit-k 8 \
+  --rounds-per-phase 18 \
+  --deformation-modes nosuper,lside,rside,twoside \
   --enr-values 25000000,50000000,75000000,100000000,150000000,200000000,300000000,500000000,750000000,1000000000
 ```
 
 The sweep output includes the remaining remote-CNOT count for each deformation
 and the derived `required_epr_pairs_per_round` field.
+
+For a larger remote machine, set both the MPI width and the number of
+simultaneous sweep jobs explicitly:
+
+```bash
+.venv-tqec/bin/python python/tqec_import/sweep_enr_raw_pairs.py \
+  --circuit-k 8 \
+  --rounds-per-phase 18 \
+  --deformation-modes nosuper,lside,rside,twoside \
+  --mpi-ranks 8 \
+  --max-concurrent-jobs auto \
+  --name d17_regime_sweep
+```
+
+That creates a fresh run directory like
+`output/tqec_import/raw_pairs_sweeps/d17_regime_sweep_20260424_153000/` and
+keeps generated clean Stim, noisy Stim, timing JSON, result JSON, and parameter
+snapshots separated.
 
 ## Apply Simple Code Deformation
 
@@ -219,9 +242,17 @@ Or apply the same pass directly during export:
   --remove-data "(5,7)"
 ```
 
-The current deformation pass is intentionally limited to the simpler
-"remove data qubits / suppress nearby checks" case. Superstabilizer gauge-round
-alternation is not implemented in the TQEC import path yet.
+The deformation pass now has two paths:
+
+- border / simple deformations still use the original
+  "remove data qubits / suppress nearby checks" rewrite, and
+- interior seam data removals use the split-round superstabilizer rewrite in
+  `rewrite_interior_gauges.py`, including cluster gauge detectors and a rebuilt
+  deterministic border observable.
+
+The interior-gauge rewrite is currently targeted at the validated TQEC
+merge-style circuits with an interior seam defect. Border deformations continue
+to use the simpler suppression-based path.
 
 ## Add Polygon Annotations
 
