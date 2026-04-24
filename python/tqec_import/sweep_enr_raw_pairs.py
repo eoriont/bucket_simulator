@@ -6,8 +6,11 @@ import json
 import os
 import shutil
 import subprocess
-from concurrent.futures import ThreadPoolExecutor
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 from paths import PROJECT_ROOT, create_experiment_run_paths
@@ -58,12 +61,39 @@ def normalize_deformation_mode(mode: str) -> str:
 
 @dataclass(frozen=True)
 class SweepJob:
+    index: int
+    total_jobs: int
     variant: DeformationVariant
     clean_stim: Path
     entanglement_rate: float
     injected_stim: Path
     timing_json: Path
     result_json: Path
+
+
+class ProgressLogger:
+    def __init__(self, log_path: Path) -> None:
+        self._log_path = log_path
+        self._lock = threading.Lock()
+
+    def log(self, message: str) -> None:
+        line = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {message}"
+        with self._lock:
+            print(line, flush=True)
+            self._log_path.parent.mkdir(parents=True, exist_ok=True)
+            with self._log_path.open("a", encoding="utf-8") as f:
+                f.write(line + "\n")
+
+
+def format_enr_mhz(entanglement_rate: float) -> str:
+    return f"{entanglement_rate / 1e6:.1f}MHz"
+
+
+def describe_job(job: SweepJob) -> str:
+    return (
+        f"[{job.index}/{job.total_jobs}] "
+        f"{job.variant.label} @ {format_enr_mhz(job.entanglement_rate)}"
+    )
 
 
 def parse_args() -> argparse.Namespace:
@@ -169,7 +199,10 @@ def run_job(
     batch_shots: int,
     mpi_ranks: int,
     rounds_per_phase: int,
+    logger: ProgressLogger,
 ) -> dict:
+    started_at = time.perf_counter()
+    logger.log(f"START {describe_job(job)}")
     subprocess.run(
         [
             str(py),
@@ -202,6 +235,10 @@ def run_job(
 
     timing_summary = json.loads(job.timing_json.read_text())
     required_epr_pairs_per_round = compute_required_epr_pairs_per_round(timing_summary, rounds_per_phase)
+    logger.log(
+        f"INJECTED {describe_job(job)} "
+        f"required_epr_pairs_per_round={required_epr_pairs_per_round}"
+    )
 
     proc = subprocess.run(
         [
@@ -226,6 +263,12 @@ def run_job(
         text=True,
     )
     ler_result = json.loads(proc.stdout)
+    elapsed_s = time.perf_counter() - started_at
+    logger.log(
+        f"DONE {describe_job(job)} "
+        f"ler={ler_result['logical_error_rate']:.6g} "
+        f"runtime={elapsed_s:.1f}s"
+    )
 
     return {
         "deformation_mode": job.variant.label,
@@ -245,6 +288,7 @@ def run_job(
         "timing_constraint_satisfied": all(section["timing_constraint_satisfied"] for section in timing_summary["sections"])
         if timing_summary["sections"]
         else True,
+        "elapsed_seconds": elapsed_s,
         "ler_result": ler_result,
     }
 
@@ -265,6 +309,7 @@ def main() -> None:
         raise SystemExit("This sweep currently expects a fixed pre=merge=rounds_per_phase and post=0 schedule.")
 
     run_paths = create_experiment_run_paths("raw_pairs_sweeps", args.name)
+    logger = ProgressLogger(run_paths.root / "progress.log")
     write_run_metadata(
         run_dir=run_paths.root,
         args=args,
@@ -277,12 +322,23 @@ def main() -> None:
         },
         max_concurrent_jobs=max_concurrent_jobs,
     )
+    logger.log(
+        f"RUN_DIR {run_paths.root}"
+    )
+    logger.log(
+        f"CONFIG source={args.source} basis={args.basis} "
+        f"d={2 * args.circuit_k + 1} k={args.circuit_k} "
+        f"rounds_per_phase={args.rounds_per_phase} "
+        f"mpi_ranks={args.mpi_ranks} "
+        f"max_concurrent_jobs={max_concurrent_jobs}"
+    )
 
     variants = [parse_variant(mode) for mode in normalized_modes]
     results_by_mode: dict[str, dict] = {}
-    jobs: list[SweepJob] = []
+    pending_jobs: list[tuple[DeformationVariant, Path, float]] = []
 
     for variant in variants:
+        logger.log(f"PREP variant={variant.label}")
         clean = export_clean_variant(
             py=py,
             root=root,
@@ -294,6 +350,7 @@ def main() -> None:
             variant=variant,
         )
         validate_deterministic_circuit(clean)
+        logger.log(f"READY variant={variant.label} clean_stim={clean.name}")
 
         run_clean = run_paths.clean_circuits_dir / clean.name
         shutil.copyfile(clean, run_clean)
@@ -307,21 +364,31 @@ def main() -> None:
         }
 
         for enr in args.enr_values:
-            stem = f"{run_clean.stem}.enr{int(enr)}.rawpairs"
-            jobs.append(
-                SweepJob(
-                    variant=variant,
-                    clean_stim=run_clean,
-                    entanglement_rate=enr,
-                    injected_stim=run_paths.noisy_circuits_dir / f"{stem}.network_noisy.stim",
-                    timing_json=run_paths.timing_dir / f"{stem}.network_noisy.json",
-                    result_json=run_paths.results_dir / f"{stem}.ler_{args.shots}_mpi.json",
-                )
+            pending_jobs.append((variant, run_clean, enr))
+
+    jobs: list[SweepJob] = []
+    total_jobs = len(pending_jobs)
+    for index, (variant, run_clean, enr) in enumerate(pending_jobs, start=1):
+        stem = f"{run_clean.stem}.enr{int(enr)}.rawpairs"
+        jobs.append(
+            SweepJob(
+                index=index,
+                total_jobs=total_jobs,
+                variant=variant,
+                clean_stim=run_clean,
+                entanglement_rate=enr,
+                injected_stim=run_paths.noisy_circuits_dir / f"{stem}.network_noisy.stim",
+                timing_json=run_paths.timing_dir / f"{stem}.network_noisy.json",
+                result_json=run_paths.results_dir / f"{stem}.ler_{args.shots}_mpi.json",
             )
+        )
+
+    logger.log(f"QUEUE total_jobs={total_jobs}")
 
     with ThreadPoolExecutor(max_workers=max_concurrent_jobs) as executor:
-        completed = executor.map(
-            lambda job: run_job(
+        futures = [
+            executor.submit(
+                run_job,
                 job=job,
                 py=py,
                 root=root,
@@ -332,11 +399,16 @@ def main() -> None:
                 batch_shots=args.batch_shots,
                 mpi_ranks=args.mpi_ranks,
                 rounds_per_phase=args.rounds_per_phase,
-            ),
-            jobs,
-        )
-        for entry in completed:
+                logger=logger,
+            )
+            for job in jobs
+        ]
+        completed_jobs = 0
+        for future in as_completed(futures):
+            entry = future.result()
+            completed_jobs += 1
             results_by_mode[entry["deformation_mode"]]["results"].append(entry)
+            logger.log(f"PROGRESS completed={completed_jobs}/{total_jobs}")
 
     results = [results_by_mode[variant.label] for variant in variants]
     summary = {
@@ -357,6 +429,7 @@ def main() -> None:
     }
     out = run_paths.root / "summary.json"
     out.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    logger.log(f"SUMMARY {out}")
     print(json.dumps(summary, indent=2))
 
 

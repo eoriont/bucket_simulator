@@ -202,6 +202,18 @@ That creates a fresh run directory like
 keeps generated clean Stim, noisy Stim, timing JSON, result JSON, and parameter
 snapshots separated.
 
+To plot one of these per-run sweep directories:
+
+```bash
+.venv-tqec/bin/python python/tqec_import/plot_raw_pairs_sweep.py \
+  output/tqec_import/raw_pairs_sweeps/d17_regime_sweep_20260424_153000
+```
+
+That writes:
+
+- `ler_vs_enr.png`
+- `required_epr_pairs_vs_enr.png`
+
 ## Apply Simple Code Deformation
 
 This path now includes a Stim-level post-processing pass for the simple case

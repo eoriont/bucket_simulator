@@ -1,0 +1,21 @@
+{
+  "source": "simple_merge_only",
+  "basis": "X",
+  "circuit_k": 2,
+  "rounds_per_phase": 6,
+  "deformation_modes": [
+    "none",
+    "lside"
+  ],
+  "enr_values": [
+    25000000.0
+  ],
+  "physical_error": 0.001,
+  "measurement_delay": 6.6e-07,
+  "shots": 1000,
+  "batch_shots": 1000,
+  "mpi_ranks": 2,
+  "max_concurrent_jobs": 2,
+  "name": "smoke_progress",
+  "max_concurrent_jobs_resolved": 2
+}

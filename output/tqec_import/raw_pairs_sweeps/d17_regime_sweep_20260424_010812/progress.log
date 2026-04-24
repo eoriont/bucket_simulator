@@ -1,0 +1,13 @@
+[2026-04-24 01:08:12] RUN_DIR /Users/eli/dev/bucket_simulator/output/tqec_import/raw_pairs_sweeps/d17_regime_sweep_20260424_010812
+[2026-04-24 01:08:12] CONFIG source=simple_merge_only basis=X d=17 k=8 rounds_per_phase=18 mpi_ranks=8 max_concurrent_jobs=1
+[2026-04-24 01:08:12] PREP variant=none
+[2026-04-24 01:08:18] READY variant=none clean_stim=simple_merge_only_x_k8_pre18_merge18_post0.none.stim
+[2026-04-24 01:08:18] PREP variant=lside
+[2026-04-24 01:08:26] READY variant=lside clean_stim=simple_merge_only_x_k8_pre18_merge18_post0.lside.stim
+[2026-04-24 01:08:26] PREP variant=rside
+[2026-04-24 01:08:33] READY variant=rside clean_stim=simple_merge_only_x_k8_pre18_merge18_post0.rside.stim
+[2026-04-24 01:08:33] PREP variant=twoside
+[2026-04-24 01:08:41] READY variant=twoside clean_stim=simple_merge_only_x_k8_pre18_merge18_post0.twoside.stim
+[2026-04-24 01:08:41] QUEUE total_jobs=48
+[2026-04-24 01:08:41] START [1/48] none @ 10.0MHz
+[2026-04-24 01:08:43] INJECTED [1/48] none @ 10.0MHz required_epr_pairs_per_round=33

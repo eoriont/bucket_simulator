@@ -1,0 +1,16 @@
+[2026-04-24 01:06:39] RUN_DIR /Users/eli/dev/bucket_simulator/output/tqec_import/raw_pairs_sweeps/smoke_progress_20260424_010639
+[2026-04-24 01:06:39] CONFIG source=simple_merge_only basis=X d=5 k=2 rounds_per_phase=6 mpi_ranks=2 max_concurrent_jobs=2
+[2026-04-24 01:06:39] PREP variant=none
+[2026-04-24 01:06:39] READY variant=none clean_stim=simple_merge_only_x_k2_pre6_merge6_post0.none.stim
+[2026-04-24 01:06:39] PREP variant=lside
+[2026-04-24 01:06:39] READY variant=lside clean_stim=simple_merge_only_x_k2_pre6_merge6_post0.lside.stim
+[2026-04-24 01:06:39] QUEUE total_jobs=2
+[2026-04-24 01:06:39] START [1/2] none @ 25.0MHz
+[2026-04-24 01:06:39] START [2/2] lside @ 25.0MHz
+[2026-04-24 01:06:39] INJECTED [1/2] none @ 25.0MHz required_epr_pairs_per_round=9
+[2026-04-24 01:06:40] INJECTED [2/2] lside @ 25.0MHz required_epr_pairs_per_round=6
+[2026-04-24 01:06:40] DONE [1/2] none @ 25.0MHz ler=0.004 runtime=1.0s
+[2026-04-24 01:06:40] PROGRESS completed=1/2
+[2026-04-24 01:06:40] DONE [2/2] lside @ 25.0MHz ler=0.014 runtime=1.0s
+[2026-04-24 01:06:40] PROGRESS completed=2/2
+[2026-04-24 01:06:40] SUMMARY /Users/eli/dev/bucket_simulator/output/tqec_import/raw_pairs_sweeps/smoke_progress_20260424_010639/summary.json
