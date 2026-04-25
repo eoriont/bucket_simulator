@@ -35,6 +35,7 @@ class NoiseConfig:
     t1_coherence_time: float = 125e-6
     t2_coherence_time: float = 200e-6
     monolithic_baseline: bool = False
+    local_baseline: bool = False
     split_axis: str = "auto"
     split_x: float | None = None
 
@@ -248,7 +249,10 @@ def evaluate_remote_cnot_noise_model(protocol: str, rounds: int, num_remote_cnot
         config.physical_error,
         config.accurate_rcx,
     )
-    if config.monolithic_baseline:
+    if config.local_baseline:
+        remote_only_error = 0.0
+        remote_cnot_error = 0.0
+    elif config.monolithic_baseline:
         remote_only_error = 0.0
         remote_cnot_error = config.physical_error
     else:

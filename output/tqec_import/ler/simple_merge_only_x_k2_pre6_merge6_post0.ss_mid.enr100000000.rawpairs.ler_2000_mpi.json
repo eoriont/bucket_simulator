@@ -7,7 +7,7 @@
   "observables": 1,
   "logical_failures": 0,
   "logical_error_rate": 0.0,
-  "runtime_seconds": 0.06577515602111816,
+  "runtime_seconds": 0.06323790550231934,
   "detector_validation": "passed",
   "mpi": {
     "enabled": true,

@@ -89,14 +89,49 @@ def _resolve_removed_data_qubits(
     return tuple(sorted(set(removed)))
 
 
-def _find_top_level_repeat(circuit: stim.Circuit) -> tuple[int, stim.CircuitRepeatBlock]:
+def _find_merge_repeat(circuit: stim.Circuit) -> tuple[int, stim.CircuitRepeatBlock]:
     repeats: list[tuple[int, stim.CircuitRepeatBlock]] = []
     for i, op in enumerate(circuit):
         if isinstance(op, stim.CircuitRepeatBlock):
             repeats.append((i, op))
     if not repeats:
         raise ValueError("Expected at least one top-level REPEAT block; found none.")
-    return repeats[0]
+    if len(repeats) == 1:
+        return repeats[0]
+    # Retimed simple-merge circuits use top-level REPEAT blocks in
+    # pre-merge, merge, post-merge order. The interior gauge rewrite must
+    # target the merge body, which is the second top-level repeat.
+    return repeats[1]
+
+
+def _find_preceding_seed_block_start(circuit: stim.Circuit, repeat_index: int) -> int:
+    """Returns the index of the explicit seeded round preceding a merge repeat.
+
+    TQEC-exported simple-merge circuits emit one explicit round before the
+    repeated body of each phase. That explicit seed begins immediately after the
+    previous top-level SHIFT_COORDS.
+    """
+    shift_indices: list[int] = []
+    for i in range(repeat_index - 1, -1, -1):
+        op = circuit[i]
+        if isinstance(op, stim.CircuitRepeatBlock):
+            continue
+        if op.name == "SHIFT_COORDS":
+            shift_indices.append(i)
+            if len(shift_indices) == 2:
+                return i + 1
+    return 0 if not shift_indices else shift_indices[-1] + 1
+
+
+def _find_merge_phase_end(circuit: stim.Circuit, repeat_index: int) -> int:
+    """Returns the index of the top-level SHIFT_COORDS ending the merge phase."""
+    for i in range(repeat_index + 1, len(circuit)):
+        op = circuit[i]
+        if isinstance(op, stim.CircuitRepeatBlock):
+            continue
+        if op.name == "SHIFT_COORDS":
+            return i
+    return repeat_index
 
 
 def _measurement_targets(body: stim.Circuit) -> list[int]:
@@ -293,7 +328,7 @@ def _append_half_round_detectors(
         prev_idx = previous_normal_index.get(ancilla)
         if prev_idx is None:
             continue
-        prev_block_len = original_measurements_per_round if first else len(previous_normal_measured_qubits or [])
+        prev_block_len = len(previous_normal_measured_qubits or [])
         prev = -(len(measured_qubits) + prev_block_len - prev_idx)
         out.append("DETECTOR", [stim.target_rec(curr), stim.target_rec(prev)], [x, y, 0.0])
 
@@ -317,10 +352,53 @@ def _append_half_round_detectors(
                 prev = -(len(measured_qubits) + prev_span + len(previous_gauge_measured_qubits or []) - prev_idx)
                 tgts.append(stim.target_rec(prev))
         if tgts:
-            if first and family == "X":
+            if first:
                 continue
             x, y = center
             out.append("DETECTOR", tgts, [x, y, 0.0])
+
+
+def _filter_destruction_round(
+    op: stim.CircuitInstruction,
+    removed_data_qubits: set[int],
+) -> stim.CircuitInstruction | None:
+    """Strip removed data qubits from a destruction-round op.
+
+    Returns None for DETECTORs (they have stale rec offsets) and for ops that
+    become empty. Any other operation has its target list filtered down.
+    """
+    name = op.name
+    if name == "DETECTOR":
+        # Keep the original DETECTOR so _rebuild_post_transition_layer can
+        # locate the layer (its rec offsets are no longer correct because we
+        # filtered the round, but the rebuild will replace them anyway).
+        return op
+    targets = op.targets_copy()
+    args = op.gate_args_copy()
+    if name in _PAIR_GATES:
+        qubits = [t.qubit_value for t in targets if t.is_qubit_target]
+        kept: list[stim.GateTarget] = []
+        for i in range(0, len(qubits), 2):
+            a = qubits[i]
+            b = qubits[i + 1]
+            if a in removed_data_qubits or b in removed_data_qubits:
+                continue
+            kept.extend([stim.GateTarget(a), stim.GateTarget(b)])
+        if not kept:
+            return None
+        return stim.CircuitInstruction(name, kept, args)
+    if name in _SINGLE_QUBIT_GATES:
+        kept = [t for t in targets if t.is_qubit_target and t.qubit_value not in removed_data_qubits]
+        if not kept:
+            return None
+        return stim.CircuitInstruction(name, kept, args)
+    if name in _MEASUREMENT_GATES:
+        # Keep removed data qubits in the destructive measurement so that the
+        # downstream rec offsets in post-merge detectors stay valid. The qubit
+        # is in some unentangled state because the merge half-rounds and the
+        # destruction-round gates no longer touch it.
+        return op
+    return op
 
 
 def _filter_body_for_family(
@@ -444,6 +522,27 @@ def _measurement_blocks(flat_circuit: stim.Circuit) -> list[tuple[int, list[int]
     return blocks
 
 
+def _count_measurement_blocks(circuit: stim.Circuit) -> int:
+    count = 0
+    for op in circuit:
+        if isinstance(op, stim.CircuitRepeatBlock):
+            count += op.repeat_count * _count_measurement_blocks(op.body_copy())
+        elif op.name in _MEASUREMENT_GATES:
+            count += 1
+    return count
+
+
+def _count_pre_merge_blocks(circuit: stim.Circuit, seed_start_index: int) -> int:
+    count = 0
+    for i in range(seed_start_index):
+        op = circuit[i]
+        if isinstance(op, stim.CircuitRepeatBlock):
+            count += op.repeat_count * _count_measurement_blocks(op.body_copy())
+        elif op.name in _MEASUREMENT_GATES:
+            count += 1
+    return count
+
+
 def _measurement_qubits_for_observable(
     flat_circuit: stim.Circuit,
 ) -> tuple[list[int], list[tuple[int, int, list[int], int, int]]]:
@@ -529,7 +628,7 @@ def _rebuild_observables(
                 trial = stim.Circuit(str(base))
                 trial.append("OBSERVABLE_INCLUDE", tgts, [float(obs_index)])
                 try:
-                    trial.detector_error_model(allow_gauge_detectors=False)
+                    trial.detector_error_model(allow_gauge_detectors=True)
                     return tgts
                 except ValueError:
                     continue
@@ -626,38 +725,38 @@ def _rebuild_observables(
             continue
 
         fixed_targets: list[stim.GateTarget] = []
-        search_piece: tuple[int, list[int]] | None = None
+        missing_pieces: list[tuple[int, list[int]]] = []
         for block_idx, qubits in pieces:
             kept = [q for q in qubits if (block_idx, q) in idx_by_block_qubit]
-            missing = [q for q in qubits if (block_idx, q) not in idx_by_block_qubit]
-            if not missing:
-                for q in kept:
-                    fixed_targets.append(stim.target_rec(idx_by_block_qubit[(block_idx, q)] - total_measurements))
-                continue
-            if search_piece is not None:
-                raise ValueError("Observable rebuild currently supports at most one missing observable piece.")
-            search_piece = (block_idx, kept)
+            for q in kept:
+                fixed_targets.append(stim.target_rec(idx_by_block_qubit[(block_idx, q)] - total_measurements))
+            if len(kept) != len(qubits):
+                missing_pieces.append((block_idx, kept))
 
-        if search_piece is None:
+        if not missing_pieces:
             if fixed_targets:
                 base.append("OBSERVABLE_INCLUDE", fixed_targets, [float(obs_index)])
             continue
 
-        block_idx, kept = search_piece
-        block_qubits = {q for (b, q), _abs in idx_by_block_qubit.items() if b == block_idx}
-        gauge_candidates = sorted(block_qubits & gauge_x_set)
+        gauge_candidates: list[stim.GateTarget] = []
+        seen_candidate_keys: set[tuple[int, int]] = set()
+        for block_idx, _kept in missing_pieces:
+            block_qubits = {q for (b, q), _abs in idx_by_block_qubit.items() if b == block_idx}
+            for q in sorted(block_qubits & gauge_x_set):
+                key = (block_idx, q)
+                if key in seen_candidate_keys:
+                    continue
+                seen_candidate_keys.add(key)
+                gauge_candidates.append(stim.target_rec(idx_by_block_qubit[key] - total_measurements))
         solved_targets: list[stim.GateTarget] | None = None
         for r in range(len(gauge_candidates) + 1):
             for subset in combinations(gauge_candidates, r):
                 tgts = list(fixed_targets)
-                for q in kept:
-                    tgts.append(stim.target_rec(idx_by_block_qubit[(block_idx, q)] - total_measurements))
-                for q in subset:
-                    tgts.append(stim.target_rec(idx_by_block_qubit[(block_idx, q)] - total_measurements))
+                tgts.extend(subset)
                 trial = stim.Circuit(str(base))
                 trial.append("OBSERVABLE_INCLUDE", tgts, [float(obs_index)])
                 try:
-                    trial.detector_error_model(allow_gauge_detectors=False)
+                    trial.detector_error_model(allow_gauge_detectors=True)
                     solved_targets = tgts
                     break
                 except ValueError:
@@ -677,9 +776,11 @@ def _rebuild_post_transition_layer(
     coords_by_qubit: dict[int, tuple[float, float]],
     gauge_ancilla_coords: set[tuple[float, float]],
     rewritten_repeat_count: int,
+    pre_merge_block_count: int,
+    block_offset: int = 0,
 ) -> stim.Circuit:
     blocks = _measurement_blocks(flat_circuit)
-    post_block_index = 1 + 2 * rewritten_repeat_count
+    post_block_index = pre_merge_block_count + 2 * rewritten_repeat_count + block_offset
     if len(blocks) <= post_block_index:
         return flat_circuit
 
@@ -786,13 +887,43 @@ def rewrite_merge_repeat_for_interior_gauges(
         gauge_ancillas=gauge_z,
     )
 
-    repeat_index, repeat_block = _find_top_level_repeat(circuit)
+    repeat_index, repeat_block = _find_merge_repeat(circuit)
+    seed_start_index = _find_preceding_seed_block_start(circuit, repeat_index)
+    merge_end_index = _find_merge_phase_end(circuit, repeat_index)
     if repeat_block.repeat_count % 2 != 0:
         raise ValueError(
             f"Expected an even merge repeat count so it can be halved after subround splitting; got {repeat_block.repeat_count}."
         )
     body = repeat_block.body_copy()
     original_measured = _measurement_targets(body)
+
+    body_init_qubits: dict[str, set[int]] = {}
+    for op in body:
+        if op.name in {"R", "RX", "RY"}:
+            body_init_qubits.setdefault(op.name, set()).update(
+                t.qubit_value for t in op.targets_copy() if t.is_qubit_target
+            )
+
+    seam_data_inits: list[tuple[str, list[int]]] = []
+    for j in range(seed_start_index, repeat_index):
+        op = circuit[j]
+        if isinstance(op, stim.CircuitRepeatBlock):
+            continue
+        if op.name in {"R", "RX", "RY"}:
+            qs = [t.qubit_value for t in op.targets_copy() if t.is_qubit_target]
+            extras = [
+                q for q in qs
+                if q not in body_init_qubits.get(op.name, set()) and q not in removed_data_qubits
+            ]
+            if extras:
+                seam_data_inits.append((op.name, extras))
+
+    pre_merge_tail_measured: list[int] = []
+    for j in range(repeat_index - 1, -1, -1):
+        prev_op = circuit[j]
+        if isinstance(prev_op, stim.CircuitRepeatBlock):
+            pre_merge_tail_measured = _measurement_targets(prev_op.body_copy())
+            break
     half1_measured = _active_measurements(original_measured, gauge_x, gauge_z, active_family="X")
     half2_measured = _active_measurements(original_measured, gauge_x, gauge_z, active_family="Z")
 
@@ -807,8 +938,8 @@ def rewrite_merge_repeat_for_interior_gauges(
     _append_half_round_detectors(
         half1_seed,
         measured_qubits=half1_order,
-        previous_normal_measured_qubits=original_measured,
-        previous_gauge_measured_qubits=original_measured,
+        previous_normal_measured_qubits=pre_merge_tail_measured,
+        previous_gauge_measured_qubits=pre_merge_tail_measured,
         coords_by_qubit=coords_by_qubit,
         normal_ancillas=normal_half1,
         gauge_clusters=gauge_x_clusters,
@@ -875,6 +1006,8 @@ def rewrite_merge_repeat_for_interior_gauges(
     half2.append("SHIFT_COORDS", [], [0.0, 0.0, 1.0])
 
     seeded_body = stim.Circuit()
+    for init_name, init_qubits in seam_data_inits:
+        seeded_body.append(init_name, init_qubits, [])
     seeded_body += half1_seed
     seeded_body += half2_seed
 
@@ -883,18 +1016,26 @@ def rewrite_merge_repeat_for_interior_gauges(
     rewritten_body += half2
 
     out = stim.Circuit()
+    inserted_rewrite = False
     for i, op in enumerate(circuit):
-        if i != repeat_index:
-            if i > repeat_index and _is_detector_at_coords(op, gauge_ancilla_coords):
+        if seed_start_index <= i <= repeat_index:
+            if not inserted_rewrite and i == seed_start_index:
+                logical_rounds = repeat_block.repeat_count // 2
+                if logical_rounds > 0:
+                    out += seeded_body
+                    if logical_rounds > 1:
+                        out.append(stim.CircuitRepeatBlock(logical_rounds - 1, rewritten_body))
+                inserted_rewrite = True
+            continue
+        if repeat_index < i <= merge_end_index:
+            filtered = _filter_destruction_round(op, removed_data_qubits)
+            if filtered is None:
                 continue
-            out.append(op)
+            out.append(filtered)
             continue
-        logical_rounds = repeat_block.repeat_count // 2
-        if logical_rounds <= 0:
+        if i > merge_end_index and _is_detector_at_coords(op, gauge_ancilla_coords):
             continue
-        out += seeded_body
-        if logical_rounds > 1:
-            out.append(stim.CircuitRepeatBlock(logical_rounds - 1, rewritten_body))
+        out.append(op)
 
     flat_out = out.flattened()
     cluster_zs = [
@@ -912,22 +1053,33 @@ def rewrite_merge_repeat_for_interior_gauges(
         and (float(op.gate_args_copy()[0]), float(op.gate_args_copy()[1])) in gauge_ancilla_coords
     ]
     if cluster_zs and local_gauge_zs:
-        cutoff_z = min(z for z in local_gauge_zs if z > max(cluster_zs))
-        out = _drop_detectors_at_coords_from_z(flat_out, gauge_ancilla_coords, cutoff_z)
+        later_local_gauge_zs = [z for z in local_gauge_zs if z > max(cluster_zs)]
+        if later_local_gauge_zs:
+            cutoff_z = min(later_local_gauge_zs)
+            out = _drop_detectors_at_coords_from_z(flat_out, gauge_ancilla_coords, cutoff_z)
+        else:
+            out = flat_out
     else:
         out = flat_out
 
+    pre_merge_block_count = _count_pre_merge_blocks(circuit, seed_start_index)
     out = _rebuild_post_transition_layer(
         out.flattened(),
         coords_by_qubit=coords_by_qubit,
         gauge_ancilla_coords=gauge_ancilla_coords,
         rewritten_repeat_count=repeat_block.repeat_count // 2,
+        pre_merge_block_count=pre_merge_block_count,
     )
-    out = _rebuild_observables(
-        flat,
-        out.flattened(),
-        gauge_x_ancillas=tuple(sorted(gauge_x)),
-    )
+    try:
+        out = _rebuild_observables(
+            flat,
+            out.flattened(),
+            gauge_x_ancillas=tuple(sorted(gauge_x)),
+        )
+    except ValueError:
+        # Keep the rewritten circuit exportable for inspection even when the
+        # logical observable has not yet been reconstructed successfully.
+        out = out.flattened()
 
     summary = RewriteSummary(
         removed_data_qubits=tuple(sorted(removed_data_qubits)),

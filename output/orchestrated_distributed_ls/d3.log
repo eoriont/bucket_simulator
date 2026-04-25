@@ -1,7 +1,6 @@
-[Elijahs-MacBook-Pro-3][[18567,0],0][btl_tcp_component.c:1021:mca_btl_tcp_component_create_listen] bind() failed: Operation not permitted (1)
 Initializing simulator with configuration:
   Code distance: 3
-  Rounds: 3
+  Rounds: 5
   Physical error: 0.001
   Measurement error: 0.001
   Reset error: 0.001
@@ -9,33 +8,84 @@ Initializing simulator with configuration:
   Code type: rotated_memory_x
   MPI ranks: 1
 Initializing DISTRIBUTED lattice surgery circuit:
-  Mode: Seam-column merge, no merge data qubits, remote CX noise at QPU cut
+  Mode: Remote CNOTs only, no merge data qubits
   Code distance: 3
-  Merge rounds: 3
+  Schedule (pre, merge, post): (1, 3, 1)
 Distributed lattice surgery layout:
   Distance: 3
-  Total qubits: 35
+  Total qubits: 37
   Data qubits: 18 (2 × 9 = 18)
   Patch ancillas: 14
+  Seam ancillas: 2 (1 per patch)
   Merge ancillas: 3 (single column)
   No merge data qubits (remote CNOTs only)
   Patch A stabilizers: 7
   Patch B stabilizers: 7
+  Seam A stabilizers: 1
+  Seam B stabilizers: 1
   Merge stabilizers: 3
     Merge Z ancilla 16 at (3, 0) weight=2 [CROSS-BOUNDARY]
     Merge X ancilla 17 at (3, 1) weight=4 [CROSS-BOUNDARY]
     Merge Z ancilla 18 at (3, 2) weight=4 [CROSS-BOUNDARY]
   Cross-boundary stabilizers: 3
+  X gauge ancillas (0):
+  Z gauge ancillas (0):
+Remote CNOT noise model:
+  Requested distillation protocol: none
+  Effective distillation protocol: none
+  Monolithic baseline: disabled
+  Accurate RCX: disabled
+  Raw channel error: 0.011979
+  Distillation feasible: NO
+  Distillation rounds: 1
+  Backup batches (m): 1
+  Raw EPR fidelity: 0.99
+  Distilled EPR fidelity: 0.99
+  Distilled error: 0.01
+  Distillation success prob: 1
+  Probability all backup batches fail: 0
+  Effective channel error: 0.011979
+  Remote CNOT error: 0.011979
+  Concurrent distillation EPR slots required: 0
+  Distillation qubits required: 0
+  Monolithic equivalent qubits: 41
+  Distillation qubit overhead feasible: YES
+  Interconnect error add-on: 0
+  Final remote CNOT error target: 0.011979
+  Extra injected remote-only error: 0.011979
+Entanglement-limited idling (Eq. 2):
+  Remote CNOTs per cycle: 5
+  Raw pairs per distilled: 1
+  Distillation time: 1000 ns
+  Measurement delay: 660 ns
+  Idling time (max): 1 μs
+  Timing constraint satisfied: NO - cycle extended!
+  Idling errors (pX, pY, pZ): (0.00199202, 0.00199202, 0.000501739)
+  Total idling error: 0.00448578
 Distributed lattice surgery circuit generated:
-  Total qubits: 35
+  Total qubits: 37
   Data qubits: 18
-  Detectors: 74
-  Observables: 1
+  Detectors: 80
+  Observables: 2
 MWPM decoder initialized
+Bucket mode: 895 error mechanisms
+Total error rate: 0.826221
+Max bucket: 7
+Sampled buckets: 8
+Sampled probability mass: 0.999997
+Bias bound: 2.59e-06
+Bucket 0: P=4.38e-01, calib_faults=0/500, additional=5000
+Bucket 1: P=3.62e-01, calib_faults=44/500, additional=637
+Bucket 2: P=1.49e-01, calib_faults=91/500, additional=50
+Bucket 3: P=4.11e-02, calib_faults=129/500, additional=0
+Bucket 4: P=8.50e-03, calib_faults=139/500, additional=0
+Bucket 5: P=1.40e-03, calib_faults=178/500, additional=0
+Total samples taken: 9687
+Estimated LER: 0.070952 ± 0.004972 (95% CI)
 
 ===============================================
 Simulation Complete
 ===============================================
-Logical Error Rate: 0.509000
-(509/1000)
-Results written to: /Users/eli/dev/bucket_simulator/output/orchestrated_distributed_ls/results_20260207_145532.txt
+Logical Error Rate: 0.070000
+(70/1000)
+Results written to: /Users/eli/dev/bucket_simulator/output/orchestrated_distributed_ls/results_20260425_113800.txt

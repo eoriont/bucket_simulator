@@ -31,6 +31,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--t1", type=float, default=125e-6)
     parser.add_argument("--t2", type=float, default=200e-6)
     parser.add_argument("--monolithic-baseline", action="store_true")
+    parser.add_argument("--local-baseline", action="store_true")
     parser.add_argument("--split-axis", choices=("auto", "x", "y"), default="auto")
     parser.add_argument("--split-x", type=float)
     return parser.parse_args()
@@ -60,6 +61,7 @@ def main() -> None:
         t1_coherence_time=args.t1,
         t2_coherence_time=args.t2,
         monolithic_baseline=args.monolithic_baseline,
+        local_baseline=args.local_baseline,
         split_axis=args.split_axis,
         split_x=args.split_x,
     )
