@@ -1,0 +1,18 @@
+{
+  "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/raw_pairs_sweeps/enr_raw_pairs_d13_deformations_5to30_thesis_20260425_163153/circuits/noisy/simple_merge_only_x_k6_pre6_merge6_post0.rside.enr20000000.rawpairs.network_noisy.stim",
+  "shots": 5000,
+  "batch_shots": 1000,
+  "qubits": 743,
+  "detectors": 5784,
+  "observables": 1,
+  "logical_failures": 0,
+  "logical_error_rate": 0.0,
+  "runtime_seconds": 0.6226921081542969,
+  "detector_validation": "passed",
+  "mpi": {
+    "enabled": true,
+    "ranks": 2,
+    "mpi4py_available": true,
+    "total_batches": 6
+  }
+}

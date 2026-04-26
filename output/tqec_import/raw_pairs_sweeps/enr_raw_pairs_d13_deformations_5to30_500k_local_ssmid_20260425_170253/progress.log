@@ -1,0 +1,11 @@
+[2026-04-25 17:02:53] RUN_DIR /Users/eli/dev/bucket_simulator/output/tqec_import/raw_pairs_sweeps/enr_raw_pairs_d13_deformations_5to30_500k_local_ssmid_20260425_170253
+[2026-04-25 17:02:53] CONFIG source=simple_merge_only basis=X d=13 k=6 rounds_per_phase=14 mpi_ranks=10 max_concurrent_jobs=2
+[2026-04-25 17:02:53] PREP variant=none
+[2026-04-25 17:02:53] READY variant=none clean_stim=simple_merge_only_x_k6_pre14_merge14_post0.none.stim
+[2026-04-25 17:02:53] PREP variant=lside
+[2026-04-25 17:02:53] READY variant=lside clean_stim=simple_merge_only_x_k6_pre14_merge14_post0.lside.stim
+[2026-04-25 17:02:53] PREP variant=rside
+[2026-04-25 17:02:53] READY variant=rside clean_stim=simple_merge_only_x_k6_pre14_merge14_post0.rside.stim
+[2026-04-25 17:02:53] PREP variant=twoside
+[2026-04-25 17:02:53] READY variant=twoside clean_stim=simple_merge_only_x_k6_pre14_merge14_post0.twoside.stim
+[2026-04-25 17:02:53] PREP variant=ss_mid

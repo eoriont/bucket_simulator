@@ -1,0 +1,521 @@
+{
+  "source": "simple_merge_only",
+  "basis": "X",
+  "physical_error": 0.001,
+  "measurement_delay": 6.6e-07,
+  "mpi_ranks": 4,
+  "batch_shots": 25000,
+  "shots_per_point": 100000,
+  "circuit_k": 2,
+  "rounds_per_phase": 6,
+  "variants": [
+    "none",
+    "ss_mid=5,11"
+  ],
+  "results": [
+    {
+      "variant": "none",
+      "export_args": [],
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k2_pre6_merge6_post0.none.stim",
+      "entanglement_rate_values": [
+        1000000.0,
+        2500000.0,
+        5000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 1000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr1000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr1000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr1000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 25000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 10250,
+            "logical_error_rate": 0.1025,
+            "runtime_seconds": 0.4222269058227539,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 4,
+              "mpi4py_available": true,
+              "total_batches": 4
+            }
+          }
+        },
+        {
+          "entanglement_rate": 2500000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr2500000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr2500000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr2500000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 25000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 2283,
+            "logical_error_rate": 0.02283,
+            "runtime_seconds": 0.234205961227417,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 4,
+              "mpi4py_available": true,
+              "total_batches": 4
+            }
+          }
+        },
+        {
+          "entanglement_rate": 5000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr5000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr5000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 9,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 6,
+              "remote_cnots_per_body": 9
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.none.enr5000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 25000,
+            "qubits": 127,
+            "detectors": 858,
+            "observables": 1,
+            "logical_failures": 968,
+            "logical_error_rate": 0.00968,
+            "runtime_seconds": 0.18939733505249023,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 4,
+              "mpi4py_available": true,
+              "total_batches": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "variant": "ss_mid",
+      "export_args": [
+        "--remove-data",
+        "(5,11)"
+      ],
+      "clean_stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/generated/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.stim",
+      "entanglement_rate_values": [
+        1000000.0,
+        2500000.0,
+        5000000.0
+      ],
+      "results": [
+        {
+          "entanglement_rate": 1000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr1000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr1000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 7,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 7
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr1000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 25000,
+            "qubits": 127,
+            "detectors": 767,
+            "observables": 1,
+            "logical_failures": 0,
+            "logical_error_rate": 0.0,
+            "runtime_seconds": 0.3577919006347656,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 4,
+              "mpi4py_available": true,
+              "total_batches": 4
+            }
+          }
+        },
+        {
+          "entanglement_rate": 2500000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr2500000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr2500000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 7,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 7
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr2500000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 25000,
+            "qubits": 127,
+            "detectors": 767,
+            "observables": 1,
+            "logical_failures": 0,
+            "logical_error_rate": 0.0,
+            "runtime_seconds": 0.23271799087524414,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 4,
+              "mpi4py_available": true,
+              "total_batches": 4
+            }
+          }
+        },
+        {
+          "entanglement_rate": 5000000.0,
+          "timing_summary_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr5000000.rawpairs.network_noisy.json",
+          "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr5000000.rawpairs.network_noisy.stim",
+          "required_epr_pairs_per_round": 7,
+          "remaining_remote_cnots_per_section": [
+            {
+              "section_index": 0,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 1,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 2,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 3,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 4,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 5,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 6,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 7,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 8,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 9,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 10,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 11,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 12,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 13,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 14,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 15,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 6
+            },
+            {
+              "section_index": 16,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 7
+            },
+            {
+              "section_index": 17,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            },
+            {
+              "section_index": 18,
+              "repeat_count": 1,
+              "remote_cnots_per_body": 0
+            }
+          ],
+          "timing_constraint_satisfied": false,
+          "ler_result": {
+            "stim_path": "/Users/eli/dev/bucket_simulator/output/tqec_import/injected/simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.enr5000000.rawpairs.network_noisy.stim",
+            "shots": 100000,
+            "batch_shots": 25000,
+            "qubits": 127,
+            "detectors": 767,
+            "observables": 1,
+            "logical_failures": 0,
+            "logical_error_rate": 0.0,
+            "runtime_seconds": 0.1957869529724121,
+            "detector_validation": "passed",
+            "mpi": {
+              "enabled": true,
+              "ranks": 4,
+              "mpi4py_available": true,
+              "total_batches": 4
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

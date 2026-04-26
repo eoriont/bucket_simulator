@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from paths import GENERATED_ROOT, INJECTED_ROOT, LER_ROOT, PROJECT_ROOT
-from sweep_enr_protocol import build_env, ensure_clean_circuit, schedule_for_circuit_k, validate_deterministic_circuit
+from sweep_enr_protocol import build_env, ensure_clean_circuit, schedule_for_circuit_k, validate_ler_ready_circuit
 
 
 def parse_csv_floats(text: str) -> list[float]:
@@ -100,6 +100,8 @@ def parse_variant(spec: str) -> DeformationVariant:
         return DeformationVariant(label="none", export_args=())
     if text in {"lside", "rside", "twoside"}:
         return DeformationVariant(label=text, export_args=("--mode", text))
+    if text == "ss_mid":
+        return DeformationVariant(label="ss_mid", export_args=("--remove-data", "(5,11)"))
 
     match = re.fullmatch(r"(?:(?P<label>[A-Za-z0-9_-]+)=)?ss@?(?P<x>-?\d+(?:\.\d+)?),(?P<y>-?\d+(?:\.\d+)?)", text)
     if match:
@@ -181,7 +183,7 @@ def main() -> None:
             rounds_per_phase=args.rounds_per_phase,
             variant=variant,
         )
-        validate_deterministic_circuit(clean)
+        validate_ler_ready_circuit(clean)
 
         variant_result = {
             "variant": variant.label,

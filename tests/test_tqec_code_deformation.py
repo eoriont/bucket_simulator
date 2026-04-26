@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -81,6 +83,36 @@ class TqecCodeDeformationTest(unittest.TestCase):
         self.assertEqual(both.suppressed_ancillas, frozenset({6, 29, 97, 120}))
         self.assertEqual(both.dropped_detector_coords, ())
         self.assertGreater(both.circuit.detector_error_model(allow_gauge_detectors=False).num_detectors, 0)
+
+    def test_ss_mid_interior_deformation_keeps_one_logical_observable(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_path = Path(temp_dir) / "test_ss_mid.stim"
+            subprocess.run(
+                [
+                    str(PROJECT_ROOT / ".venv-tqec" / "bin" / "python"),
+                    str(PROJECT_ROOT / "python" / "tqec_import" / "export_stim.py"),
+                    "--source",
+                    "simple_merge_only",
+                    "--basis",
+                    "X",
+                    "--k",
+                    "2",
+                    "--syndrome-rounds",
+                    "6",
+                    "--remove-data",
+                    "(5,11)",
+                    "--out",
+                    str(output_path),
+                ],
+                cwd=PROJECT_ROOT,
+                check=True,
+            )
+
+            circuit = stim.Circuit.from_file(output_path)
+            self.assertEqual(circuit.num_observables, 1)
+            self.assertIn("OBSERVABLE_INCLUDE", output_path.read_text())
+            dem = circuit.detector_error_model(allow_gauge_detectors=False)
+            self.assertGreater(dem.num_detectors, 0)
 
 
 if __name__ == "__main__":

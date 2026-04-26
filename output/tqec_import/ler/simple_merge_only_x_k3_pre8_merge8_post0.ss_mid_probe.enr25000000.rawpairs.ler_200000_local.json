@@ -1,0 +1,18 @@
+{
+  "stim_path": "output/tqec_import/injected/simple_merge_only_x_k3_pre8_merge8_post0.ss_mid_probe.enr25000000.rawpairs.network_noisy.stim",
+  "shots": 200000,
+  "batch_shots": 50000,
+  "qubits": 233,
+  "detectors": 1929,
+  "observables": 1,
+  "logical_failures": 0,
+  "logical_error_rate": 0.0,
+  "runtime_seconds": 2.449331045150757,
+  "detector_validation": "passed",
+  "mpi": {
+    "enabled": false,
+    "ranks": 1,
+    "mpi4py_available": true,
+    "total_batches": 4
+  }
+}

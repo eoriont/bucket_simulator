@@ -1,0 +1,46 @@
+[2026-04-25 20:05:48] RUN_DIR /Users/eli/dev/bucket_simulator/output/tqec_import/raw_pairs_sweeps/enr_raw_pairs_d13_ss_mid_only_500k_local_20260425_200548
+[2026-04-25 20:05:48] CONFIG source=simple_merge_only basis=X d=13 k=6 rounds_per_phase=14 mpi_ranks=10 max_concurrent_jobs=2
+[2026-04-25 20:05:48] PREP variant=ss_mid
+[2026-04-25 20:05:48] READY variant=ss_mid clean_stim=simple_merge_only_x_k6_pre14_merge14_post0.ss_mid.stim
+[2026-04-25 20:05:48] QUEUE total_jobs=10
+[2026-04-25 20:05:48] START [1/10] ss_mid @ 5.0MHz
+[2026-04-25 20:05:48] START [2/10] ss_mid @ 7.5MHz
+[2026-04-25 20:05:54] INJECTED [2/10] ss_mid @ 7.5MHz required_epr_pairs_per_round=25
+[2026-04-25 20:05:54] INJECTED [1/10] ss_mid @ 5.0MHz required_epr_pairs_per_round=25
+[2026-04-25 20:07:38] DONE [2/10] ss_mid @ 7.5MHz ler=0 runtime=109.1s
+[2026-04-25 20:07:38] START [3/10] ss_mid @ 10.0MHz
+[2026-04-25 20:07:38] PROGRESS completed=1/10
+[2026-04-25 20:07:40] DONE [1/10] ss_mid @ 5.0MHz ler=0 runtime=111.8s
+[2026-04-25 20:07:40] START [4/10] ss_mid @ 12.5MHz
+[2026-04-25 20:07:40] PROGRESS completed=2/10
+[2026-04-25 20:07:43] INJECTED [3/10] ss_mid @ 10.0MHz required_epr_pairs_per_round=25
+[2026-04-25 20:07:46] INJECTED [4/10] ss_mid @ 12.5MHz required_epr_pairs_per_round=25
+[2026-04-25 20:08:52] DONE [3/10] ss_mid @ 10.0MHz ler=0 runtime=74.0s
+[2026-04-25 20:08:52] START [5/10] ss_mid @ 15.0MHz
+[2026-04-25 20:08:52] PROGRESS completed=3/10
+[2026-04-25 20:08:52] DONE [4/10] ss_mid @ 12.5MHz ler=0 runtime=72.0s
+[2026-04-25 20:08:52] START [6/10] ss_mid @ 17.5MHz
+[2026-04-25 20:08:52] PROGRESS completed=4/10
+[2026-04-25 20:08:57] INJECTED [5/10] ss_mid @ 15.0MHz required_epr_pairs_per_round=25
+[2026-04-25 20:08:58] INJECTED [6/10] ss_mid @ 17.5MHz required_epr_pairs_per_round=25
+[2026-04-25 20:10:11] DONE [6/10] ss_mid @ 17.5MHz ler=0 runtime=78.4s
+[2026-04-25 20:10:11] START [7/10] ss_mid @ 20.0MHz
+[2026-04-25 20:10:11] PROGRESS completed=5/10
+[2026-04-25 20:10:12] DONE [5/10] ss_mid @ 15.0MHz ler=0 runtime=80.0s
+[2026-04-25 20:10:12] START [8/10] ss_mid @ 22.5MHz
+[2026-04-25 20:10:12] PROGRESS completed=6/10
+[2026-04-25 20:10:16] INJECTED [7/10] ss_mid @ 20.0MHz required_epr_pairs_per_round=25
+[2026-04-25 20:10:17] INJECTED [8/10] ss_mid @ 22.5MHz required_epr_pairs_per_round=25
+[2026-04-25 20:11:29] DONE [8/10] ss_mid @ 22.5MHz ler=0 runtime=77.3s
+[2026-04-25 20:11:29] START [9/10] ss_mid @ 25.0MHz
+[2026-04-25 20:11:29] PROGRESS completed=7/10
+[2026-04-25 20:11:29] DONE [7/10] ss_mid @ 20.0MHz ler=0 runtime=78.2s
+[2026-04-25 20:11:29] START [10/10] ss_mid @ 30.0MHz
+[2026-04-25 20:11:29] PROGRESS completed=8/10
+[2026-04-25 20:11:34] INJECTED [9/10] ss_mid @ 25.0MHz required_epr_pairs_per_round=25
+[2026-04-25 20:11:34] INJECTED [10/10] ss_mid @ 30.0MHz required_epr_pairs_per_round=25
+[2026-04-25 20:13:30] DONE [10/10] ss_mid @ 30.0MHz ler=0 runtime=121.1s
+[2026-04-25 20:13:30] PROGRESS completed=9/10
+[2026-04-25 20:13:30] DONE [9/10] ss_mid @ 25.0MHz ler=0 runtime=121.5s
+[2026-04-25 20:13:30] PROGRESS completed=10/10
+[2026-04-25 20:13:30] SUMMARY /Users/eli/dev/bucket_simulator/output/tqec_import/raw_pairs_sweeps/enr_raw_pairs_d13_ss_mid_only_500k_local_20260425_200548/summary.json

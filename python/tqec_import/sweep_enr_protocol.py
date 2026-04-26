@@ -192,6 +192,13 @@ def validate_deterministic_circuit(path: Path) -> None:
     circuit.detector_error_model(allow_gauge_detectors=False)
 
 
+def validate_ler_ready_circuit(path: Path) -> None:
+    circuit = stim.Circuit.from_file(path)
+    circuit.detector_error_model(allow_gauge_detectors=False)
+    if circuit.num_observables < 1:
+        raise ValueError(f"Expected at least one logical observable in {path}, found none.")
+
+
 def schedule_for_circuit_k(circuit_k: int, rounds_per_phase: int | None) -> RoundSchedule:
     if rounds_per_phase is not None:
         return RoundSchedule(

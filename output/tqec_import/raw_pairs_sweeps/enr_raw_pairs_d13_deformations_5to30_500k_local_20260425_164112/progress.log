@@ -1,0 +1,172 @@
+[2026-04-25 16:41:12] RUN_DIR /Users/eli/dev/bucket_simulator/output/tqec_import/raw_pairs_sweeps/enr_raw_pairs_d13_deformations_5to30_500k_local_20260425_164112
+[2026-04-25 16:41:12] CONFIG source=simple_merge_only basis=X d=13 k=6 rounds_per_phase=14 mpi_ranks=10 max_concurrent_jobs=2
+[2026-04-25 16:41:12] PREP variant=none
+[2026-04-25 16:41:12] READY variant=none clean_stim=simple_merge_only_x_k6_pre14_merge14_post0.none.stim
+[2026-04-25 16:41:12] PREP variant=lside
+[2026-04-25 16:41:16] READY variant=lside clean_stim=simple_merge_only_x_k6_pre14_merge14_post0.lside.stim
+[2026-04-25 16:41:16] PREP variant=rside
+[2026-04-25 16:41:19] READY variant=rside clean_stim=simple_merge_only_x_k6_pre14_merge14_post0.rside.stim
+[2026-04-25 16:41:19] PREP variant=twoside
+[2026-04-25 16:41:23] READY variant=twoside clean_stim=simple_merge_only_x_k6_pre14_merge14_post0.twoside.stim
+[2026-04-25 16:41:23] QUEUE total_jobs=40
+[2026-04-25 16:41:23] START [1/40] none @ 5.0MHz
+[2026-04-25 16:41:23] START [2/40] none @ 7.5MHz
+[2026-04-25 16:41:24] INJECTED [2/40] none @ 7.5MHz required_epr_pairs_per_round=25
+[2026-04-25 16:41:24] INJECTED [1/40] none @ 5.0MHz required_epr_pairs_per_round=25
+[2026-04-25 16:42:29] DONE [2/40] none @ 7.5MHz ler=0.000976 runtime=65.7s
+[2026-04-25 16:42:29] START [3/40] none @ 10.0MHz
+[2026-04-25 16:42:29] PROGRESS completed=1/40
+[2026-04-25 16:42:30] INJECTED [3/40] none @ 10.0MHz required_epr_pairs_per_round=25
+[2026-04-25 16:42:33] DONE [1/40] none @ 5.0MHz ler=0.00525 runtime=70.4s
+[2026-04-25 16:42:33] START [4/40] none @ 12.5MHz
+[2026-04-25 16:42:33] PROGRESS completed=2/40
+[2026-04-25 16:42:35] INJECTED [4/40] none @ 12.5MHz required_epr_pairs_per_round=25
+[2026-04-25 16:43:24] DONE [3/40] none @ 10.0MHz ler=0.000318 runtime=55.5s
+[2026-04-25 16:43:24] START [5/40] none @ 15.0MHz
+[2026-04-25 16:43:24] PROGRESS completed=3/40
+[2026-04-25 16:43:25] DONE [4/40] none @ 12.5MHz ler=0.000132 runtime=51.1s
+[2026-04-25 16:43:25] START [6/40] none @ 17.5MHz
+[2026-04-25 16:43:25] PROGRESS completed=4/40
+[2026-04-25 16:43:25] INJECTED [5/40] none @ 15.0MHz required_epr_pairs_per_round=25
+[2026-04-25 16:43:25] INJECTED [6/40] none @ 17.5MHz required_epr_pairs_per_round=25
+[2026-04-25 16:44:23] DONE [6/40] none @ 17.5MHz ler=3.6e-05 runtime=58.1s
+[2026-04-25 16:44:23] START [7/40] none @ 20.0MHz
+[2026-04-25 16:44:23] PROGRESS completed=5/40
+[2026-04-25 16:44:23] DONE [5/40] none @ 15.0MHz ler=7.6e-05 runtime=58.9s
+[2026-04-25 16:44:23] START [8/40] none @ 22.5MHz
+[2026-04-25 16:44:23] PROGRESS completed=6/40
+[2026-04-25 16:44:24] INJECTED [7/40] none @ 20.0MHz required_epr_pairs_per_round=25
+[2026-04-25 16:44:24] INJECTED [8/40] none @ 22.5MHz required_epr_pairs_per_round=25
+[2026-04-25 16:45:14] DONE [8/40] none @ 22.5MHz ler=2e-05 runtime=51.2s
+[2026-04-25 16:45:14] START [9/40] none @ 25.0MHz
+[2026-04-25 16:45:14] PROGRESS completed=7/40
+[2026-04-25 16:45:14] DONE [7/40] none @ 20.0MHz ler=3.4e-05 runtime=51.7s
+[2026-04-25 16:45:14] START [10/40] none @ 30.0MHz
+[2026-04-25 16:45:14] PROGRESS completed=8/40
+[2026-04-25 16:45:15] INJECTED [9/40] none @ 25.0MHz required_epr_pairs_per_round=25
+[2026-04-25 16:45:15] INJECTED [10/40] none @ 30.0MHz required_epr_pairs_per_round=25
+[2026-04-25 16:46:11] DONE [10/40] none @ 30.0MHz ler=0 runtime=56.6s
+[2026-04-25 16:46:11] START [11/40] lside @ 5.0MHz
+[2026-04-25 16:46:11] PROGRESS completed=9/40
+[2026-04-25 16:46:11] DONE [9/40] none @ 25.0MHz ler=1.8e-05 runtime=56.9s
+[2026-04-25 16:46:11] START [12/40] lside @ 7.5MHz
+[2026-04-25 16:46:11] PROGRESS completed=10/40
+[2026-04-25 16:46:15] INJECTED [11/40] lside @ 5.0MHz required_epr_pairs_per_round=22
+[2026-04-25 16:46:15] INJECTED [12/40] lside @ 7.5MHz required_epr_pairs_per_round=22
+[2026-04-25 16:47:16] DONE [12/40] lside @ 7.5MHz ler=0.000734 runtime=64.5s
+[2026-04-25 16:47:16] START [13/40] lside @ 10.0MHz
+[2026-04-25 16:47:16] PROGRESS completed=11/40
+[2026-04-25 16:47:18] DONE [11/40] lside @ 5.0MHz ler=0.004234 runtime=67.2s
+[2026-04-25 16:47:18] START [14/40] lside @ 12.5MHz
+[2026-04-25 16:47:18] PROGRESS completed=12/40
+[2026-04-25 16:47:21] INJECTED [13/40] lside @ 10.0MHz required_epr_pairs_per_round=22
+[2026-04-25 16:47:23] INJECTED [14/40] lside @ 12.5MHz required_epr_pairs_per_round=22
+[2026-04-25 16:48:04] DONE [13/40] lside @ 10.0MHz ler=0.000268 runtime=48.7s
+[2026-04-25 16:48:04] START [15/40] lside @ 15.0MHz
+[2026-04-25 16:48:04] PROGRESS completed=13/40
+[2026-04-25 16:48:05] DONE [14/40] lside @ 12.5MHz ler=0.000142 runtime=47.2s
+[2026-04-25 16:48:05] START [16/40] lside @ 17.5MHz
+[2026-04-25 16:48:05] PROGRESS completed=14/40
+[2026-04-25 16:48:09] INJECTED [15/40] lside @ 15.0MHz required_epr_pairs_per_round=22
+[2026-04-25 16:48:10] INJECTED [16/40] lside @ 17.5MHz required_epr_pairs_per_round=22
+[2026-04-25 16:48:50] DONE [15/40] lside @ 15.0MHz ler=7e-05 runtime=45.9s
+[2026-04-25 16:48:50] START [17/40] lside @ 20.0MHz
+[2026-04-25 16:48:50] PROGRESS completed=15/40
+[2026-04-25 16:48:52] DONE [16/40] lside @ 17.5MHz ler=4e-05 runtime=47.1s
+[2026-04-25 16:48:52] START [18/40] lside @ 22.5MHz
+[2026-04-25 16:48:52] PROGRESS completed=16/40
+[2026-04-25 16:48:55] INJECTED [17/40] lside @ 20.0MHz required_epr_pairs_per_round=22
+[2026-04-25 16:48:57] INJECTED [18/40] lside @ 22.5MHz required_epr_pairs_per_round=22
+[2026-04-25 16:49:38] DONE [17/40] lside @ 20.0MHz ler=2.4e-05 runtime=47.5s
+[2026-04-25 16:49:38] START [19/40] lside @ 25.0MHz
+[2026-04-25 16:49:38] PROGRESS completed=17/40
+[2026-04-25 16:49:39] DONE [18/40] lside @ 22.5MHz ler=2.4e-05 runtime=46.3s
+[2026-04-25 16:49:39] START [20/40] lside @ 30.0MHz
+[2026-04-25 16:49:39] PROGRESS completed=18/40
+[2026-04-25 16:49:42] INJECTED [19/40] lside @ 25.0MHz required_epr_pairs_per_round=22
+[2026-04-25 16:49:43] INJECTED [20/40] lside @ 30.0MHz required_epr_pairs_per_round=22
+[2026-04-25 16:50:20] DONE [19/40] lside @ 25.0MHz ler=2.8e-05 runtime=42.7s
+[2026-04-25 16:50:20] START [21/40] rside @ 5.0MHz
+[2026-04-25 16:50:20] PROGRESS completed=19/40
+[2026-04-25 16:50:23] DONE [20/40] lside @ 30.0MHz ler=1.2e-05 runtime=44.0s
+[2026-04-25 16:50:23] START [22/40] rside @ 7.5MHz
+[2026-04-25 16:50:23] PROGRESS completed=20/40
+[2026-04-25 16:50:25] INJECTED [21/40] rside @ 5.0MHz required_epr_pairs_per_round=24
+[2026-04-25 16:50:28] INJECTED [22/40] rside @ 7.5MHz required_epr_pairs_per_round=24
+[2026-04-25 16:51:26] DONE [22/40] rside @ 7.5MHz ler=0.00144 runtime=63.0s
+[2026-04-25 16:51:26] START [23/40] rside @ 10.0MHz
+[2026-04-25 16:51:26] PROGRESS completed=21/40
+[2026-04-25 16:51:28] DONE [21/40] rside @ 5.0MHz ler=0.007166 runtime=67.5s
+[2026-04-25 16:51:28] START [24/40] rside @ 12.5MHz
+[2026-04-25 16:51:28] PROGRESS completed=22/40
+[2026-04-25 16:51:31] INJECTED [23/40] rside @ 10.0MHz required_epr_pairs_per_round=24
+[2026-04-25 16:51:33] INJECTED [24/40] rside @ 12.5MHz required_epr_pairs_per_round=24
+[2026-04-25 16:52:21] DONE [23/40] rside @ 10.0MHz ler=0.00053 runtime=54.9s
+[2026-04-25 16:52:21] START [25/40] rside @ 15.0MHz
+[2026-04-25 16:52:21] PROGRESS completed=23/40
+[2026-04-25 16:52:21] DONE [24/40] rside @ 12.5MHz ler=0.000226 runtime=53.5s
+[2026-04-25 16:52:21] START [26/40] rside @ 17.5MHz
+[2026-04-25 16:52:21] PROGRESS completed=24/40
+[2026-04-25 16:52:25] INJECTED [25/40] rside @ 15.0MHz required_epr_pairs_per_round=24
+[2026-04-25 16:52:26] INJECTED [26/40] rside @ 17.5MHz required_epr_pairs_per_round=24
+[2026-04-25 16:53:26] DONE [25/40] rside @ 15.0MHz ler=0.000132 runtime=65.0s
+[2026-04-25 16:53:26] START [27/40] rside @ 20.0MHz
+[2026-04-25 16:53:26] PROGRESS completed=25/40
+[2026-04-25 16:53:26] DONE [26/40] rside @ 17.5MHz ler=4.8e-05 runtime=64.8s
+[2026-04-25 16:53:26] START [28/40] rside @ 22.5MHz
+[2026-04-25 16:53:26] PROGRESS completed=26/40
+[2026-04-25 16:53:30] INJECTED [27/40] rside @ 20.0MHz required_epr_pairs_per_round=24
+[2026-04-25 16:53:31] INJECTED [28/40] rside @ 22.5MHz required_epr_pairs_per_round=24
+[2026-04-25 16:54:37] DONE [28/40] rside @ 22.5MHz ler=3.8e-05 runtime=70.9s
+[2026-04-25 16:54:37] START [29/40] rside @ 25.0MHz
+[2026-04-25 16:54:37] PROGRESS completed=27/40
+[2026-04-25 16:54:37] DONE [27/40] rside @ 20.0MHz ler=4.6e-05 runtime=71.7s
+[2026-04-25 16:54:37] START [30/40] rside @ 30.0MHz
+[2026-04-25 16:54:37] PROGRESS completed=28/40
+[2026-04-25 16:54:42] INJECTED [29/40] rside @ 25.0MHz required_epr_pairs_per_round=24
+[2026-04-25 16:54:42] INJECTED [30/40] rside @ 30.0MHz required_epr_pairs_per_round=24
+[2026-04-25 16:55:32] DONE [30/40] rside @ 30.0MHz ler=2.2e-05 runtime=54.4s
+[2026-04-25 16:55:32] START [31/40] twoside @ 5.0MHz
+[2026-04-25 16:55:32] PROGRESS completed=29/40
+[2026-04-25 16:55:32] DONE [29/40] rside @ 25.0MHz ler=3.8e-05 runtime=54.9s
+[2026-04-25 16:55:32] START [32/40] twoside @ 7.5MHz
+[2026-04-25 16:55:32] PROGRESS completed=30/40
+[2026-04-25 16:55:36] INJECTED [31/40] twoside @ 5.0MHz required_epr_pairs_per_round=21
+[2026-04-25 16:55:36] INJECTED [32/40] twoside @ 7.5MHz required_epr_pairs_per_round=21
+[2026-04-25 16:56:39] DONE [32/40] twoside @ 7.5MHz ler=0.001172 runtime=67.1s
+[2026-04-25 16:56:39] START [33/40] twoside @ 10.0MHz
+[2026-04-25 16:56:39] PROGRESS completed=31/40
+[2026-04-25 16:56:42] DONE [31/40] twoside @ 5.0MHz ler=0.005224 runtime=69.8s
+[2026-04-25 16:56:42] START [34/40] twoside @ 12.5MHz
+[2026-04-25 16:56:42] PROGRESS completed=32/40
+[2026-04-25 16:56:44] INJECTED [33/40] twoside @ 10.0MHz required_epr_pairs_per_round=21
+[2026-04-25 16:56:47] INJECTED [34/40] twoside @ 12.5MHz required_epr_pairs_per_round=21
+[2026-04-25 16:57:29] DONE [33/40] twoside @ 10.0MHz ler=0.000462 runtime=49.6s
+[2026-04-25 16:57:29] START [35/40] twoside @ 15.0MHz
+[2026-04-25 16:57:29] PROGRESS completed=33/40
+[2026-04-25 16:57:30] DONE [34/40] twoside @ 12.5MHz ler=0.000196 runtime=48.4s
+[2026-04-25 16:57:30] START [36/40] twoside @ 17.5MHz
+[2026-04-25 16:57:30] PROGRESS completed=34/40
+[2026-04-25 16:57:33] INJECTED [35/40] twoside @ 15.0MHz required_epr_pairs_per_round=21
+[2026-04-25 16:57:35] INJECTED [36/40] twoside @ 17.5MHz required_epr_pairs_per_round=21
+[2026-04-25 16:58:20] DONE [35/40] twoside @ 15.0MHz ler=0.00013 runtime=51.7s
+[2026-04-25 16:58:20] START [37/40] twoside @ 20.0MHz
+[2026-04-25 16:58:20] PROGRESS completed=35/40
+[2026-04-25 16:58:21] DONE [36/40] twoside @ 17.5MHz ler=9.8e-05 runtime=50.8s
+[2026-04-25 16:58:21] START [38/40] twoside @ 22.5MHz
+[2026-04-25 16:58:21] PROGRESS completed=36/40
+[2026-04-25 16:58:25] INJECTED [37/40] twoside @ 20.0MHz required_epr_pairs_per_round=21
+[2026-04-25 16:58:25] INJECTED [38/40] twoside @ 22.5MHz required_epr_pairs_per_round=21
+[2026-04-25 16:59:14] DONE [37/40] twoside @ 20.0MHz ler=6.8e-05 runtime=53.1s
+[2026-04-25 16:59:14] START [39/40] twoside @ 25.0MHz
+[2026-04-25 16:59:14] PROGRESS completed=37/40
+[2026-04-25 16:59:14] DONE [38/40] twoside @ 22.5MHz ler=5.6e-05 runtime=53.0s
+[2026-04-25 16:59:14] START [40/40] twoside @ 30.0MHz
+[2026-04-25 16:59:14] PROGRESS completed=38/40
+[2026-04-25 16:59:18] INJECTED [39/40] twoside @ 25.0MHz required_epr_pairs_per_round=21
+[2026-04-25 16:59:18] INJECTED [40/40] twoside @ 30.0MHz required_epr_pairs_per_round=21
+[2026-04-25 17:00:13] DONE [40/40] twoside @ 30.0MHz ler=2e-05 runtime=58.7s
+[2026-04-25 17:00:13] PROGRESS completed=39/40
+[2026-04-25 17:00:13] DONE [39/40] twoside @ 25.0MHz ler=2.6e-05 runtime=59.0s
+[2026-04-25 17:00:13] PROGRESS completed=40/40
+[2026-04-25 17:00:13] SUMMARY /Users/eli/dev/bucket_simulator/output/tqec_import/raw_pairs_sweeps/enr_raw_pairs_d13_deformations_5to30_500k_local_20260425_164112/summary.json

@@ -256,6 +256,11 @@ def evaluate_remote_cnot_noise_model(protocol: str, rounds: int, num_remote_cnot
         remote_only_error = 0.0
         remote_cnot_error = config.physical_error
     else:
+        queue_wait = max(0.0, distillation_time - config.measurement_delay)
+        queue_penalty = 0.0
+        if queue_wait > 0.0 and config.t2_coherence_time > 0:
+            queue_penalty = 1.0 - exp(-queue_wait / config.t2_coherence_time)
+        remote_cnot_error = 1.0 - (1.0 - remote_cnot_error) * (1.0 - queue_penalty)
         if config.interconnect_error > 0:
             remote_cnot_error = 1.0 - (1.0 - remote_cnot_error) * (1.0 - config.interconnect_error)
         remote_only_error = remote_cnot_error

@@ -1,0 +1,23 @@
+{
+  "variants": [
+    {
+      "label": "ss_mid",
+      "export_args": [
+        "--remove-data",
+        "(5,11)"
+      ]
+    }
+  ],
+  "schedule": {
+    "pre_rounds": 14,
+    "merge_rounds": 14,
+    "post_rounds": 0
+  },
+  "naming": {
+    "circuit_k_meaning": "TQEC spatial scale parameter with distance d = 2*circuit_k + 1",
+    "deformation_baseline_aliases": [
+      "none",
+      "nosuper"
+    ]
+  }
+}

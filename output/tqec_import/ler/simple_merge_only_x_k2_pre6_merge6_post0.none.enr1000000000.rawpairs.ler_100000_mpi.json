@@ -5,9 +5,9 @@
   "qubits": 127,
   "detectors": 858,
   "observables": 1,
-  "logical_failures": 398,
-  "logical_error_rate": 0.00398,
-  "runtime_seconds": 0.09760904312133789,
+  "logical_failures": 413,
+  "logical_error_rate": 0.00413,
+  "runtime_seconds": 0.09744000434875488,
   "detector_validation": "passed",
   "mpi": {
     "enabled": true,

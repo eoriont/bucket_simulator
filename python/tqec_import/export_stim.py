@@ -182,6 +182,12 @@ def compile_and_write(
     remove_seam_border: str | None,
     deformation_mode: str | None,
 ) -> None:
+    print(
+        f"Exporting source={graph.name if hasattr(graph, 'name') else 'tqec'} "
+        f"k={k} syndrome_rounds={syndrome_rounds} remove_data={remove_data} "
+        f"deformation_mode={deformation_mode}",
+        flush=True,
+    )
     compile_kwargs = {
         "observables": observables if observables else "auto",
     }
@@ -189,22 +195,31 @@ def compile_and_write(
         # TQEC requires cube blocks to remain scalable in time. This affine form
         # evaluates to the requested round count at the chosen spatial scale k.
         compile_kwargs["block_temporal_height"] = LinearFunction(1, syndrome_rounds - k)
+    print("Compiling block graph...", flush=True)
     compiled = compile_block_graph(graph, **compile_kwargs)
+    print("Generating Stim circuit...", flush=True)
     circuit = compiled.generate_stim_circuit(
         k=k,
         noise_model=make_noise_model(noise),
         manhattan_radius=manhattan_radius,
     )
     if remove_data:
+        print("Applying interior or seam deformation...", flush=True)
+    if remove_data:
         removed_coords = parse_coordinate_list(remove_data)
         if supports_interior_gauge_rewrite(circuit, removed_coords):
+            print(f"Rewriting interior gauges for {len(removed_coords)} removed qubits...", flush=True)
             circuit, _summary = rewrite_merge_repeat_for_interior_gauges(circuit, removed_coords)
         else:
+            print(f"Applying code deformation for {len(removed_coords)} removed qubits...", flush=True)
             circuit = apply_code_deformation(circuit, removed_coords).circuit
     elif remove_seam_border:
+        print("Applying seam-border deformation...", flush=True)
         circuit = apply_code_deformation(circuit, [seam_border_coordinate(circuit, remove_seam_border)]).circuit
     elif deformation_mode:
+        print(f"Applying seam deformation mode {deformation_mode}...", flush=True)
         circuit = apply_code_deformation(circuit, deformation_coordinates_for_mode(circuit, deformation_mode)).circuit
+    print(f"Writing {out_path}...", flush=True)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(annotate_with_polygons(circuit), encoding="utf-8")
     print(

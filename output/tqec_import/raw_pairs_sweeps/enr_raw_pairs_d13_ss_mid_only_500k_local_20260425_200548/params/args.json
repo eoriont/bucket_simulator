@@ -1,0 +1,29 @@
+{
+  "source": "simple_merge_only",
+  "basis": "X",
+  "circuit_k": 6,
+  "rounds_per_phase": 14,
+  "deformation_modes": [
+    "ss_mid"
+  ],
+  "enr_values": [
+    5000000.0,
+    7500000.0,
+    10000000.0,
+    12500000.0,
+    15000000.0,
+    17500000.0,
+    20000000.0,
+    22500000.0,
+    25000000.0,
+    30000000.0
+  ],
+  "physical_error": 0.001,
+  "measurement_delay": 6.6e-07,
+  "shots": 500000,
+  "batch_shots": 250000,
+  "mpi_ranks": 10,
+  "max_concurrent_jobs": 2,
+  "name": "enr_raw_pairs_d13_ss_mid_only_500k_local",
+  "max_concurrent_jobs_resolved": 2
+}

@@ -1,0 +1,110 @@
+[
+  {
+    "variant": "none",
+    "enr": 1000000,
+    "ler": 0.17553,
+    "failures": 17553,
+    "detectors": 858,
+    "required_epr_pairs_per_round": 9,
+    "remote_cnot_error": 0.0542266602275987
+  },
+  {
+    "variant": "none",
+    "enr": 2500000,
+    "ler": 0.03596,
+    "failures": 3596,
+    "detectors": 858,
+    "required_epr_pairs_per_round": 9,
+    "remote_cnot_error": 0.028342922005740956
+  },
+  {
+    "variant": "none",
+    "enr": 5000000,
+    "ler": 0.0125,
+    "failures": 1250,
+    "detectors": 858,
+    "required_epr_pairs_per_round": 9,
+    "remote_cnot_error": 0.019558537869693193
+  },
+  {
+    "variant": "none",
+    "enr": 10000000,
+    "ler": 0.00604,
+    "failures": 604,
+    "detectors": 858,
+    "required_epr_pairs_per_round": 9,
+    "remote_cnot_error": 0.015136609413081259
+  },
+  {
+    "variant": "none",
+    "enr": 25000000,
+    "ler": 0.00408,
+    "failures": 408,
+    "detectors": 858,
+    "required_epr_pairs_per_round": 9,
+    "remote_cnot_error": 0.013954063959009999
+  },
+  {
+    "variant": "none",
+    "enr": 50000000,
+    "ler": 0.00413,
+    "failures": 413,
+    "detectors": 858,
+    "required_epr_pairs_per_round": 9,
+    "remote_cnot_error": 0.013954063959009999
+  },
+  {
+    "variant": "ss_mid",
+    "enr": 1000000,
+    "ler": 0.08442,
+    "failures": 8442,
+    "detectors": 767,
+    "required_epr_pairs_per_round": 7,
+    "remote_cnot_error": 0.04472148013913435
+  },
+  {
+    "variant": "ss_mid",
+    "enr": 2500000,
+    "ler": 0.05516,
+    "failures": 5516,
+    "detectors": 767,
+    "required_epr_pairs_per_round": 7,
+    "remote_cnot_error": 0.02444851006242521
+  },
+  {
+    "variant": "ss_mid",
+    "enr": 5000000,
+    "ler": 0.04517,
+    "failures": 4517,
+    "detectors": 767,
+    "required_epr_pairs_per_round": 7,
+    "remote_cnot_error": 0.017595692754599268
+  },
+  {
+    "variant": "ss_mid",
+    "enr": 10000000,
+    "ler": 0.03835,
+    "failures": 3835,
+    "detectors": 767,
+    "required_epr_pairs_per_round": 7,
+    "remote_cnot_error": 0.014151253426614163
+  },
+  {
+    "variant": "ss_mid",
+    "enr": 25000000,
+    "ler": 0.03881,
+    "failures": 3881,
+    "detectors": 767,
+    "required_epr_pairs_per_round": 7,
+    "remote_cnot_error": 0.013954063959009999
+  },
+  {
+    "variant": "ss_mid",
+    "enr": 50000000,
+    "ler": 0.03943,
+    "failures": 3943,
+    "detectors": 767,
+    "required_epr_pairs_per_round": 7,
+    "remote_cnot_error": 0.013954063959009999
+  }
+]

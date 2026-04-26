@@ -19,6 +19,7 @@
     "t1_coherence_time": 0.000125,
     "t2_coherence_time": 0.0002,
     "monolithic_baseline": false,
+    "local_baseline": false,
     "split_axis": "auto",
     "split_x": null
   },

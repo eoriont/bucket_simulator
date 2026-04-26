@@ -14,7 +14,7 @@ from datetime import datetime
 from pathlib import Path
 
 from paths import PROJECT_ROOT, create_experiment_run_paths
-from sweep_enr_protocol import build_env, schedule_for_circuit_k, validate_deterministic_circuit
+from sweep_enr_protocol import build_env, schedule_for_circuit_k, validate_ler_ready_circuit
 from sweep_enr_deformation_variants import DeformationVariant, export_clean_variant, parse_variant
 
 
@@ -349,7 +349,7 @@ def main() -> None:
             rounds_per_phase=args.rounds_per_phase,
             variant=variant,
         )
-        validate_deterministic_circuit(clean)
+        validate_ler_ready_circuit(clean)
         logger.log(f"READY variant={variant.label} clean_stim={clean.name}")
 
         run_clean = run_paths.clean_circuits_dir / clean.name

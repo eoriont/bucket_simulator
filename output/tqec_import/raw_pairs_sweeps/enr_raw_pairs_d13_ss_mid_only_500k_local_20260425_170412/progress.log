@@ -1,0 +1,3 @@
+[2026-04-25 17:04:12] RUN_DIR /Users/eli/dev/bucket_simulator/output/tqec_import/raw_pairs_sweeps/enr_raw_pairs_d13_ss_mid_only_500k_local_20260425_170412
+[2026-04-25 17:04:12] CONFIG source=simple_merge_only basis=X d=13 k=6 rounds_per_phase=14 mpi_ranks=10 max_concurrent_jobs=2
+[2026-04-25 17:04:12] PREP variant=ss_mid

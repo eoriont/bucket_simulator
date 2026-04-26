@@ -9,18 +9,20 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
 
-MODE_ORDER = ["none", "lside", "rside", "twoside"]
+MODE_ORDER = ["none", "lside", "rside", "twoside", "ss_mid"]
 MODE_COLORS = {
     "none": "#4C4C4C",
     "lside": "#1F77B4",
     "rside": "#D62728",
     "twoside": "#2CA02C",
+    "ss_mid": "#9467BD",
 }
 MODE_LABELS = {
     "none": "nosuper",
     "lside": "lside",
     "rside": "rside",
     "twoside": "twoside",
+    "ss_mid": "ss_mid",
 }
 
 
@@ -112,20 +114,11 @@ def plot_ler_vs_enr(rows: list[dict], run_dir: Path, summary: dict) -> Path:
     ax.grid(True, which="both", linestyle=":", alpha=0.4)
     ax.legend(framealpha=0.9, fontsize=9)
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:g}"))
-    ax.text(
-        0.99,
-        0.01,
-        "Zero-failure points shown at 0.5 / shots with arrows",
-        transform=ax.transAxes,
-        ha="right",
-        va="bottom",
-        fontsize=7.5,
-        alpha=0.8,
-    )
-
     add_shared_title(fig, summary)
     out_path = run_dir / "ler_vs_enr.png"
     fig.savefig(out_path, dpi=160, bbox_inches="tight")
+    fig.savefig(run_dir / "ler_vs_enr.svg", bbox_inches="tight")
+    fig.savefig(run_dir / "ler_vs_enr.pdf", bbox_inches="tight")
     plt.close(fig)
     return out_path
 
@@ -158,6 +151,8 @@ def plot_epr_pairs_vs_enr(rows: list[dict], run_dir: Path, summary: dict) -> Pat
     add_shared_title(fig, summary)
     out_path = run_dir / "required_epr_pairs_vs_enr.png"
     fig.savefig(out_path, dpi=160, bbox_inches="tight")
+    fig.savefig(run_dir / "required_epr_pairs_vs_enr.svg", bbox_inches="tight")
+    fig.savefig(run_dir / "required_epr_pairs_vs_enr.pdf", bbox_inches="tight")
     plt.close(fig)
     return out_path
 

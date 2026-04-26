@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 import tempfile
@@ -63,6 +64,51 @@ class TqecEnrSweepTest(unittest.TestCase):
             validate_deterministic_circuit(out)
             text = out.read_text()
             self.assertNotIn("post", text.lower())
+
+    def test_remote_cnot_noise_changes_with_entanglement_rate(self) -> None:
+        stim_path = PROJECT_ROOT / "output" / "tqec_import" / "generated" / "simple_merge_only_x_k2_pre6_merge6_post0.ss_mid.stim"
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_dir = Path(temp_dir)
+            low_json = temp_dir / "low.json"
+            high_json = temp_dir / "high.json"
+            low_stim = temp_dir / "low.stim"
+            high_stim = temp_dir / "high.stim"
+
+            for enr, out_stim, out_json in [(1_000_000, low_stim, low_json), (50_000_000, high_stim, high_json)]:
+                subprocess.run(
+                    [
+                        str(TQEC_PYTHON),
+                        str(PROJECT_ROOT / "python" / "tqec_import" / "inject_noise.py"),
+                        "--stim",
+                        str(stim_path),
+                        "--physical-error",
+                        "0.001",
+                        "--accurate-rcx",
+                        "--distillation-protocol",
+                        "none",
+                        "--distillation-rounds",
+                        "0",
+                        "--distillation-backup-batches",
+                        "1",
+                        "--entanglement-rate",
+                        str(enr),
+                        "--measurement-delay",
+                        "6.6e-07",
+                        "--out-stim",
+                        str(out_stim),
+                        "--out-json",
+                        str(out_json),
+                    ],
+                    cwd=PROJECT_ROOT,
+                    check=True,
+                    stdout=subprocess.DEVNULL,
+                )
+
+            low = json.loads(low_json.read_text())
+            high = json.loads(high_json.read_text())
+            low_rcx = max(section["remote_cnot_error"] for section in low["sections"])
+            high_rcx = max(section["remote_cnot_error"] for section in high["sections"])
+            self.assertGreater(low_rcx, high_rcx)
 
 
 if __name__ == "__main__":
